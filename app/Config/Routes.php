@@ -15,9 +15,6 @@ $routes->post('admin/login', 'admin\Login::login');
 $routes->get('admin/logout', 'admin\Login::logout');
 
 
-
-
-=======
 $routes->get('admin/profile', 'admin\Profile::index');
 $routes->get('admin/roles', 'admin\Roles::index');
 
