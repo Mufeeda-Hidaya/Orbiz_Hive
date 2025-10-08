@@ -1,0 +1,18 @@
+CRITICAL - 2025-10-08 10:23:12 --> Error: Class "App\Models\Admin\CategoryModel" not found
+[Method: GET, Route: admin/roles]
+in APPPATH\Controllers\admin\Roles.php on line 30.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\admin\Roles->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(498): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-10-08 10:52:17 --> Error: Class "App\Models\Admin\RolesModel" not found
+[Method: GET, Route: admin/roles]
+in APPPATH\Controllers\admin\Roles.php on line 30.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\admin\Roles->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(498): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))

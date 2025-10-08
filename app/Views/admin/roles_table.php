@@ -142,25 +142,36 @@
                 <div class="ms-3">
                     <h3 class="mb-0 h4 font-weight-bolder">Manage Roles</h3>
                     <p class="mb-4">
-
+                   
                     </p>
                 </div>
             </div>
             <div> &nbsp;</div>
-            <div class="card-body form-elements">
-                <form role="form" name="addRole" id="createroles" method="post" action="addRole.php">
-                    <div class="input-group input-group-outline mb-3 input-box">
-                        <label class="form-label">Add Role</label>
-                        <input type="text" name="role_name" id="role_name" class="form-control"
-                            oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '')">
-                    </div>
-                    <!-- Button aligned with input boxes -->
-                    <div class="input-group input-group-outline mt-3 mb-0">
-                        <button type="button" name="rolesSubmit" id="rolesSubmit"
-                            class="btn btn-dark btn-sm">Save</button>
-                    </div>
-                </form>
-
+         <div class="row">
+        <div class="col-12">
+          <div class="card my-4">
+            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+              <div class="bg-gradient-dark shadow-dark border-radius-lg pt-4 pb-3">
+                <h6 class="text-white text-capitalize ps-3">Roles table</h6>
+              </div>
             </div>
+            <div class="card-body px-0 pb-2">
+              <div class="table-responsive p-0">
+                <table class="table align-items-center mb-0" id="rolesList">
+                  <thead>
+                    <tr>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Sl.No</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Role Name</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Status</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Action</th>
+                      <th class="text-secondary opacity-7"></th>
+                    </tr>
+                  </thead>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
         </div>
