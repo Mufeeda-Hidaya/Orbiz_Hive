@@ -47,13 +47,6 @@ class Login extends BaseController
             ]);
         }
 
-        if ($user->status != 1) {
-            return $this->response->setJSON([
-                "success" => false,
-                "message" => "Your account is inactive. Contact admin."
-            ]);
-        }
-
         // Set session
         $this->session->set([
             'user_id' => $user->user_id,
@@ -67,6 +60,7 @@ class Login extends BaseController
             "redirect" => base_url('admin/dashboard')
         ]);
     }
+    
 
     public function logout()
     {

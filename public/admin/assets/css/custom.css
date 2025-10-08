@@ -1,3 +1,78 @@
 .input-box{
     width: 50% !important;
 }
+/* ====== LOGIN PAGE STYLES ====== */
+body, html {
+  height: 100%;
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+}
+
+.login-page {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: row; 
+}
+
+/* Left side: Welcome section with dark background */
+.login-left {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #3a3538; 
+  color: #fff;
+  text-align: center;
+  padding: 2rem;
+}
+
+.login-left h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
+.login-left p {
+  font-size: 1.2rem;
+  margin-top: 1rem;
+}
+
+/* Right side: Login form with light background */
+.login-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f8f9fa; 
+  color: #000;
+}
+
+.login-card {
+  width: 90%;
+  max-width: 580px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgb(0 0 0 / 10%);
+  background-color: #ffffff; 
+  color: #000;
+}
+
+.login-card .form-control {
+  background-color: #ffffff;
+  color: #000;
+  border: 1px solid #ccc;
+}
+
+.login-card .form-control::placeholder {
+  color: #888;
+}
+
+.captcha-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.captcha-box img {
+  height: 45px;
+  border-radius: 6px;
+  margin-right: 10px;
+}
