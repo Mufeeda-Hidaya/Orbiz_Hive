@@ -1,4 +1,5 @@
-     <footer class="footer py-4  ">
+
+  <footer class="footer py-4  ">
         <div class="container-fluid">
           <div class="row align-items-center justify-content-lg-between">
             <div class="col-lg-6 mb-lg-0 mb-4">
@@ -30,7 +31,9 @@
           </div>
         </div>
       </footer>
-        <div class="fixed-plugin">
+    </div>
+  </main>
+  <div class="fixed-plugin">
     <a class="fixed-plugin-button text-dark position-fixed px-3 py-2">
       <i class="material-symbols-rounded py-2">settings</i>
     </a>
@@ -105,28 +108,12 @@
     </div>
   </div>
   <!--   Core JS Files   -->
-<script src="<?= base_url(). ASSET_PATH; ?>admin/assets/js/core/popper.min.js"></script>
-<script src="<?= base_url(). ASSET_PATH; ?>admin/assets/js/core/bootstrap.min.js "></script>
-<script src="<?= base_url(). ASSET_PATH; ?>admin/assets/js/plugins/perfect-scrollbar.min.js "></script>
-<script src="<?= base_url(). ASSET_PATH; ?>admin/assets/js/plugins/smooth-scrollbar.min.js "></script>
-<script src="<?= base_url(). ASSET_PATH; ?>admin/assets/js/plugins/chartjs.min.js "></script>
-  <!-- Example card images -->
-  <img src="<?= base_url(). ASSET_PATH; ?>admin/assets/img/small-logos/logo-xd.svg " alt="Logo">
-  <img src="<?= base_url() . ASSET_PATH; ?>admin/assets/img/team-1.jpg" alt="Team">
-  <!-- Include JS scripts -->
   <script src="<?= base_url() . ASSET_PATH; ?>admin/assets/js/core/popper.min.js"></script>
+  <script src="<?= base_url() . ASSET_PATH; ?>admin/assets/js/core/bootstrap.min.js"></script>
   <script src="<?= base_url() . ASSET_PATH; ?>admin/assets/js/plugins/perfect-scrollbar.min.js"></script>
-
   <script src="<?= base_url() . ASSET_PATH; ?>admin/assets/js/plugins/smooth-scrollbar.min.js"></script>
-
   <script src="<?= base_url() . ASSET_PATH; ?>admin/assets/js/plugins/chartjs.min.js"></script>
-
-  <!-- <script src="<?= base_url('admin/assets/js/core/bootstrap.min.js') ?>"></script>
-  <script src="<?= base_url('admin/assets/js/plugins/perfect-scrollbar.min.js') ?>"></script>
-  <script src="<?= base_url('admin/assets/js/plugins/smooth-scrollbar.min.js') ?>"></script>
-  <script src="<?= base_url('admin/assets/js/plugins/chartjs.min.js') ?>"></script> -->
-
-    <script>
+  <script>
     var ctx = document.getElementById("chart-bars").getContext("2d");
 
     new Chart(ctx, {
@@ -368,8 +355,10 @@
       Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
     }
   </script>
-
-    <!-- Github buttons -->
+  <!-- Github buttons -->
   <script async defer src="https://buttons.github.io/buttons.js"></script>
   <!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
-<script src="<?= base_url('admin/assets/js/material-dashboard.min.js?v=3.2.0') ?>"></script>
+  <script src="<?= base_url() . ASSET_PATH; ?>admin/assets/js/material-dashboard.min.js?v=3.2.0"></script>
+</body>
+
+</html>
