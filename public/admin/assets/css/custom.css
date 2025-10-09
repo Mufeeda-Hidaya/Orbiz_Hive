@@ -78,10 +78,16 @@ body, html {
 .text-muted {
     color: #181818 !important;
     margin-top: 10px;
-  
 }
 .logo-img {
     width: 230px;
+}
+.header-center {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
 }
 
 
