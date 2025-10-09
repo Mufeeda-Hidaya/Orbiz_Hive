@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="<?php echo base_url().ASSET_PATH; ?>admin/assets/css/bootstrap.min.css" />
   <link rel="stylesheet" href="<?php echo base_url().ASSET_PATH; ?>admin/assets/css/material-dashboard.css?v=3.2.0" />
   <link rel="stylesheet" href="<?php echo base_url().ASSET_PATH; ?>admin/assets/css/custom.css" /> 
-  <link rel="icon" href="<?php echo base_url().ASSET_PATH; ?>admin/assets/img/logo.png" type="image/x-icon" />
+  <!-- <link rel="icon" href="<?php echo base_url().ASSET_PATH; ?>admin/assets/img/logo.png" type="image/x-icon" /> -->
 
   <!-- Font Awesome 6 Free CSS -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-pV5pC...==" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -21,8 +21,9 @@
     <!-- Left Side: Welcome Section (Dark) -->
     <div class="login-left">
       <div class="welcome-text">
-        <h1>Welcome to Orbiz Admin</h1>
-        <p>Manage everything with ease and security.</p>
+       <img src="<?= base_url() . ASSET_PATH; ?>admin/assets/img/logo-ct-dark.webp" class="logo-img">
+        <h1>Welcome to ORBIZ Admin</h1>
+        <p>Easily manage all your data securely in one place.</p>
       </div>
     </div>
 
@@ -38,13 +39,13 @@
           <form id="loginForm" method="post">
             <div class="mb-3">
               <label for="email" class="form-label">Email</label>
-              <input type="email" name="email" id="email" class="form-control" placeholder="Enter Email" required>
+              <input type="email" name="email" id="email" class="form-control" placeholder="Enter Email" required style="padding-left: 10px;">
             </div>
-            <div class="mb-3 position-relative">
+            <div class="mb-3">
               <label for="password" class="form-label">Password</label>
               <div class="input-group">
-                <input type="password" name="password" id="password" class="form-control" placeholder="Password" required>
-                <span class="input-group-text" id="togglePassword" style=" margin-right:20px; cursor: pointer;">
+                <input type="password" name="password" id="password" class="form-control" placeholder="Password" required style="padding-left: 10px;">
+                <span class="input-group-text position-absolute end-0 top-50 translate-middle-y" id="togglePassword" style=" margin-right:20px; cursor: pointer; z-index: 10;">
                   <i class="fas fa-eye-slash"></i>
                 </span>
               </div>
@@ -66,85 +67,72 @@
   <script>
     // Login form submission
     $('#loginCheck').click(function(e) {
-    e.preventDefault();
+        e.preventDefault();
 
-    let email = $('#email').val().trim();
-    let password = $('#password').val().trim();
-    let errorMessage = '';
+        let email = $('#email').val().trim();
+        let password = $('#password').val().trim();
+        let errorMessage = '';
 
-    // Field validation
-    if (email === '' && password === '') {
-        errorMessage = "Please Enter Email And Password.";
-    } else if (email === '') {
-        errorMessage = "Please Enter Your Email.";
-    } else if (password === '') {
-        errorMessage = "Please Enter Your Password.";
-    }
-
-    if (errorMessage !== '') {
-        showAlert(errorMessage, 'danger');
-        return;
-    }
-
-    // reCAPTCHA validation
-    let captchaResponse = grecaptcha.getResponse();
-    if (captchaResponse.length === 0) {
-        showAlert("Please Complete The reCAPTCHA.", 'danger');
-        return;
-    }
-
-    // Disable button and show spinner
-    let $btn = $('#loginCheck');
-    $btn.prop('disabled', true).html(
-        '<span class="spinner-border spinner-border-sm me-2"></span> Authenticating, Please Wait…'
-    );
-
-    // AJAX POST
-    let url = "<?php echo base_url('admin/login'); ?>"; 
-    $.post(url, $('#loginForm').serialize(), function(data) {
-        if (data.success) {
-            window.location.href = data.redirect;
-        } else {
-            showAlert(data.message, 'danger');
-            $btn.prop('disabled', false).html('Login');
-            grecaptcha.reset(); 
+        if (email === '' && password === '') {
+            errorMessage = "Please Enter Email And password.";
+        } else if (email === '') {
+            errorMessage = "Please Enter Your Email.";
+        } else if (password === '') {
+            errorMessage = "Please Enter Your Password.";
         }
-    }, 'json').fail(function() {
-        showAlert("Something Went Wrong. Please Try Again.", 'danger');
-        $btn.prop('disabled', false).html('Login');
-        grecaptcha.reset();
-    });
-});
+        if (errorMessage !== '') {
+            showAlert(errorMessage, 'danger');
+            return;
+        }
+        var response = grecaptcha.getResponse();
+        if (response.length === 0) {
+            showAlert("Please Complete The reCAPTCHA.", 'danger');
+            return;
+        }
+        let $btn = $('#loginCheck');
+        $btn.prop('disabled', true).html(
+            '<span class="spinner-border spinner-border-sm me-2"></span> Authenticating, Please Wait…');
 
-// Show alert function
-function showAlert(message, type = 'danger') {
-    let $alertBox = $('#errorDiv');
-    $alertBox
-        .hide()
-        .html('<div id="alertbox" class="login-alert alert-' + type + '">' + message + '</div>')
-        .fadeIn();
+        var url = "<?php echo base_url('admin/login'); ?>";
 
-    setTimeout(() => {
-        $('#alertbox').fadeOut(function() {
-            $(this).remove();
+         $.post(url, $('#loginForm').serialize(), function(data) {
+            if (data.success) {
+                window.location.href = data.redirect;
+            } else {
+                showAlert(data.message, 'danger');
+                $btn.prop('disabled', false).html('Log in');
+            }
+        }, 'json').fail(function() {
+            showAlert("Something Went Wrong. Please Try Again.", 'danger');
+            $btn.prop('disabled', false).html('Log in');
         });
+
+    });
+
+    // Function to show alert messages
+
+    function showAlert(message) {
+    $('#errorDiv').text(message); 
+    setTimeout(() => {
+        $('#errorDiv').text(''); 
     }, 3000);
 }
 
-// Password show/hide toggle
-$(document).on('click', '#togglePassword', function() {
-    const passwordField = $('#password');
-    const icon = $(this).find('i');
+    //Password Show and hide
+    $(document).on('click', '#togglePassword', function() {
+        const passwordField = $('#password');
+        const icon = $(this).find('i');
 
-    if (passwordField.attr('type') === 'password') {
-        passwordField.attr('type', 'text');
-        icon.removeClass('fa-eye-slash').addClass('fa-eye');
-    } else {
-        passwordField.attr('type', 'password');
-        icon.removeClass('fa-eye').addClass('fa-eye-slash');
-    }
-});
+        if (passwordField.attr('type') === 'password') {
+            passwordField.attr('type', 'text');
+            icon.removeClass('fa-eye-slash').addClass('fa-eye');
+        } else {
+            passwordField.attr('type', 'password');
+            icon.removeClass('fa-eye').addClass('fa-eye-slash');
+        }
+    });
 
+    
   </script>
 </body>
 </html>
