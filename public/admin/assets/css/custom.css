@@ -1,6 +1,7 @@
 .input-box{
     width: 50% !important;
 }
+
 /*  LOGIN PAGE STYLES  */
 body, html {
   height: 100%;
@@ -88,3 +89,9 @@ body, html {
 /* .login-card .form-control::placeholder {
   color: #969393;
 } */
+
+.form-elements{
+
+    margin-left:20px;
+}
+
