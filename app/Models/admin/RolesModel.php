@@ -26,7 +26,7 @@ public function isRolesExists($roleName, $excludeId = null) {
 
     return $builder->get()->getRow();
 }
-	public function getRolesByid($catId){
+	public function getRolesByid($roleId){
 
 			return $this->db->query("select * from roles where role_Id = '".$roleId."'")->getRow();
     }

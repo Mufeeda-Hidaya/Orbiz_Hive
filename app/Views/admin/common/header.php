@@ -15,6 +15,8 @@
 <link href="<?= base_url(). ASSET_PATH; ?>admin/assets/css/nucleo-icons.css ?>" rel="stylesheet" />
 <link href="<?= base_url(). ASSET_PATH; ?>admin/assets/css/nucleo-svg.css ?>" rel="stylesheet" />
 <link href="<?= base_url(). ASSET_PATH; ?>admin/assets/css/custom.css ?>" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
 
   <!-- Font Awesome Icons -->
   <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
