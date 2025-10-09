@@ -8,10 +8,17 @@ use CodeIgniter\Router\RouteCollection;
 $routes->get('/', 'Home::index');
 $routes->get('admin/dashboard', 'admin\Dashboard::index');
 
+//admin login
 
 $routes->get('admin', 'admin\Login::index');
 $routes->post('admin/login', 'admin\Login::login');
 $routes->get('admin/logout', 'admin\Login::logout');
+
+
+//enquiries
+$routes->get('admin/enquiries', 'admin\Enquiry::index');
+$routes->post('admin/manage_enquiry/List', 'admin\Enquiry::ajaxList');
+
 
 
 $routes->get('admin/profile', 'admin\Profile::index');
