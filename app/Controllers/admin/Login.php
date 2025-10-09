@@ -9,37 +9,29 @@ class Login extends BaseController
     protected $session;
     protected $request;
 
-    public function __construct()
-    {
-        $this->session = \Config\Services::session();
-        $this->request = \Config\Services::request();
-    }
-
     public function index(): string
     {
-        // If already logged in, redirect to dashboard
-        if ($this->session->has('user_id')) {
-            return redirect()->to(base_url('admin/dashboard'));
-        }
-
-        return view('admin/login');
+        return view('admin/login');     
     }
-
+    public function __construct()  
+    {
+        $this->session = \Config\Services::session();
+        $this->input = \Config\Services::request();
+    }
     public function login()
     {
+        $session = session();
         $email = $this->request->getPost('email');
         $password = $this->request->getPost('password');
-
-        if (empty($email) || empty($password)) {
+    
+        if (!$email || !$password) {
             return $this->response->setJSON([
                 "success" => false,
                 "message" => "Please enter both Email and Password."
             ]);
         }
-
         $loginModel = new LoginModel();
         $user = $loginModel->checkLoginUser($email, $password);
-
         if ($user === 'invalid') {
             return $this->response->setJSON([
                 "success" => false,
@@ -47,23 +39,30 @@ class Login extends BaseController
             ]);
         }
 
-        if ($user->status != 1) {
-            return $this->response->setJSON([
-                "success" => false,
-                "message" => "Your account is inactive. Contact admin."
-            ]);
-        }
+        // if ($user === 'removed') {
+        //     return $this->response->setJSON([
+        //         "success" => false,
+        //         "message" => "Access Denied. Your Account Has Been Removed."
+        //     ]);
+        // }
 
-        // Set session
-        $this->session->set([
-            'user_id' => $user->user_id,
-            'user_name' => $user->user_name,
+        // if ($user === 'suspended') {
+        //     return $this->response->setJSON([
+        //         "success" => false,
+        //         "message" => "Your Account Has Been Suspended By Admin."
+        //     ]);
+        // }
+
+        // Set session data
+        $session->set([
+            'user_id'    => $user->user_id,
+            'user_name'  => $user->user_name,
             'user_email' => $user->email,
         ]);
 
         return $this->response->setJSON([
             "success" => true,
-            "message" => "Login successful.",
+            "message" => "Login Successful",
             "redirect" => base_url('admin/dashboard')
         ]);
     }
