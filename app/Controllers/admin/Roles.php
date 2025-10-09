@@ -3,7 +3,9 @@
 namespace App\Controllers\admin;
 
 use App\Controllers\BaseController;
-use App\Models\Admin\RolesModel;
+use App\Models\admin\RolesModel;
+error_reporting(E_ALL);
+ini_set('display_errors', '1');
 
 class Roles extends BaseController
 {
@@ -27,19 +29,21 @@ class Roles extends BaseController
     {
         $this->session = \Config\Services::session();
         $this->input = \Config\Services::request();
-        $this->rolesModel = new \App\Models\Admin\RolesModel();
+        $this->rolesModel = new \App\Models\admin\RolesModel();
     }
 
     public function index()
     {
-         if (!$this->session->get('ad_uid')) {
-				return redirect()->to(base_url('admin'));
-			}
+        
+        //  if (!$this->session->get('ad_uid')) {
+		// 		return redirect()->to(base_url('admin'));
+		// 	}
 
         $allroles = $this->rolesModel->getAllRoles();
         $data['roles'] =  $allroles;
-        // print_r($data['category']);
-        // exit;
+
+      //   print_r($data['roles']);
+      //   exit;
         $template  = view('admin/common/header');
          $template .= view('admin/common/left_menu');
         $template .= view('admin/roles_table',$data);
@@ -196,11 +200,12 @@ class Roles extends BaseController
 	
 	public function ajaxList()
 	{
-	$model = new \App\Models\Admin\RolesModel();
+	$model = new \App\Models\admin\RolesModel();
     	//		$role_delete = $this->rolesModel->deleteRolesById( $role_id, $modified_by);
 	$data = $model->getDatatables();
 	$total = $model->countAll();
 	$filtered = $model->countFiltered();
+
 
 	foreach ($data as &$row) {
 		// Default fallbacks
@@ -208,12 +213,14 @@ class Roles extends BaseController
 
 		
 		// Status toggle switch
-	$row['status_switch'] = '
-<td class="align-middle text-center text-sm">
-    <span class="badge badge-sm ' . ($row['role_Status'] == 1 ? 'bg-gradient-success' : 'bg-gradient-secondary') . '">
-        ' . ($row['role_Status'] == 1 ? 'Active' : 'Inactive') . '
-    </span>
-</td>';
+$row['status_switch'] = '<span class="badge badge-sm ' 
+    . ($row['role_Status'] == 1 ? 'bg-gradient-success' : 'bg-gradient-secondary') 
+    . ' status-toggle" data-id="' . $row['role_Id'] . '" style="cursor:pointer">'
+    . ($row['role_Status'] == 1 ? 'Active' : 'Inactive') 
+    . '</span>';
+
+
+
 
 		// Action buttons
 		$row['actions'] = '<a href="' . base_url('admin/roles/edit/' . $row['role_Id']) . '">

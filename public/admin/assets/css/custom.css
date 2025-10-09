@@ -95,3 +95,32 @@ body, html {
     margin-left:20px;
 }
 
+.page-link{
+    border:none !important;
+}
+.dataTables_info{
+    margin-left: 20px !important;
+}
+.dataTables_length{
+    margin-left: 20px !important;
+    margin-top: 10px !important;
+}
+.form-select-sm{
+    width: 50px !important;
+}
+.dataTables_filter{
+    margin-right: 20px !important;
+    margin-top: 10px !important;
+
+}
+.text-center{
+    text-align: left !important;
+}
+td.wrap-text {
+    white-space: normal;  /* Allow wrapping */
+    word-break: break-word; /* Break long words */
+    max-width: 150px; /* adjust width as needed */
+}
+
+
+
