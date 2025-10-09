@@ -23,4 +23,4 @@ class LoginModel extends Model
 
         return (object) $user;
     }
-}
+} 
