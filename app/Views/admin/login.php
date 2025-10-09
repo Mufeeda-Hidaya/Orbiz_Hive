@@ -30,7 +30,7 @@
     <!-- Right Side: Login Form (Light) -->
     <div class="login-right">
       <div class="card login-card shadow w-75 p-4">
-        <div class="card-header text-center border-0 bg-white">
+        <div class="card-header text-center border-0 bg-white header-center">
           <h4 class="mt-3 mb-0">Welcome Back !</h4>
           <p class="text-muted small">Administration Login</p>
         </div>
