@@ -40,7 +40,9 @@ class Roles extends BaseController
 		// 	}
 
         $allroles = $this->rolesModel->getAllRoles();
+       
         $data['roles'] =  $allroles;
+        
 
       //   print_r($data['roles']);
       //   exit;
