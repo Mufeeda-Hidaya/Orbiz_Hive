@@ -27,10 +27,11 @@ class Enquiry extends BaseController
         $template .= view('admin/page_scripts/userjs'); 
         return $template;
     }
-    public function view($id)
+
+public function view($id)
 {
     $enquiry = $this->enquiryModel
-        ->select('e.enquiry_id, e.created_at, e.user_id, u.user_name')
+        ->select('e.enquiry_id, e.created_at, e.user_id, e.product_name, e.quantity, u.user_name, u.email')
         ->from('enquiries e')
         ->join('user u', 'u.user_id = e.user_id', 'left')
         ->where('e.enquiry_id', $id)

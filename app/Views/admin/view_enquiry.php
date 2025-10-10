@@ -11,18 +11,20 @@
               <tr>
                 <th>Enquiry ID</th>
                 <th>Name</th>
-                <th>Date</th>
                 <th>Email</th>
                 <th>Product Name</th>
-                <th>Product Quantity</th>
-                
+                <th>Product Quantity</th>   
+                <th>Date</th> 
               </tr>
             </thead>
             <tbody>
               <tr>
                 <td><?= $enquiry->enquiry_id ?></td>
                 <td><?= $enquiry->user_name ?></td>
-                <td><?= date("d M Y ", strtotime($enquiry->created_at)) ?></td>
+                <td><?= $enquiry->email ?></td>
+                <td><?= $enquiry->product_name ?></td>
+                <td><?= $enquiry->quantity ?></td>
+                <td><?= date("d M Y", strtotime($enquiry->created_at)) ?></td> 
               </tr>
             </tbody>
           </table>

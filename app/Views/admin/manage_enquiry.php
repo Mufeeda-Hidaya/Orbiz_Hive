@@ -5,9 +5,7 @@
       <p class="mb-4"></p>
     </div>
   </div>
-
   <div class="my-3"></div>
-
   <div class="row">
     <div class="col-12">
       <div class="card my-4">
@@ -16,7 +14,6 @@
             <h6 class="text-white text-capitalize ps-3 mb-0">Enquiry Table</h6>
           </div>
         </div>
-
         <div class="card-body px-0 pb-2">
           <div class="table-responsive p-0">
             <table class="table align-items-center mb-0" id="orderTable">
@@ -33,7 +30,6 @@
             </table>
           </div>
         </div>
-
       </div>
     </div>
   </div>

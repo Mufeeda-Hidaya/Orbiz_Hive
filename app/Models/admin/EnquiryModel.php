@@ -46,4 +46,5 @@ class EnquiryModel extends Model
 
         return $row ?? (object)['filRecords' => 0];
     }
+    
 }

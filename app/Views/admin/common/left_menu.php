@@ -18,28 +18,28 @@
         </li>
         <li class="nav-item">
           <a class="nav-link text-dark" href="<?php echo base_url('admin/roles') ?>">
-            <i class="material-symbols-rounded opacity-5">person</i>
+            <i class="bi bi-person"></i>
             <span class="nav-link-text ms-1">Manage Roles</span>
           </a>
         </li>
         <li class="nav-item">
           <a class="nav-link text-dark" href="<?php echo base_url('admin/enquiries') ?>">
-            <i class="material-symbols-rounded opacity-5">person</i>
+            <i class="bi bi-question-circle"></i>
             <span class="nav-link-text ms-1">Manage Enquiries</span>
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link text-dark" href="<?php echo base_url('admin/enquiries') ?>">
-            <i class="material-symbols-rounded opacity-5">login</i>
-            <span class="nav-link-text ms-1">Sign In</span>
+          <a class="nav-link text-dark" href="<?php echo base_url('admin/logout') ?>">
+            <i class="bi bi-box-arrow-left"></i>
+            <span class="nav-link-text ms-1">Logout</span>
           </a>
         </li>
-        <li class="nav-item">
+        <!-- <li class="nav-item">
           <a class="nav-link text-dark" href="../pages/sign-up.html">
             <i class="material-symbols-rounded opacity-5">assignment</i>
             <span class="nav-link-text ms-1">Sign Up</span>
           </a>
-        </li>
+        </li> -->
       </ul>
     </div>
     <div class="sidenav-footer position-absolute w-100 bottom-0 ">
