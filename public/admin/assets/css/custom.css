@@ -77,7 +77,7 @@ body, html {
 }
 .text-muted {
     color: #181818 !important;
-    margin-top: 10px;
+    margin-bottom: 0.5rem;
 }
 .logo-img {
     width: 230px;
@@ -122,11 +122,5 @@ body, html {
 .text-center{
     text-align: left !important;
 }
-td.wrap-text {
-    white-space: normal;  /* Allow wrapping */
-    word-break: break-word; /* Break long words */
-    max-width: 150px; /* adjust width as needed */
-}
-
 
 
