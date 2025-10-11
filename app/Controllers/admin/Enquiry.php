@@ -24,7 +24,7 @@ class Enquiry extends BaseController
         $template .= view('admin/common/left_menu');
         $template .= view('admin/manage_enquiry');
         $template .= view('admin/common/footer');
-        $template .= view('admin/page_scripts/userjs'); 
+        $template .= view('admin/page_scripts/enquiryjs'); 
         return $template;
     }
 

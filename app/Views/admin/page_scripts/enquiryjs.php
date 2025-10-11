@@ -1,39 +1,35 @@
 <script>
-// User DataTable
+// Enquiry DataTable 
 $(document).ready(function() {
-    var table = $('#userTable').DataTable({
+    var table = $('#orderTable').DataTable({
         processing: true,
         serverSide: true,
         ajax: {
-            url: "<?= base_url('admin/manage_user/userListAjax') ?>",
+            url: "<?= base_url('admin/manage_enquiry/orderListAjax') ?>",
             type: "POST",
             dataSrc: "data"
         },
         columns: [
             { data: "slno", className: "text-start" },
-            { data: "user_name", className: "text-start" },
-            { data: "email", className: "text-start" },
-            { data: "role_Name", className: "text-start" },
-            { data: "status_switch", className: "text-start" },
+            { data: "customer_name", className: "text-start" },
+            { data: "created_at", className: "text-start" },
             {
-                data: "user_id",
+                data: "enquiry_id",
                 render: function(id) {
                     return `
                         <div class="text-start">
-                            <a href="<?= base_url('admin/manage_user/edit/') ?>${id}" title="Edit" style="margin-right:5px;">
-                                <i class="bi bi-pencil-square"></i>
+                            <a href="<?= base_url('admin/manage_enquiry/view_enquiry/') ?>${id}" 
+                            title="View" style="color:rgba(37, 41, 43, 1);">
+                                <i class="bi bi-eye-fill"></i>
                             </a>
-                            <i class="bi bi-trash text-danger icon-clickable" onclick="confirmDelete(${id})"></i>
                         </div>
                     `;
                 }
             },
-            { data: "user_id", visible: false }
+            { data: "enquiry_id", visible: false }
         ],
-        order: [[6, 'desc']],
-        columnDefs: [
-            { searchable: false, orderable: false, targets: [0, 5] }
-        ],
+        order: [[4, 'desc']],
+        columnDefs: [{ searchable: false, orderable: false, targets: [0, 3] }],
         language: { infoFiltered: "" },
         scrollX: false,
         autoWidth: false
@@ -48,8 +44,4 @@ $(document).ready(function() {
             });
     });
 });
-
-
-
 </script>
-

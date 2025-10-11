@@ -17,15 +17,21 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link text-dark" href="<?php echo base_url('admin/roles') ?>">
-            <i class="bi bi-person"></i>
+          <a class="nav-link text-dark" href="<?php echo base_url('admin/manage_roles') ?>">
+            <i class="fas fa-th-list"></i>
             <span class="nav-link-text ms-1">Manage Roles</span>
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link text-dark" href="<?php echo base_url('admin/enquiries') ?>">
+          <a class="nav-link text-dark" href="<?php echo base_url('admin/manage_enquiry') ?>">
             <i class="bi bi-question-circle"></i>
             <span class="nav-link-text ms-1">Manage Enquiries</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-dark" href="<?php echo base_url('admin/manage_user') ?>">
+            <i class="bi bi-person"></i>
+            <span class="nav-link-text ms-1">Manage Admin Users</span>
           </a>
         </li>
         <li class="nav-item">
