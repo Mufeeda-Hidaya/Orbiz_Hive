@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>Orbiz Hive</title>
-  <link rel="icon" type="image/png" href="<?= base_url(). ASSET_PATH; ?>admin/assets/img/logo.webp ">
+  <link rel="icon" type="image/png" href="<?= base_url(). ASSET_PATH; ?>admin/assets/img/logo-bx.png ">
   <!-- Fonts & Styles -->
   <!-- <link href="https://fonts.googleapis.com/css?family=Inter:400,500,600,700,900" rel="stylesheet"> -->
   <link rel="stylesheet"  href="<?php echo base_url().ASSET_PATH; ?>admin/assets/css/bootstrap.min.css" />
@@ -132,7 +132,10 @@
         }
     });
 
-    
+  
+
+
   </script>
+
 </body>
 </html>

@@ -15,12 +15,14 @@
           <div class="bg-gradient-dark shadow-dark border-radius-lg pt-4 pb-3 d-flex justify-content-between align-items-center">
             <h6 class="text-white text-capitalize ps-3 mb-0">Roles Table</h6>
             <button class="btn btn-sm btn-light text-dark me-3" id="addRoleBtn">
-              <i class="fas fa-plus me-1"></i> Add Role
+              <a href="<?= base_url('admin/add_role') ?>">
+                  <i class="fas fa-plus me-1"></i> Add Role
+              </a>
             </button>
           </div>
         </div>
 
-        <div class="card-body px-0 pb-2">
+        <div class="card-body ">
           <div class="table-responsive p-0">
             <table class="table align-items-center mb-0" id="rolesList">
               <thead>

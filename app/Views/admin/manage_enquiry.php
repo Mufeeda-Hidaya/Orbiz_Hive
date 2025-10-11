@@ -14,7 +14,7 @@
             <h6 class="text-white text-capitalize ps-3 mb-0">Enquiry Table</h6>
           </div>
         </div>
-        <div class="card-body px-0 pb-2">
+        <div class="card-body">
           <div class="table-responsive p-0">
             <table class="table align-items-center mb-0" id="orderTable">
               <thead>
@@ -22,7 +22,7 @@
                   <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Sl.No</th>
                   <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Customer Name</th>
                   <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Date</th>
-                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Action</th>
+                  <th class="text-left text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Action</th>
                   <th class="text-secondary opacity-7"></th>
                 </tr>
               </thead>

@@ -29,11 +29,13 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link text-dark" href="<?php echo base_url('admin/logout') ?>">
+          <a class="nav-link text-dark" href="#" onclick="confirmLogout(event)">
             <i class="bi bi-box-arrow-left"></i>
             <span class="nav-link-text ms-1">Logout</span>
           </a>
         </li>
+
+
         <!-- <li class="nav-item">
           <a class="nav-link text-dark" href="../pages/sign-up.html">
             <i class="material-symbols-rounded opacity-5">assignment</i>
@@ -50,4 +52,11 @@
     </div>
   </aside>
    <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
-  
+  <script>
+function confirmLogout(event) {
+  event.preventDefault();
+  if (confirm("Are you sure you want to logout?")) {
+    window.location.href = "<?= base_url('admin/logout'); ?>";
+  }
+}
+</script>

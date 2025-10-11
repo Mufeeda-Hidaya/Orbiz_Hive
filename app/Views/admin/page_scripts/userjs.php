@@ -16,8 +16,8 @@ $(document).ready(function() {
                 data: "enquiry_id",
                 render: function(id) {
                     return `
-                        <div class="text-center">
-                            <a href="<?= base_url('admin/enquiry/view_enquiry/') ?>${id}" 
+                        <div class="text-start">
+                            <a href="<?= base_url('admin/manage_enquiry/view_enquiry/') ?>${id}" 
                             title="View" style="color:rgba(37, 41, 43, 1);">
                                 <i class="bi bi-eye-fill"></i>
                             </a>

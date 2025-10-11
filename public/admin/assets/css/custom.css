@@ -122,11 +122,5 @@ body, html {
 .text-center{
     text-align: left !important;
 }
-td.wrap-text {
-    white-space: normal;  /* Allow wrapping */
-    word-break: break-word; /* Break long words */
-    max-width: 150px; /* adjust width as needed */
-}
-
 
 

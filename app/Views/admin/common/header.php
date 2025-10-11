@@ -4,9 +4,9 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="apple-touch-icon" sizes="76x76" href="<?= base_url(). ASSET_PATH; ?>admin/assets/img/apple-icon.png">
-  <link rel="icon"  href="<?= base_url(). ASSET_PATH; ?>admin/assets/img/logo-ct-dark.png" class="navbar-brand-img" width="10" height="auto" alt="main_logo">
+  <link rel="icon"  href="<?= base_url(). ASSET_PATH; ?>admin/assets/img/logo-bx.png" class="navbar-brand-img" width="10" height="auto" alt="main_logo">
   <title>
-    Material Dashboard 3 by Creative Tim
+    ORBIZ HIVE
   </title>
   <!--     Fonts and icons     -->
   <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700,900" />
@@ -27,7 +27,7 @@
 </head>
 <body class="g-sidenav-show  bg-gray-100">
   <!-- Navbar -->
-    <nav class="navbar navbar-main navbar-expand-lg px-0 mx-3 shadow-none border-radius-xl" id="navbarBlur" data-scroll="true">
+    <nav class="navbar navbar-main navbar-expand-lg px-0 mx-3 shadow-none border-radius-xl" id="navbarBlur" data-scroll="true" style="position:sticky; top:0; z-index:1; background-color: white;">
       <div class="container-fluid py-1 px-3">
         <!-- <nav aria-label="breadcrumb">
           <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
