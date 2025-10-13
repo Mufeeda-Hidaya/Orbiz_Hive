@@ -7,7 +7,7 @@ class LoginModel extends Model
 {
     protected $table = 'user';
     protected $primaryKey = 'user_id';
-    protected $allowedFields = ['user_name', 'email', 'password', 'status', 'created_at', 'updated_at'];
+    protected $allowedFields = ['user_name', 'email','phone', 'password', 'status', 'created_at','created_by', 'updated_at','updated_by'];
 
     public function checkLoginUser($email, $password)
     {

@@ -21,7 +21,7 @@
     <!-- Left Side: Welcome Section (Dark) -->
     <div class="login-left">
       <div class="welcome-text">
-       <img src="<?= base_url() . ASSET_PATH; ?>admin/assets/img/logo-ct-dark.webp" class="logo-img">
+       <img src="<?= base_url() . ASSET_PATH; ?>admin/assets/img/logo.webp" class="logo-img">
         <h1>Welcome to ORBIZ Admin</h1>
         <p>Easily manage all your data securely in one place.</p>
       </div>

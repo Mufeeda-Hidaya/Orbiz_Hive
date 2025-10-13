@@ -16,14 +16,14 @@ $routes->get('admin/logout', 'admin\Login::logout');
 
 
 //enquiries
-$routes->get('admin/enquiries', 'admin\Enquiry::index');
+$routes->get('admin/manage_enquiry', 'admin\Enquiry::index');
 $routes->post('admin/manage_enquiry/orderListAjax', 'admin\Enquiry::orderListAjax');
 $routes->get('admin/manage_enquiry/view_enquiry/(:num)', 'admin\Enquiry::view/$1');
 
 // $routes->get('admin/profile', 'admin\Profile::index');
 
 //roles
-$routes->get('admin/roles', 'admin\Roles::index');
+$routes->get('admin/manage_roles', 'admin\Roles::index');
 $routes->post('admin/manage_roles/rolelistAjax', 'admin\Roles::roleListAjax');
 $routes->get('admin/add_role', 'admin\Roles::addRoles');
 // $routes->get('admin/roles/edit/(:num)', 'admin\Roles::addRoles/$1');
@@ -31,5 +31,8 @@ $routes->get('admin/add_role', 'admin\Roles::addRoles');
 // $routes->post('admin/roles/status', 'admin\Roles::changeStatus');
 // $routes->post('admin/roles/delete/(:any)', 'admin\Roles::deleteRoles/$1');
 
-
+//manage users
+$routes->get('admin/manage_user', 'admin\User::index');
+$routes->post('admin/manage_user/userListAjax', 'admin\User::userListAjax');
+$routes->get('admin/add_user', 'admin\User::addUser');
 ?>
