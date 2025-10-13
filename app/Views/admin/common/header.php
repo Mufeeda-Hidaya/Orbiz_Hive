@@ -23,7 +23,11 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
 <!-- CSS Files -->
 <link id="pagestyle" href="<?= base_url(). ASSET_PATH; ?>admin/assets/css/material-dashboard.css?v=3.2.0" rel="stylesheet" />
+<link  href="<?= base_url(). ASSET_PATH; ?>admin/assets/css/custom.css" rel="stylesheet" />
 
+<!-- <link rel="stylesheet" href="<?php base_url(). ASSET_PATH; ?>admin/assets/css/custom.css" /> -->
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body class="g-sidenav-show  bg-gray-100">
   <!-- Navbar -->

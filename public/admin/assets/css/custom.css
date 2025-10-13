@@ -30,8 +30,8 @@ body, html {
 .login-left h1 {
   font-size: 2rem; 
   font-weight: 700;
-  color: rgb(184, 79, 53);
-  /* color: #FF0054; */
+  /* color: rgb(184, 79, 53); */
+  color: #FF0054;
   padding-top: 40px;
 }
 
@@ -124,3 +124,46 @@ body, html {
 }
 
 
+  .text-field {
+    background-color: #fff !important;
+    color: #000 !important;
+    border: 1px solid #ced4da !important;
+  }
+
+.custom-eye {
+  cursor: pointer;
+  margin-right:30px;     
+  font-size: 1.1rem;     
+  display: flex;
+  align-items: center;   
+}
+
+/* manage admin user text field  */
+input.form-control, select.form-control {
+    background-color: #fff !important;
+    color: #000 !important;
+    border: 1px solid #ced4da !important;
+  }
+  /* eye icon */
+.eye-icon {
+    cursor: pointer;
+    margin-right:10px;      
+}
+.cursor-padding {
+  padding-left: 10px; 
+}
+/* logout alert */
+/* .swal2-popup {
+    font-family: 'Inter', sans-serif;
+    border-radius: 12px;
+}
+.swal2-title {
+    font-weight: 600;
+    font-size: 22px;
+}
+.swal2-confirm {
+    background-color: #3085d6 !important;
+}
+.swal2-cancel {
+    background-color: #d33 !important;
+} */

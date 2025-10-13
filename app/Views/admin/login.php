@@ -53,7 +53,8 @@
 
             <!-- Captcha -->
             <div class="g-recaptcha" data-sitekey="6Le-VXcrAAAAAFdEqJLtM5DxM6GoGl7cJdV6hknL"></div>
-            <button type="submit" id="loginCheck" class="btn w-100 my-3" style="background-color: blue; color: white;">Login</button>
+            <!-- <button type="submit" id="loginCheck" class="btn btn-primary">Login</button> -->
+            <button type="submit" id="loginCheck" class="btn btn-primary w-100 my-3 ">Login</button>
           </form>
         </div>
       </div>
