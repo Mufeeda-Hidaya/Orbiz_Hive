@@ -13,7 +13,7 @@ $(document).ready(function () {
             { data: "slno", className: "text-start" },
             { data: "user_name", className: "text-start" },
             { data: "email", className: "text-start" },
-            { data: "role_Name", className: "text-start" },
+            { data: "role_name", className: "text-start" },
             { data: "status_switch", className: "text-start" },
             {
                 data: "user_id",
@@ -89,46 +89,95 @@ $(document).ready(function () {
 
 
     // Toggle user status
-    $('#userTable').on('change', '.toggle-status', function () {
-        let userId = $(this).data('id');
-        let newStatus = $(this).is(':checked') ? 1 : 2;
+    // $('#userTable').on('change', '.toggle-status', function () {
+    //     let userId = $(this).data('id');
+    //     let newStatus = $(this).is(':checked') ? 1 : 2;
     
-        $.ajax({
-            url: "<?= base_url('admin/manage_user/toggleStatus') ?>",
-            type: "POST",
-            data: {
-                user_id: userId,
-                status: newStatus,
-                "<?= csrf_token() ?>": "<?= csrf_hash() ?>"
-            },
-            dataType: "json",
-                success: function(response) {
-                    let $msg = $('#messageBox');
-                    $msg.removeClass('d-none alert-success alert-danger');
+    //     $.ajax({
+    //         url: "<?= base_url('admin/manage_user/toggleStatus') ?>",
+    //         type: "POST",
+    //         data: {
+    //             user_id: userId,
+    //             status: newStatus,
+    //             "<?= csrf_token() ?>": "<?= csrf_hash() ?>"
+    //         },
+    //         dataType: "json",
+    //             success: function(response) {
+    //                 let $msg = $('#messageBox');
+    //                 $msg.removeClass('d-none alert-success alert-danger');
     
-                    if (response.status === 'success') {
-                        $msg.addClass('alert-success').text(response.message).show();
-                        setTimeout(function() {
-                            $msg.fadeOut();
-                            table.ajax.reload(null, false);
-                        }, 1500);
-                    } else {
-                        $msg.addClass('alert-danger').text(response.message || 'Failed To Update Status').show();
-                        setTimeout(function() {
-                            $msg.fadeOut();
-                        }, 2000);
-                    }
-                },
-            error: function(xhr, status, error) {
-                console.error(xhr.responseText);
-                let $msg = $('#messageBox');
-                $msg.removeClass('d-none alert-success').addClass('alert-danger')
-                    .text('Error Updating Status').show();
-                setTimeout(function() { $msg.fadeOut(); }, 2000);
+    //                 if (response.status === 'success') {
+    //                     $msg.addClass('alert-success').text(response.message).show();
+    //                     setTimeout(function() {
+    //                         $msg.fadeOut();
+    //                         table.ajax.reload(null, false);
+    //                     }, 1500);
+    //                 } else {
+    //                     $msg.addClass('alert-danger').text(response.message || 'Failed To Update Status').show();
+    //                     setTimeout(function() {
+    //                         $msg.fadeOut();
+    //                     }, 2000);
+    //                 }
+    //             },
+    //         error: function(xhr, status, error) {
+    //             console.error(xhr.responseText);
+    //             let $msg = $('#messageBox');
+    //             $msg.removeClass('d-none alert-success').addClass('alert-danger')
+    //                 .text('Error Updating Status').show();
+    //             setTimeout(function() { $msg.fadeOut(); }, 2000);
+    //         }
+    //     });
+    // });
+ var baseUrl = "<?= base_url('/') ?>"; // ensures trailing slash
+
+$(document).on('click', '.status-toggle', function() {
+    var badge = $(this);
+    var user_Id = badge.data('id');
+
+    var currentStatus = badge.text().trim().toLowerCase() === 'active' ? 1 : 2;
+    var newStatus = currentStatus === 1 ? 2 : 1;
+
+    $.ajax({
+        url: baseUrl + 'admin/manage_user/status',
+        type: 'POST',
+        dataType: 'json',
+        data: {
+            user_id: user_Id,   // must match controller
+            status: newStatus  // must match controller
+        },
+        success: function(response) {
+            if (response.success) {
+                if (newStatus === 1) {
+                    badge.removeClass('bg-gradient-secondary').addClass('bg-gradient-success').text('Active');
+                } else {
+                    badge.removeClass('bg-gradient-success').addClass('bg-gradient-secondary').text('Inactive');
+                }
+
+                $('#messageBox')
+                    .removeClass('alert-danger d-none')
+                    .addClass('alert-success')
+                    .text(response.message)
+                    .show();
+            } else {
+                $('#messageBox')
+                    .removeClass('alert-success d-none')
+                    .addClass('alert-danger')
+                    .text(response.message)
+                    .show();
             }
-        });
+
+            setTimeout(() => { $('#messageBox').fadeOut(); }, 2000);
+        },
+        error: function(xhr, status, error) {
+            console.log('AJAX Error:', xhr.responseText); // logs exact server error
+            $('#messageBox')
+                .removeClass('alert-success d-none')
+                .addClass('alert-danger')
+                .text('AJAX error: ' + error)
+                .show();
+        }
     });
- 
+});
  
 
     // Save user
