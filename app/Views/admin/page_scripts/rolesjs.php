@@ -3,10 +3,11 @@
     const $saveBtn = $('#saveBtn');
     const $roleForm = $('#roleForm');
     const $roleName = $('#role_name');
+    const $messageBox = $('#messageBox');
+    const $selectAll = $("#select_all_permissions");
+    const $permissions = $(".permission-checkbox");
 
     let originalData = $roleForm.serialize();
-
-    $saveBtn.prop('disabled', true).css({ opacity: 0.6, pointerEvents: 'none' });
     function checkFormChanges() {
         let currentData = $roleForm.serialize();
         if (currentData !== originalData) {
@@ -15,17 +16,22 @@
             $saveBtn.prop('disabled', true).css({ opacity: 0.6, pointerEvents: 'none' });
         }
     }
-    $roleForm.on('input change', 'input, select, textarea', checkFormChanges);
 
     function resetFormState() {
         originalData = $roleForm.serialize();
         $saveBtn.prop('disabled', true).css({ opacity: 0.6, pointerEvents: 'none' });
     }
-       const $selectAll = $("#select_all_permissions");
-    const $permissions = $(".permission-checkbox");
+    $saveBtn.prop('disabled', true).css({ opacity: 0.6, pointerEvents: 'none' });
+    $roleForm.on('input change', 'input, select, textarea', checkFormChanges);
+    function enableSaveButton() {
+        $saveBtn.prop('disabled', false).css({ opacity: 1, pointerEvents: 'auto' });
+    }
+    $roleName.on('input', enableSaveButton);
+    $permissions.on('change', enableSaveButton);
     if ($permissions.length > 0 && $permissions.filter(":checked").length === $permissions.length) {
         $selectAll.prop("checked", true);
     }
+
     $selectAll.on("change", function () {
         $permissions.prop("checked", $(this).is(":checked"));
     });
@@ -37,45 +43,47 @@
             $selectAll.prop("checked", false);
         }
     });
-    $saveBtn.prop('disabled', true).css({ opacity: 0.6, pointerEvents: 'none' });
-        function enableSaveButton() {
-            $saveBtn.prop('disabled', false).css({ opacity: 1, pointerEvents: 'auto' });
-        } 
-        $roleName.on('input', enableSaveButton);
-        $permissions.on('change', enableSaveButton);
-        $('#roleForm').on('submit', function (e) {
-            e.preventDefault();
-            var form = $(this);
-            var url = form.attr('action');
-             $saveBtn.prop('disabled', true).css({ opacity: 0.6, pointerEvents: 'none' });
-           $.post(url, $('#roleForm').serialize(), function(response) {
-                $('#messageBox').removeClass('d-none alert-success alert-danger'); 
 
-                if (response.status === 'success' || response.status == 1) {
-                    $('#messageBox')
-                        .addClass('alert-success')
-                        .text(response.msg || response.message)
-                        .show();
+    // Handle form submit
+    $roleForm.on('submit', function (e) {
+        e.preventDefault();
+        const url = $roleForm.attr('action');
+        $saveBtn.prop('disabled', true).css({ opacity: 0.6, pointerEvents: 'none' });
 
-                        setTimeout(function () {
-                            window.location.href = "<?php echo base_url('admin/manage_roles'); ?>";
-                        }, 1500);
-                         resetFormState();
-                } else {
-                    $('#messageBox')
-                        .addClass('alert-danger')
-                        .text(response.message || 'Something went wrong')
-                        .show();
-                        checkFormChanges();
-                }
+        $.post(url, $roleForm.serialize(), function(response) {
+            $messageBox.removeClass('d-none alert-success alert-danger');
 
-                setTimeout(function() {
-                    $('#messageBox').fadeOut();
-                }, 2000);
-            }, 'json');
+            if (response.status === 'success' || response.status == 1) {
+                $messageBox.addClass('alert-success')
+                           .text(response.msg || response.message)
+                           .show();
+
+                setTimeout(function () {
+                    window.location.href = response.redirect || "<?= base_url('admin/manage_roles') ?>";
+                }, 1500);
+
+                resetFormState();
+            } else {
+                $messageBox.addClass('alert-danger')
+                           .text(response.message || 'Something went wrong')
+                           .show();
+                checkFormChanges();
+            }
+
+            setTimeout(function() {
+                $messageBox.fadeOut();
+            }, 2000);
+
+        }, 'json').fail(function(xhr) {
+            $messageBox.removeClass('d-none alert-success').addClass('alert-danger')
+                       .text('Server error. Check console.')
+                       .show();
+            console.error('AJAX Error:', xhr.responseText);
+            checkFormChanges();
         });
-
+    });
 });
+
     
 // data table
 
@@ -179,38 +187,42 @@ $(document).ready(function () {
 
 //Add category
 
-// var baseUrl = "<?= base_url() ?>";
-// $('#rolesSubmit').click(function(e) {
-//     e.preventDefault(); 
-//     var url = baseUrl + "admin/roles/save"; 
+// var baseUrl = "<?= base_url('/') ?>";
 
-//     $.post(url, $('#createroles').serialize(), function(response) {
+// $('#roleForm').submit(function(e) {
+//     e.preventDefault();
+
+//     var url = baseUrl + "admin/manage_roles/save";
+//     var formData = $(this).serialize();
+
+//     $.post(url, formData, function(response) {
 //         if (response.status == 1) {
 //             $('#messageBox')
-//                 .removeClass('alert-danger')
+//                 .removeClass('alert-danger d-none')
 //                 .addClass('alert-success')
-//                 .text(response.msg || 'Roles Created Successfully!')
+//                 .text(response.msg)
 //                 .show();
 
 //             setTimeout(function() {
-//                 window.location.href = baseUrl + "admin/roles/"; 
+//                 window.location.href = response.redirect;
 //             }, 1500);
 //         } else {
 //             $('#messageBox')
-//                 .removeClass('alert-success')
+//                 .removeClass('alert-success d-none')
 //                 .addClass('alert-danger')
-//                 .text(response.message || 'Please Fill all the Data')
+//                 .text(response.message || 'Please fill all required fields')
 //                 .show();
 //         }
 
 //         setTimeout(function() {
-//             $('#messageBox').empty().hide();
-//         }, 2000);
+//             $('#messageBox').fadeOut();
+//         }, 3000);
 //     }, 'json');
 // });
 
+
 //Active and Inactive status
-var baseUrl = "<?= base_url('/') ?>"; // ensures trailing slash
+var baseUrl = "<?= base_url('/') ?>"; 
 
 $(document).on('click', '.status-toggle', function() {
     var badge = $(this);
@@ -224,8 +236,8 @@ $(document).on('click', '.status-toggle', function() {
         type: 'POST',
         dataType: 'json',
         data: {
-            role_id: roleId,   // must match controller
-            status: newStatus  // must match controller
+            role_id: roleId,   
+            status: newStatus  
         },
         success: function(response) {
             if (response.success) {

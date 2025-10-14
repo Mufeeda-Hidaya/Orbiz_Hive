@@ -37,110 +37,110 @@ class Roles extends BaseController
         $template .= view('admin/page_scripts/rolesjs');
         return $template;
     }
-    public function store()
-{
-    $request = $this->request;
-    $role_id = $request->getPost('role_id');
-    $role_name = trim($request->getPost('role_name'));
-    $menus = $request->getPost('menus') ?? [];
+//     public function store()
+// {
+//     $request = $this->request;
+//     $role_id = $request->getPost('role_id');
+//     $role_name = trim($request->getPost('role_name'));
+//     $menus = $request->getPost('menus') ?? [];
 
-    $normalized_role_name = trim(preg_replace('/\s+/', ' ', strtolower($role_name)));
+//     $normalized_role_name = trim(preg_replace('/\s+/', ' ', strtolower($role_name)));
 
-    $duplicate = $this->rolesModel
-        ->where('REPLACE(LOWER(TRIM(role_name)), " ", "") =', str_replace(' ', '', $normalized_role_name))
-        ->where('role_id !=', $role_id) 
-        ->first();
+//     $duplicate = $this->rolesModel
+//         ->where('REPLACE(LOWER(TRIM(role_name)), " ", "") =', str_replace(' ', '', $normalized_role_name))
+//         ->where('role_id !=', $role_id) 
+//         ->first();
 
-    if ($duplicate) {
-        return $this->response->setJSON([
-            'status' => 'error',
-            'message' => 'Role Already Exists.'
-        ]);
-    }
+//     if ($duplicate) {
+//         return $this->response->setJSON([
+//             'status' => 'error',
+//             'message' => 'Role Already Exists.'
+//         ]);
+//     }
 
-    if (empty($role_name)) {
-        return $this->response->setJSON([
-            'status' => 'error',
-            'message' => 'Role Name Is Required'
-        ]);
-    }
+//     if (empty($role_name)) {
+//         return $this->response->setJSON([
+//             'status' => 'error',
+//             'message' => 'Role Name Is Required'
+//         ]);
+//     }
 
-    if ($role_id) {
-        $existingRole = $this->rolesModel->find($role_id);
-        $oldRoleName  = $existingRole['role_name'] ?? '';
-        $oldMenus     = $this->roleMenuModel->where('role_id', $role_id)->findColumn('menu_name') ?? [];
+//     if ($role_id) {
+//         $existingRole = $this->rolesModel->find($role_id);
+//         $oldRoleName  = $existingRole['role_name'] ?? '';
+//         $oldMenus     = $this->roleMenuModel->where('role_id', $role_id)->findColumn('menu_name') ?? [];
 
-        sort($oldMenus);
-        $newMenus = $menus;
-        sort($newMenus);
+//         sort($oldMenus);
+//         $newMenus = $menus;
+//         sort($newMenus);
 
-        $nameChanged  = ($oldRoleName !== $role_name);
-        $menusChanged = ($oldMenus !== $newMenus);
+//         $nameChanged  = ($oldRoleName !== $role_name);
+//         $menusChanged = ($oldMenus !== $newMenus);
 
-        if (!$nameChanged && !$menusChanged) {
-            return $this->response->setJSON([
-                'status' => 'info',
-                'message' => 'No Changes Made.'
-            ]);
-        }
+//         if (!$nameChanged && !$menusChanged) {
+//             return $this->response->setJSON([
+//                 'status' => 'info',
+//                 'message' => 'No Changes Made.'
+//             ]);
+//         }
 
-        if ($nameChanged) {
-            $this->rolesModel->update($role_id, ['role_name' => $role_name]);
-        }
+//         if ($nameChanged) {
+//             $this->rolesModel->update($role_id, ['role_name' => $role_name]);
+//         }
 
-        if ($menusChanged) {
-            $this->roleMenuModel->where('role_id', $role_id)->delete();
-            if (!empty($menus)) {
-                $data = [];
-                foreach ($menus as $menuName) {
-                    $data[] = [
-                        'role_id'   => $role_id,
-                        'menu_name' => $menuName,
-                        'access'    => 1
-                    ];
-                }
-                $this->roleMenuModel->insertBatch($data);
-            }
-        }
+//         if ($menusChanged) {
+//             $this->roleMenuModel->where('role_id', $role_id)->delete();
+//             if (!empty($menus)) {
+//                 $data = [];
+//                 foreach ($menus as $menuName) {
+//                     $data[] = [
+//                         'role_id'   => $role_id,
+//                         'menu_name' => $menuName,
+//                         'access'    => 1
+//                     ];
+//                 }
+//                 $this->roleMenuModel->insertBatch($data);
+//             }
+//         }
 
-        return $this->response->setJSON([
-            'status' => 'success',
-            'message' => $nameChanged && $menusChanged
-                ? 'Role and permissions updated successfully!'
-                : ($nameChanged ? 'Role Updated Successfully!' : 'Permissions Updated Successfully!')
-        ]);
+//         return $this->response->setJSON([
+//             'status' => 'success',
+//             'message' => $nameChanged && $menusChanged
+//                 ? 'Role and permissions updated successfully!'
+//                 : ($nameChanged ? 'Role Updated Successfully!' : 'Permissions Updated Successfully!')
+//         ]);
 
-    } else {
-        $role_id = $this->rolesModel->insert([
-            'role_name' => $role_name,
-            'status'    => 1
-        ], true);
+//     } else {
+//         $role_id = $this->rolesModel->insert([
+//             'role_name' => $role_name,
+//             'status'    => 1
+//         ], true);
 
-        if (!$role_id) {
-            return $this->response->setJSON([
-                'status' => 'error',
-                'message' => 'Failed To Add Role'
-            ]);
-        }
+//         if (!$role_id) {
+//             return $this->response->setJSON([
+//                 'status' => 'error',
+//                 'message' => 'Failed To Add Role'
+//             ]);
+//         }
 
-        if (!empty($menus)) {
-            $data = [];
-            foreach ($menus as $menuName) {
-                $data[] = [
-                    'role_id'   => $role_id,
-                    'menu_name' => $menuName,
-                    'access'    => 1
-                ];
-            }
-            $this->roleMenuModel->insertBatch($data);
-        }
+//         if (!empty($menus)) {
+//             $data = [];
+//             foreach ($menus as $menuName) {
+//                 $data[] = [
+//                     'role_id'   => $role_id,
+//                     'menu_name' => $menuName,
+//                     'access'    => 1
+//                 ];
+//             }
+//             $this->roleMenuModel->insertBatch($data);
+//         }
 
-        return $this->response->setJSON([
-            'status' => 'success',
-            'message' => 'Role Added Successfully!'
-        ]);
-    }
-}
+//         return $this->response->setJSON([
+//             'status' => 'success',
+//             'message' => 'Role Added Successfully!'
+//         ]);
+//     }
+// }
 
 public function deleteRole()
 {
@@ -165,7 +165,7 @@ public function deleteRole()
 }
 
 
-
+// table list
     public function roleListAjax()
 {
     $draw = intval($this->request->getPost('draw') ?? 1);
@@ -265,52 +265,50 @@ public function deleteRole()
 		
 	// }
 
-//     public function saveRoles() {
-//     $role_id = $this->input->getPost('role_id');
-//     $role_name = $this->input->getPost('role_name');
+    public function saveRoles()
+    {
+        $role_id = $this->request->getPost('role_id');
+        $role_name = $this->request->getPost('role_name');
+        $menus = $this->request->getPost('menus'); 
 
-//     if ($role_name) {
-//         // 🔍 Check if category name already exists
-//         $exists = $this->rolesModel->isRolesExists($role_name, $role_id);
-//         if ($exists) {
-//             return $this->response->setJSON([
-//                 'status' => 'error',
-//                 'field' => 'role_Name',
-//                 'message' => 'Role Already Exists.'
-//             ]);
-//         }
+        if (!$role_name) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Role Name is required.'
+            ]);
+        }
+        $exists = $this->rolesModel->isRolesExists($role_name, $role_id);
+        if ($exists) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'field' => 'role_name',
+                'message' => 'Role Already Exists.'
+            ]);
+        }
 
-//         $data = [
-//             'role_Name' => $role_name,
-//             'role_Status' => 1,
-//             'role_Createdon' => date("Y-m-d H:i:s"),
-//             'role_Createdby' => $this->session->get('ad_uid'),
-//             'role_Modifyby' => $this->session->get('ad_uid'),
-//         ];
+        $data = [
+            'role_name' => $role_name,
+            'status' => 1,
+            'permissions' => $menus ? json_encode($menus) : null,
+            'created_on' => date("Y-m-d H:i:s"),
+            'created_by' => session()->get('user_id'),
+            'updated_by' => session()->get('user_id'),
+        ];
 
-//         if (empty($role_id)) {
-//             $CreateRoles = $this->rolesModel->roleInsert($data);
-//             return $this->response->setJSON([
-//                 "status" => 1,
-//                 "msg" => "Roles Created Successfully.",
-//                 "redirect" => base_url('roles')
-//             ]);
-//         } else {
-//             $modifyRoles = $this->rolesModel->updateRoles($role_id, $data);
-//             return $this->response->setJSON([
-//                 "status" => 1,
-//                 "msg" => "Roles Updated Successfully.",
-//                 "redirect" => base_url('admin/roles')
-//             ]);
-//         }
-//     } else {
-//         return $this->response->setJSON([
-//             'status' => 'error',
-//             'message' => 'All fields are required.'
-//         ]);
-//     }
-// }
+        if (empty($role_id)) {
+            $this->rolesModel->roleInsert($data);
+            $msg = 'Role Created Successfully.';
+        } else {
+            $this->rolesModel->updateRoles($role_id, $data);
+            $msg = 'Role Updated Successfully.';
+        }
 
+        return $this->response->setJSON([
+            'status' => 1,
+            'msg' => $msg,
+            'redirect' => base_url('admin/manage_roles')
+        ]);
+    }
    public function changeStatus()
 {
     $roleId = $this->request->getPost('role_id');
@@ -323,7 +321,7 @@ public function deleteRole()
         ]);
     }
 
-    $role = $this->rolesModel->getRolesByid($roleId);
+    $role = $this->rolesModel->getByid($roleId);
 
     if (!$role) {
         return $this->response->setJSON([
@@ -332,7 +330,7 @@ public function deleteRole()
         ]);
     }
 
-    $update = $this->rolesModel->updateRoles($roleId, ['status' => $newStatus]);
+    $update = $this->rolesModel->updateRolesStatus($roleId, ['status' => $newStatus]);
 
     if ($update) {
         return $this->response->setJSON([

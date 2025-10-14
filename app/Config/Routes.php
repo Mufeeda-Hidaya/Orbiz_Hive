@@ -25,11 +25,10 @@ $routes->get('admin/manage_enquiry/view_enquiry/(:num)', 'admin\Enquiry::view/$1
 //roles
 $routes->get('admin/manage_roles', 'admin\Roles::index');
 $routes->post('admin/manage_roles/rolelistAjax', 'admin\Roles::roleListAjax');
-$routes->get('admin/add_role', 'admin\Roles::addRoles');
-$routes->post('admin/manage_roles/save', 'Admin\Roles::store');
+$routes->get('admin/add_role', 'Admin\Roles::addRoles');
+$routes->post('admin/manage_roles/save', 'Admin\Roles::saveRoles');
 $routes->post('admin/manage_roles/delete', 'admin\Roles::deleteRole/$1');
-
-// $routes->get('admin/manage_roles/edit/(:num)', 'admin\Roles::addRoles/$1');
+$routes->get('admin/manage_roles/edit/(:num)', 'admin\Roles::addRoles/$1');
 $routes->post('admin/manage_roles/status', 'admin\Roles::changeStatus');
 
 

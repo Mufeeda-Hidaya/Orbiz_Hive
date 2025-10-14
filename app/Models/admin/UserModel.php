@@ -14,6 +14,11 @@ class UserModel extends Model
     protected $createdField = 'created_at';
     protected $updatedField = 'updated_at';
 
+    public function getAllRoles()
+    {
+        return $this->db->table('roles')->get()->getResult();
+    }
+
     public function userInsert($data) {
         return $this->db->table($this->table)->insert($data);
     }
@@ -23,16 +28,6 @@ class UserModel extends Model
                         ->where('user_id', $user_id)
                         ->update($data);
     }
- 
-    public function getAllRoles()
-    {
-        return $this->db->table('roles')
-                        ->select('role_id, role_name')
-                        ->where('status', 1)
-                        ->get()
-                        ->getResult();
-    }
-
     public function getAllFilteredRecords($searchVal = '', $start = 0, $length = 10, $orderBy = 'u.user_id', $orderDir = 'desc')
 {
     $builder = $this->db->table('user u')

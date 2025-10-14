@@ -32,12 +32,14 @@ class User extends BaseController
     }
     public function addUser()
     {
-        // $data['roles'] = $this->userModel->getAllRoles();
-        $template = view('admin/common/header');
-        $template.= view('admin/common/left_menu');
-        $template.= view('admin/add_user');
-        $template.= view('admin/common/footer');
-        $template.= view('admin/page_scripts/userjs');
+        $data['roles'] = $this->userModel->getAllRoles();
+
+        $template  = view('admin/common/header');
+        $template .= view('admin/common/left_menu');
+        $template .= view('admin/add_user', $data);
+        $template .= view('admin/common/footer');
+        $template .= view('admin/page_scripts/userjs');
+
         return $template;
     }
     public function edit($id)
@@ -104,8 +106,7 @@ class User extends BaseController
         "data" => $result
     ]);
 }
-    public function saveUser() 
-    {
+    public function saveUser() {
         $user_id  = $this->request->getPost('user_id');
         $name     = $this->request->getPost('name');
         $email    = $this->request->getPost('email');
