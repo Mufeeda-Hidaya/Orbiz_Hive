@@ -14,6 +14,25 @@ class UserModel extends Model
     protected $createdField = 'created_at';
     protected $updatedField = 'updated_at';
 
+    public function userInsert($data) {
+        return $this->db->table($this->table)->insert($data);
+    }
+ 
+    public function updateUser($user_id, $data) {
+        return $this->db->table($this->table)
+                        ->where('user_id', $user_id)
+                        ->update($data);
+    }
+ 
+    public function getAllRoles()
+    {
+        return $this->db->table('roles')
+                        ->select('role_id, role_name')
+                        ->where('status', 1)
+                        ->get()
+                        ->getResult();
+    }
+
     public function getAllFilteredRecords($searchVal = '', $start = 0, $length = 10, $orderBy = 'u.user_id', $orderDir = 'desc')
 {
     $builder = $this->db->table('user u')
@@ -64,4 +83,21 @@ class UserModel extends Model
         $row = $builder->get()->getRow();
         return $row ? $row->filRecords : 0;
     }
+        public function update($user_Id, $data)
+    {
+        $builder = $this->db->table('user');
+        $builder->where('role_id', $user_Id); 
+        $builder->update($data);
+
+        return $this->db->affectedRows() > 0;
+    }
+
+    public function getByid($user_Id)
+    {
+        return $this->db->table('user')
+            ->where('role_id', $user_Id)
+            ->get()
+            ->getRow();
+    }
+
 }

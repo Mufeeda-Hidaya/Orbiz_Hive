@@ -11,7 +11,8 @@
                 </div>
                 <div id="messageBox" class="alert d-none text-center" role="alert"></div>
                 <div class="card-body">
-                    <form id="roleForm" action="<?= base_url('admin/manage_role/store') ?>" class="p-3">
+                    <form id="roleForm" action="<?= base_url('admin/manage_roles/save') ?>" method="POST" class="p-3">
+
                         <input type="hidden" name="role_id" id="role_id"
                             value="<?= isset($role['role_id']) ? esc($role['role_id']) : '' ?>">
                         <div class="mb-3">
@@ -30,7 +31,7 @@
                                 </div>
                                 <div class="row">
                                     <?php
-                                    $menus = ['Dashboard', 'Manage Role', 'Manage Admin User', 'Manage Course'];
+                                    $menus = ['Dashboard', 'Manage Role', 'Manage Admin User'];
                                     foreach ($menus as $menu):
                                         $menuKey = ucwords(str_replace('_', ' ', $menu));
                                         $isChecked = (isset($access[$menuKey]) && $access[$menuKey] == 1) ? 'checked' : '';
@@ -48,7 +49,7 @@
                                 </div>
 
                                 <div class="col-12 d-flex justify-content-end gap-2">
-                                    <a href="<?= base_url('admin/manage_role') ?>" class="btn btn-secondary">Discard</a>
+                                    <a href="<?= base_url('admin/manage_roles') ?>" class="btn btn-secondary">Discard</a>
                                     <button type="submit" class="btn btn-primary enter-btn" id="saveBtn">Save Role</button>
                                 </div>
 

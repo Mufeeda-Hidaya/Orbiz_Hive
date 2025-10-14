@@ -1,5 +1,86 @@
 <script>
-$(document).ready(function() {
+    $(document).ready(function () {
+    const $saveBtn = $('#saveBtn');
+    const $roleForm = $('#roleForm');
+    const $roleName = $('#role_name');
+
+    let originalData = $roleForm.serialize();
+
+    $saveBtn.prop('disabled', true).css({ opacity: 0.6, pointerEvents: 'none' });
+    function checkFormChanges() {
+        let currentData = $roleForm.serialize();
+        if (currentData !== originalData) {
+            $saveBtn.prop('disabled', false).css({ opacity: 1, pointerEvents: 'auto' });
+        } else {
+            $saveBtn.prop('disabled', true).css({ opacity: 0.6, pointerEvents: 'none' });
+        }
+    }
+    $roleForm.on('input change', 'input, select, textarea', checkFormChanges);
+
+    function resetFormState() {
+        originalData = $roleForm.serialize();
+        $saveBtn.prop('disabled', true).css({ opacity: 0.6, pointerEvents: 'none' });
+    }
+       const $selectAll = $("#select_all_permissions");
+    const $permissions = $(".permission-checkbox");
+    if ($permissions.length > 0 && $permissions.filter(":checked").length === $permissions.length) {
+        $selectAll.prop("checked", true);
+    }
+    $selectAll.on("change", function () {
+        $permissions.prop("checked", $(this).is(":checked"));
+    });
+
+    $permissions.on("change", function () {
+        if ($permissions.filter(":checked").length === $permissions.length) {
+            $selectAll.prop("checked", true);
+        } else {
+            $selectAll.prop("checked", false);
+        }
+    });
+    $saveBtn.prop('disabled', true).css({ opacity: 0.6, pointerEvents: 'none' });
+        function enableSaveButton() {
+            $saveBtn.prop('disabled', false).css({ opacity: 1, pointerEvents: 'auto' });
+        } 
+        $roleName.on('input', enableSaveButton);
+        $permissions.on('change', enableSaveButton);
+        $('#roleForm').on('submit', function (e) {
+            e.preventDefault();
+            var form = $(this);
+            var url = form.attr('action');
+             $saveBtn.prop('disabled', true).css({ opacity: 0.6, pointerEvents: 'none' });
+           $.post(url, $('#roleForm').serialize(), function(response) {
+                $('#messageBox').removeClass('d-none alert-success alert-danger'); 
+
+                if (response.status === 'success' || response.status == 1) {
+                    $('#messageBox')
+                        .addClass('alert-success')
+                        .text(response.msg || response.message)
+                        .show();
+
+                        setTimeout(function () {
+                            window.location.href = "<?php echo base_url('admin/manage_roles'); ?>";
+                        }, 1500);
+                         resetFormState();
+                } else {
+                    $('#messageBox')
+                        .addClass('alert-danger')
+                        .text(response.message || 'Something went wrong')
+                        .show();
+                        checkFormChanges();
+                }
+
+                setTimeout(function() {
+                    $('#messageBox').fadeOut();
+                }, 2000);
+            }, 'json');
+        });
+
+});
+    
+// data table
+
+
+$(document).ready(function () {
     var table = $('#rolesList').DataTable({
         processing: true,
         serverSide: true,
@@ -10,22 +91,22 @@ $(document).ready(function() {
         },
         columns: [
             { data: "slno", className: "text-start" },
-            { data: "role_Name", className: "text-start" },
+            { data: "role_name", className: "text-start" },
             { data: "status_switch", className: "text-start" },
-            { 
-                data: "role_Id",
-                render: function(id, type, row) {
+            {
+                data: "role_id",
+                render: function (id) {
                     return `
                         <div class="text-start">
-                            <a href="<?= base_url('admin/roles/edit/') ?>${id}" title="Edit" style="margin-right:5px;">
+                            <a href="<?= base_url('admin/manage_roles/edit/') ?>${id}" title="Edit" style="margin-right:5px;">
                                 <i class="bi bi-pencil-square"></i>
                             </a>
-                            <i class="bi bi-trash text-danger icon-clickable" onclick="confirmDelete(${id})"></i>
+                            <i class="bi bi-trash text-danger icon-delete" data-id="${id}" style="cursor:pointer;"></i>
                         </div>
                     `;
                 }
             },
-            { data: "role_Id", visible: false }
+            { data: "role_id", visible: false }
         ],
         order: [[4, 'desc']],
         columnDefs: [
@@ -35,7 +116,6 @@ $(document).ready(function() {
         scrollX: false,
         autoWidth: false
     });
-
     table.on('order.dt search.dt draw.dt', function () {
         table.column(0, { search: 'applied', order: 'applied' })
             .nodes()
@@ -44,11 +124,57 @@ $(document).ready(function() {
                 cell.innerHTML = pageInfo.start + i + 1;
             });
     });
-});
+    function showMessage(type, message) {
+        $('#messageBox')
+            .removeClass('d-none alert-success alert-danger')
+            .addClass('alert-' + type)
+            .text(message);
+
+        setTimeout(() => {
+            $('#messageBox').addClass('d-none').text('');
+        }, 3000);
+    }
 
 
 
+    //delete roles
 
+    $('#rolesList').on('click', '.icon-delete', function () {
+    var roleId = $(this).data('id');
+    var row = $(this).closest('tr');
+
+    Swal.fire({
+        title: 'Delete Confirmation',
+        text: "Are you sure you want to delete this user?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',       
+        cancelButtonColor: '#3085d6',     
+        confirmButtonText: 'Delete',      
+        cancelButtonText: 'Cancel',       
+        reverseButtons: true             
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: "<?= base_url('admin/manage_roles/delete') ?>",
+                type: "POST",
+                dataType: "json",
+                data: { role_id: roleId },
+                success: function (res) {
+                    if (res.success) {
+                        showMessage('success', res.message);
+                        table.ajax.reload(null, false); 
+                    } else {
+                        showMessage('danger', res.message);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    showMessage('danger', 'Something went wrong: ' + error);
+                }
+            });
+        }
+    });
+    });
 
 
 //Add category
@@ -84,82 +210,58 @@ $(document).ready(function() {
 // });
 
 //Active and Inactive status
-// var baseUrl = "<?= base_url() ?>";
+var baseUrl = "<?= base_url('/') ?>"; // ensures trailing slash
 
-// $(document).on('click', '.status-toggle', function() {
-//     var badge = $(this);
-//     var roleId = badge.data('id');
-//     var currentStatus = badge.text() === 'Active' ? 1 : 2;
-//     var newStatus = currentStatus === 1 ? 2 : 1;
+$(document).on('click', '.status-toggle', function() {
+    var badge = $(this);
+    var roleId = badge.data('id');
 
-//     $.ajax({
-//         url: baseUrl + 'admin/roles/status',
-//         type: 'POST',
-//         dataType: 'json',
-//         data: {
-//             role_Id: roleId,
-//             role_Status: newStatus
-//         },
-//         success: function(response) {
-//             if (response.success) {
-//                 // Update badge instantly
-//                 if (newStatus === 1) {
-//                     badge.removeClass('bg-gradient-secondary').addClass('bg-gradient-success').text('Active');
-//                 } else {
-//                     badge.removeClass('bg-gradient-success').addClass('bg-gradient-secondary').text('Inactive');
-//                 }
+    var currentStatus = badge.text().trim().toLowerCase() === 'active' ? 1 : 2;
+    var newStatus = currentStatus === 1 ? 2 : 1;
 
-//                 $('#messageBox')
-//                     .removeClass('alert-danger')
-//                     .addClass('alert-success')
-//                     .text(response.message)
-//                     .show();
-//             } else {
-//                 $('#messageBox')
-//                     .removeClass('alert-success')
-//                     .addClass('alert-danger')
-//                     .text(response.message)
-//                     .show();
-//             }
+    $.ajax({
+        url: baseUrl + 'admin/manage_roles/status',
+        type: 'POST',
+        dataType: 'json',
+        data: {
+            role_id: roleId,   // must match controller
+            status: newStatus  // must match controller
+        },
+        success: function(response) {
+            if (response.success) {
+                if (newStatus === 1) {
+                    badge.removeClass('bg-gradient-secondary').addClass('bg-gradient-success').text('Active');
+                } else {
+                    badge.removeClass('bg-gradient-success').addClass('bg-gradient-secondary').text('Inactive');
+                }
 
-//             setTimeout(() => { $('#messageBox').fadeOut(); }, 2000);
-//         },
-//         error: function(xhr, status, error) {
-//             $('#messageBox')
-//                 .removeClass('alert-success')
-//                 .addClass('alert-danger')
-//                 .text('AJAX error: ' + error)
-//                 .show();
-//         }
-//     });
-// });
+                $('#messageBox')
+                    .removeClass('alert-danger d-none')
+                    .addClass('alert-success')
+                    .text(response.message)
+                    .show();
+            } else {
+                $('#messageBox')
+                    .removeClass('alert-success d-none')
+                    .addClass('alert-danger')
+                    .text(response.message)
+                    .show();
+            }
 
-//Delete
-// function confirmDelete(roleId) {
-//     Swal.fire({
-//         title: 'Are you sure?',
-//         text: 'You want to delete this Role?',
-//         icon: 'warning',
-//         showCancelButton: true,
-//         confirmButtonText: 'Delete',
-//         cancelButtonText: 'Cancel',
-//     }).then((result) => {
-//         if (result.isConfirmed) {
-//             $.ajax({
-//                 url: "<?php echo base_url('admin/roles/delete/'); ?>" + roleId,
-//                 type: "POST",
-//                 success: function(response) {
-//                     Swal.fire('Deleted!', 'Roles has been deleted.', 'success')
-//                         .then(() => {
-//                             location.reload(); 
-//                         });
-//                 },
-//                 error: function(xhr, status, error) {
-//                     Swal.fire('Error!', 'Something went wrong.', 'error');
-//                 }
-//             });
-//         }
-//     });
-// }
+            setTimeout(() => { $('#messageBox').fadeOut(); }, 2000);
+        },
+        error: function(xhr, status, error) {
+            console.log('AJAX Error:', xhr.responseText); // logs exact server error
+            $('#messageBox')
+                .removeClass('alert-success d-none')
+                .addClass('alert-danger')
+                .text('AJAX error: ' + error)
+                .show();
+        }
+    });
+});
+
+
+});
 
 </script>
