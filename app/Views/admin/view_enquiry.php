@@ -30,7 +30,7 @@
           </table>
 
           <div class="text-end mt-3">
-            <a href="<?= base_url('admin/enquiries') ?>" class="btn btn-secondary">Back to List</a>
+            <a href="<?= base_url('admin/manage_enquiry') ?>" class="btn btn-secondary">Back to List</a>
           </div>
         </div>
       </div>

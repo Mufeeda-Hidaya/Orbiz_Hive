@@ -83,6 +83,21 @@ class UserModel extends Model
         $row = $builder->get()->getRow();
         return $row ? $row->filRecords : 0;
     }
-    
+        public function update($user_Id, $data)
+    {
+        $builder = $this->db->table('user');
+        $builder->where('role_id', $user_Id); 
+        $builder->update($data);
+
+        return $this->db->affectedRows() > 0;
+    }
+
+    public function getByid($user_Id)
+    {
+        return $this->db->table('user')
+            ->where('role_id', $user_Id)
+            ->get()
+            ->getRow();
+    }
 
 }

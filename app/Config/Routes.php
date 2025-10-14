@@ -26,10 +26,19 @@ $routes->get('admin/manage_enquiry/view_enquiry/(:num)', 'admin\Enquiry::view/$1
 $routes->get('admin/manage_roles', 'admin\Roles::index');
 $routes->post('admin/manage_roles/rolelistAjax', 'admin\Roles::roleListAjax');
 $routes->get('admin/add_role', 'admin\Roles::addRoles');
-$routes->get('admin/roles/edit/(:num)', 'admin\Roles::addRoles/$1');
-$routes->post('admin/roles/save', 'admin\Roles::saveRoles');
-$routes->post('admin/roles/status', 'admin\Roles::changeStatus');
-$routes->post('admin/roles/delete/(:any)', 'admin\Roles::deleteRoles/$1');
+$routes->post('admin/manage_roles/save', 'Admin\Roles::store');
+$routes->post('admin/manage_roles/delete', 'admin\Roles::deleteRole/$1');
+
+// $routes->get('admin/manage_roles/edit/(:num)', 'admin\Roles::addRoles/$1');
+$routes->post('admin/manage_roles/status', 'admin\Roles::changeStatus');
+
+
+
+
+
+// $routes->get('admin/add_role/edit/(:num)', 'admin\ManageRole::edit/$1');
+// $routes->post('admin/manage_role/update/(:num)', 'admin\ManageRole::update/$1');
+
 
 //manage users
 $routes->get('admin/manage_user', 'admin\User::index');
@@ -38,7 +47,7 @@ $routes->get('admin/add_user', 'admin\User::addUser');
 $routes->post('admin/save/user', 'admin\User::saveUser');
 $routes->get('admin/add_user/edit/(:num)', 'admin\User::edit/$1');
 $routes->post('admin/manage_user/delete', 'admin\User::deleteUser');
-$routes->post('admin/manage_user/toggleStatus', 'admin\User::toggleStatus');
+$routes->post('admin/manage_user/status', 'admin\User::changeStatus');
 
 
 

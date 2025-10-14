@@ -6,8 +6,18 @@ use CodeIgniter\Model;
 class RolesModel extends Model
 {
     protected $table = 'roles';
-    protected $primaryKey = 'role_Id';
-    protected $allowedFields = ['role_Name', 'role_Status', 'role_Createdon', 'role_Createdby', 'role_Modifyon', 'role_Modifyby'];
+    protected $primaryKey = 'role_id';
+    protected $allowedFields = [
+        'role_name',
+        'status',
+        'created_on',
+        'created_by',
+        'updated_on',
+        'updated_by'
+    ];
+    protected $useTimestamps = false;
+    protected $returnType = 'array';
+
 
     public function getAllFilteredRecords($condition, $start, $length, $orderBy, $orderDir)
     {
@@ -32,7 +42,7 @@ class RolesModel extends Model
             ->get()
             ->getRow();
     }
-}
+
  
 // public function isRolesExists($roleName, $excludeId = null) {
 //     $builder = $this->db->table('roles');
@@ -56,66 +66,29 @@ class RolesModel extends Model
 	
 	
 
-// public function updateRoles($roleId, $data)
-// {
-//     $this->db->table('roles')
-//         ->where('role_Id', $roleId)
-//         ->update($data);
+public function updateRoles($roleId, $data)
+{
+    $builder = $this->db->table('roles');
+    $builder->where('role_id', $roleId); // make sure column name matches DB
+    $builder->update($data);
 
-//     $roles = $this->db->table('roles')
-//      //   ->select('cat_Discount_Value, cat_Discount_Type')
-//         ->where('role_Id', $roleId)
-// 		->where('role_Status', 1)
-//         ->get()
-//         ->getRow();
+    // Return true if any rows affected
+    return $this->db->affectedRows() > 0;
+}
 
-//     if (!$roles) {
-//         return false;
-//     }
+public function getRolesByid($roleId)
+{
+    return $this->db->table('roles')
+        ->where('role_id', $roleId)
+        ->get()
+        ->getRow();
+}
 
-// }
 
-	// delete category
+
+}
 	
-		// public function deleteRolesById($role_id, $modified_by)
-		// {
-
-			
-		// 		return $this->db->table('roles')
-		// 			->where('role_Id', $role_id)
-		// 			->update([
-		// 				'role_Status'   => 3,
-		// 				'role_Modifyon' => date('Y-m-d H:i:s'),
-		// 				'role_Modifyby' => $modified_by
-		// 			]);
-		
-		// }
 	
-		
-	//**************************Data table */
-				
-// 	public function getAllFilteredRecords($condition, $start, $length, $orderBy, $orderDir)
-//     {
-//         return $this->db->table($this->table)
-//             ->where($condition)
-//             ->orderBy($orderBy, $orderDir)
-//             ->limit($length, $start)
-//             ->get()
-//             ->getResult(); 
-//     }
-//     public function getAllCount()
-//     {
-//         return $this->db->table($this->table)->countAll();
-//     }
-//     public function getFilterCount($condition)
-//     {
-//         return $this->db->table($this->table)
-//             ->select('COUNT(*) as filRecords')
-//             ->where($condition)
-//             ->get()
-//             ->getRow(); 
-//     }
-// }
 
     
 

@@ -23,6 +23,7 @@
         </div>
 
         <div class="card-body ">
+          <div id="messageBox" class="alert d-none text-center" role="alert"></div>
           <div class="table-responsive p-0">
             <table class="table align-items-center mb-0" id="rolesList">
               <thead>
