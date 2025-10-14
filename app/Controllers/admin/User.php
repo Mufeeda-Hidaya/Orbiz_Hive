@@ -63,7 +63,7 @@ class User extends BaseController
         0 => 'u.user_id',
         1 => 'u.user_name',
         2 => 'u.email',
-        3 => 'r.role_Name',
+        3 => 'r.role_name',
         4 => 'u.status',
         5 => 'u.user_id'
     ];
@@ -88,7 +88,7 @@ class User extends BaseController
             'slno'          => $slno++,
             'user_name'     => $user->user_name,
             'email'         => $user->email,
-            'role_Name'     => $user->role_Name ?? 'N/A',
+            'role_name'     => $user->role_Name ?? 'N/A',
             'status_switch' => $statusBadge,
             'user_id'       => $user->user_id
         ];
@@ -250,34 +250,41 @@ class User extends BaseController
     ]);
 }
 
-public function toggleStatus()
+public function changeStatus()
 {
-    if ($this->request->isAJAX()) {
-        $user_id = $this->request->getPost('user_id');
-        $status  = $this->request->getPost('status');
+    $user_Id = $this->request->getPost('user_id');
+    $newStatus = $this->request->getPost('status');
 
-        if (!$user_id || !in_array((string)$status, ['1','2'])) {
-            return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => 'Invalid Status Value'
-            ]);
-        }
+    if (!$user_Id || !$newStatus) {
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'Invalid request'
+        ]);
+    }
 
-        $updated = $this->userModel->update($user_id, ['status' => $status]);
+    $users = $this->userModel->getUserByid($user_Id);
 
-        if ($updated) {
-            return $this->response->setJSON([
-                'status' => 'success',
-                'message' => 'Status Updated Successfully!',
-                'new_status' => $status
-            ]);
-        } else {
-            return $this->response->setJSON([
-                'status' => 'error',
-                'message' => 'Update Failed',
-                'new_status' => $status
-            ]);
-        }
+    if (!$users) {
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'User not found'
+        ]);
+    }
+
+    $update = $this->userModel->updateStatus($user_Id, ['status' => $newStatus]);
+
+    if ($update) {
+        return $this->response->setJSON([
+            'success' => true,
+            'message' => 'User Status Updated Successfully!',
+            'new_status' => $newStatus
+        ]);
+    } else {
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'Failed To Update User Status!',
+            'new_status' => $newStatus
+        ]);
     }
 }
 
