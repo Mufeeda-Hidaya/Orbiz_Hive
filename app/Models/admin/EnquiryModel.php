@@ -8,7 +8,7 @@ class EnquiryModel extends Model
 {
     protected $table = 'enquiries';
     protected $primaryKey = 'enquiry_id';
-    protected $allowedFields = ['user_id', 'product_name', 'quantity', 'status', 'created_at', 'updated_at'];
+    protected $allowedFields = ['user_id', 'product_name', 'product_desc', 'quantity', 'status', 'created_at', 'updated_at'];
 
     protected $useTimestamps = true;
     protected $createdField = 'created_at';

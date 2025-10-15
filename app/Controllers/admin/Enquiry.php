@@ -4,6 +4,7 @@ namespace App\Controllers\admin;
 
 use App\Controllers\BaseController;
 use App\Models\admin\EnquiryModel;
+use App\Models\admin\UserModel;
 
 class Enquiry extends BaseController
 {
