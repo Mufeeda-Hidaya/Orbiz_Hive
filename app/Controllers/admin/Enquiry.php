@@ -31,7 +31,7 @@ class Enquiry extends BaseController
 public function view($id)
 {
     $enquiry = $this->enquiryModel
-        ->select('e.enquiry_id, e.created_at, e.user_id, e.product_name, e.quantity, u.user_name, u.email')
+        ->select('e.enquiry_id, e.created_at, e.user_id, e.product_name, e.quantity, u.name, u.email')
         ->from('enquiries e')
         ->join('user u', 'u.user_id = e.user_id', 'left')
         ->where('e.enquiry_id', $id)
@@ -59,11 +59,11 @@ public function view($id)
         if (!empty($searchValue)) {
             $searchValue = trim(preg_replace('/\s+/', ' ', $searchValue));
             $noSpaceSearch = str_replace(' ', '', strtolower($searchValue));
-            $condition .= " AND REPLACE(LOWER(u.user_name), ' ', '') LIKE '%" .
+            $condition .= " AND REPLACE(LOWER(u.name), ' ', '') LIKE '%" .
                 $this->enquiryModel->db->escapeLikeString($noSpaceSearch) . "%'";
         }
 
-        $columns = ['u.user_name', 'e.created_at', 'e.enquiry_id'];
+        $columns = ['u.name', 'e.created_at', 'e.enquiry_id'];
         $orderColumnIndex = intval($this->request->getPost('order')[0]['column'] ?? 0);
         $orderDir = $this->request->getPost('order')[0]['dir'] ?? 'desc';
         $orderBy = $columns[$orderColumnIndex] ?? 'e.enquiry_id';
@@ -77,7 +77,7 @@ public function view($id)
             $data[] = [
                 'slno' => $slno++,
                 'enquiry_id' => $row->enquiry_id,
-                'customer_name' => $row->user_name,
+                'customer_name' => $row->name,
                 'created_at' => date("d M Y", strtotime($row->created_at))
             ];
         }

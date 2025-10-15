@@ -152,18 +152,4 @@ input.form-control, select.form-control {
 .cursor-padding {
   padding-left: 10px; 
 }
-/* logout alert */
-/* .swal2-popup {
-    font-family: 'Inter', sans-serif;
-    border-radius: 12px;
-}
-.swal2-title {
-    font-weight: 600;
-    font-size: 22px;
-}
-.swal2-confirm {
-    background-color: #3085d6 !important;
-}
-.swal2-cancel {
-    background-color: #d33 !important;
-} */
+

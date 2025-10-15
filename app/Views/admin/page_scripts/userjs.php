@@ -106,7 +106,10 @@ $(document).ready(function () {
             });
         });
     });
- });
+});
+
+//  data table
+
 $(document).ready(function () {
     var table = $('#userTable').DataTable({
         processing: true,
@@ -118,7 +121,7 @@ $(document).ready(function () {
         },
         columns: [
             { data: "slno", className: "text-start" },
-            { data: "user_name", className: "text-start" },
+            { data: "name", className: "text-start" },
             { data: "email", className: "text-start" },
             { data: "role_name", className: "text-start" },
             { data: "status_switch", className: "text-start" },
@@ -247,63 +250,6 @@ $(document).on('click', '.status-toggle', function() {
     });
 });
  
-
-    // Save user
-
-//    $(document).ready(function () {
-//     $('#userForm').on('submit', function (e) {
-//         e.preventDefault();
-
-//         let formData = new FormData(this);
-
-//         $.ajax({
-//             url: '<?= base_url("admin/save/user") ?>',
-//             type: 'POST',
-//             data: formData,
-//             processData: false,
-//             contentType: false,
-//             dataType: 'json',
-//             beforeSend: function () {
-//                 $('#saveUserBtn').prop('disabled', true).text('Saving...');
-//             },
-//             success: function (response) {
-//                 $('#saveUserBtn').prop('disabled', false).text('Save User');
-//                 if (response.success) {
-//                     Swal.fire({
-//                         icon: 'success',
-//                         title: 'Success',
-//                         text: response.message,
-//                         timer: 2000,
-//                         showConfirmButton: false
-//                     }).then(() => {
-//                         window.location.href = response.redirect;
-//                     });
-//                 } else {
-//                     Swal.fire({
-//                         icon: 'error',
-//                         title: 'Error',
-//                         text: response.message,
-//                     });
-//                 }
-//             },
-//             error: function () {
-//                 $('#saveUserBtn').prop('disabled', false).text('Save User');
-//                 Swal.fire({
-//                     icon: 'error',
-//                     title: 'Server Error',
-//                     text: 'Something went wrong. Please try again.',
-//                 });
-//             }
-//         });
-//     });
-// });
-
-
-// Manage admin user password toggle
-
-    
-
-
     // Toggle password visibility
 $('.toggle-password').click(function() {
     var input = $(this).closest('.input-group').find('input');

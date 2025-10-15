@@ -53,7 +53,7 @@ class User extends BaseController
         $template .= view('admin/common/footer');
         $template .= view('admin/page_scripts/userjs');
         return $template;
-}
+    }
    public function userListAjax()
 {
     $draw      = $this->request->getPost('draw') ?? 1;
@@ -63,7 +63,7 @@ class User extends BaseController
 
     $columns = [
         0 => 'u.user_id',
-        1 => 'u.user_name',
+        1 => 'u.name',
         2 => 'u.email',
         3 => 'r.role_name',
         4 => 'u.status',
@@ -88,9 +88,9 @@ class User extends BaseController
 
         $result[] = [
             'slno'          => $slno++,
-            'user_name'     => $user->user_name,
+            'name'          => $user->name,
             'email'         => $user->email,
-            'role_name'     => $user->role_Name ?? 'N/A',
+            'role_name'     => $user->role_name ?? 'N/A',
             'status_switch' => $statusBadge,
             'user_id'       => $user->user_id
         ];

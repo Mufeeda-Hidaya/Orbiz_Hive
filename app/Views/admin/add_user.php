@@ -13,20 +13,22 @@
         <div class="card-body px-4 py-4">
           <div id="messageBox" class="alert d-none text-center" role="alert"></div>
 
-          <form id="userForm" method="post" data-edit="true">
+          <form id="userForm" method="post" data-edit="<?= isset($userData['user_id']) ? 'true' : 'false' ?>">
             <?php if (isset($userData['user_id'])): ?>
               <input type="hidden" name="user_id" value="<?= esc($userData['user_id']) ?>">
             <?php endif; ?>
 
             <div class="row">
               <div class="col-md-6 mb-3">
-                <label class="form-label">Name<span class="text-danger">*</span></label>
-                <input type="text" name="user_name" class="form-control cursor-padding" value="<?= isset($userData['name']) ? esc($userData['name']) : '' ?>" autocomplete="off" required>
+                <label class="form-label">Name <span class="text-danger">*</span></label>
+                <input type="text" name="name" class="form-control cursor-padding"
+                       value="<?= isset($userData['name']) ? esc($userData['name']) : '' ?>" autocomplete="off" required>
               </div>
 
               <div class="col-md-6 mb-3">
-                <label class="form-label">Email<span class="text-danger">*</span></label>
-                <input type="email" name="email" class="form-control cursor-padding" value="<?= isset($userData['email']) ? esc($userData['email']) : '' ?>" autocomplete="off" required>
+                <label class="form-label">Email <span class="text-danger">*</span></label>
+                <input type="email" name="email" class="form-control cursor-padding"
+                       value="<?= isset($userData['email']) ? esc($userData['email']) : '' ?>" autocomplete="off" required>
               </div>
             </div>
 
@@ -49,7 +51,11 @@
 
               <div class="col-md-6 mb-3">
                 <label class="form-label">Phone Number</label>
-                <input type="text" name="phone" class="form-control cursor-padding" maxlength="20" value="<?= isset($userData['phone']) ? esc($userData['phone']) : '' ?>" oninput="this.value = this.value.replace(/[^0-9 +]/g, '')" autocomplete="off" required>
+                <input type="text" name="phone" class="form-control cursor-padding"
+                       maxlength="20"
+                       value="<?= isset($userData['phone']) ? esc($userData['phone']) : '' ?>"
+                       oninput="this.value = this.value.replace(/[^0-9 +]/g, '')"
+                       autocomplete="off">
               </div>
             </div>
 
@@ -58,14 +64,37 @@
                 <div class="col-md-6 mb-3">
                   <label class="form-label">Password <span class="text-danger">*</span></label>
                   <div class="input-group">
-                    <input type="password" id="new_password" name="new_password" class="form-control cursor-padding">
+                    <input type="password" name="password" class="form-control cursor-padding">
+                    <span class="input-group-text eye-icon"><i class="bi bi-eye-slash toggle-password"></i></span>
+                  </div>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
+                  <div class="input-group">
+                    <input type="password" name="confirm_password" class="form-control cursor-padding">
+                    <span class="input-group-text eye-icon"><i class="bi bi-eye-slash toggle-password"></i></span>
+                  </div>
+                </div>
+              </div>
+            <?php else: ?>
+              <div class="col-md-12 mt-4">
+                <p class="mb-0 text-muted">
+                  <b class="fs-4 fw-bold">Change Password</b>
+                </p>
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">New Password</label>
+                  <div class="input-group">
+                    <input type="password" name="new_password" class="form-control cursor-padding">
                     <span class="input-group-text eye-icon"><i class="bi bi-eye-slash toggle-password"></i></span>
                   </div>
                 </div>
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
+                  <label class="form-label">Confirm New Password</label>
                   <div class="input-group">
-                    <input type="password" id="confirm_password" name="confirm_password" class="form-control cursor-padding">
+                    <input type="password" name="confirm_password" class="form-control cursor-padding">
                     <span class="input-group-text eye-icon"><i class="bi bi-eye-slash toggle-password"></i></span>
                   </div>
                 </div>
@@ -82,7 +111,3 @@
     </div>
   </div>
 </div>
-
-
-
-

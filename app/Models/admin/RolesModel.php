@@ -7,17 +7,11 @@ class RolesModel extends Model
 {
     protected $table = 'roles';
     protected $primaryKey = 'role_id';
-    protected $allowedFields = [
-        'role_name',
-        'status',
-        'created_on',
-        'created_by',
-        'updated_on',
-        'updated_by'
-    ];
-    protected $useTimestamps = false;
-    protected $returnType = 'array';
+    protected $allowedFields = ['role_id', 'role_name', 'status'];
 
+    protected $useTimestamps = true;
+    protected $createdField = 'created_at';
+    protected $updatedField = 'updated_at';
 
     public function getAllFilteredRecords($condition, $start, $length, $orderBy, $orderDir)
     {
@@ -47,9 +41,7 @@ class RolesModel extends Model
     public function isRoleExists($roleName, $roleId = null)
     {
         $builder = $this->db->table($this->table)->where('role_name', $roleName);
-        if ($roleId) {
-            $builder->where('role_id !=', $roleId);
-        }
+        if ($roleId) $builder->where('role_id !=', $roleId);
         return $builder->countAllResults() > 0;
     }
 
@@ -61,8 +53,7 @@ class RolesModel extends Model
 
     public function updateRole($roleId, $data)
     {
-        $this->db->table($this->table)->where('role_id', $roleId)->update($data);
-        return true;
+        return $this->db->table($this->table)->where('role_id', $roleId)->update($data);
     }
 	
 // status change
@@ -82,6 +73,10 @@ class RolesModel extends Model
             ->getRow();
     }
 
+public function getAllRoles()
+    {
+        return $this->db->table('roles')->get()->getResult();
+    }
 
 
 }

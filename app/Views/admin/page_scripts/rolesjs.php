@@ -3,11 +3,10 @@
     const $saveBtn = $('#saveBtn');
     const $roleForm = $('#roleForm');
     const $roleName = $('#role_name');
-    const $messageBox = $('#messageBox');
-    const $selectAll = $("#select_all_permissions");
-    const $permissions = $(".permission-checkbox");
 
     let originalData = $roleForm.serialize();
+
+    $saveBtn.prop('disabled', true).css({ opacity: 0.6, pointerEvents: 'none' });
     function checkFormChanges() {
         let currentData = $roleForm.serialize();
         if (currentData !== originalData) {
@@ -17,21 +16,17 @@
         }
     }
 
+    $roleForm.on('input change', 'input, select, textarea', checkFormChanges);
+
     function resetFormState() {
         originalData = $roleForm.serialize();
         $saveBtn.prop('disabled', true).css({ opacity: 0.6, pointerEvents: 'none' });
     }
-    $saveBtn.prop('disabled', true).css({ opacity: 0.6, pointerEvents: 'none' });
-    $roleForm.on('input change', 'input, select, textarea', checkFormChanges);
-    function enableSaveButton() {
-        $saveBtn.prop('disabled', false).css({ opacity: 1, pointerEvents: 'auto' });
-    }
-    $roleName.on('input', enableSaveButton);
-    $permissions.on('change', enableSaveButton);
+       const $selectAll = $("#select_all_permissions");
+    const $permissions = $(".permission-checkbox");
     if ($permissions.length > 0 && $permissions.filter(":checked").length === $permissions.length) {
         $selectAll.prop("checked", true);
     }
-
     $selectAll.on("change", function () {
         $permissions.prop("checked", $(this).is(":checked"));
     });
@@ -44,45 +39,47 @@
         }
     });
 
-    // Handle form submit
-    $roleForm.on('submit', function (e) {
-        e.preventDefault();
-        const url = $roleForm.attr('action');
         $saveBtn.prop('disabled', true).css({ opacity: 0.6, pointerEvents: 'none' });
+        function enableSaveButton() {
+            $saveBtn.prop('disabled', false).css({ opacity: 1, pointerEvents: 'auto' });
+        } 
+        $roleName.on('input', enableSaveButton);
+        $permissions.on('change', enableSaveButton);
+        $('#roleForm').on('submit', function (e) {
+            e.preventDefault();
+            var form = $(this);
+            var url = form.attr('action');
+             $saveBtn.prop('disabled', true).css({ opacity: 0.6, pointerEvents: 'none' });
+           $.post(url, $('#roleForm').serialize(), function(response) {
+                $('#messageBox').removeClass('d-none alert-success alert-danger'); 
 
-        $.post(url, $roleForm.serialize(), function(response) {
-            $messageBox.removeClass('d-none alert-success alert-danger');
+                if (response.status === 'success' || response.status == 1) {
+                    $('#messageBox')
+                        .addClass('alert-success')
+                        .text(response.msg || response.message)
+                        .show();
 
-            if (response.status === 'success' || response.status == 1) {
-                $messageBox.addClass('alert-success')
-                           .text(response.msg || response.message)
-                           .show();
+                        setTimeout(function () {
+                            window.location.href = "<?php echo base_url('admin/manage_roles'); ?>";
+                        }, 1500);
+                         resetFormState();
+                } else {
+                    $('#messageBox')
+                        .addClass('alert-danger')
+                        .text(response.message || 'Something went wrong')
+                        .show();
+                        checkFormChanges();
+                }
 
-                setTimeout(function () {
-                    window.location.href = response.redirect || "<?= base_url('admin/manage_roles') ?>";
-                }, 1500);
+                setTimeout(function() {
+                    $('#messageBox').fadeOut();
+                }, 2000);
+            }, 'json');
+            
 
-                resetFormState();
-            } else {
-                $messageBox.addClass('alert-danger')
-                           .text(response.message || 'Something went wrong')
-                           .show();
-                checkFormChanges();
-            }
-
-            setTimeout(function() {
-                $messageBox.fadeOut();
-            }, 2000);
-
-        }, 'json').fail(function(xhr) {
-            $messageBox.removeClass('d-none alert-success').addClass('alert-danger')
-                       .text('Server error. Check console.')
-                       .show();
-            console.error('AJAX Error:', xhr.responseText);
-            checkFormChanges();
         });
+
     });
-});
 
     
 // data table
@@ -106,7 +103,7 @@ $(document).ready(function () {
                 render: function (id) {
                     return `
                         <div class="text-start">
-                            <a href="<?= base_url('admin/manage_roles/edit/') ?>${id}" title="Edit" style="margin-right:5px;">
+                            <a href="<?= base_url('admin/add_role/edit/') ?>${id}" title="Edit" style="margin-right:5px;">
                                 <i class="bi bi-pencil-square"></i>
                             </a>
                             <i class="bi bi-trash text-danger icon-delete" data-id="${id}" style="cursor:pointer;"></i>

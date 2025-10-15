@@ -8,7 +8,7 @@ class UserModel extends Model
 {
     protected $table = 'user';
     protected $primaryKey = 'user_id';
-    protected $allowedFields = ['user_name', 'email', 'phone', 'password', 'status', 'created_at', 'created_by', 'updated_at', 'updated_by'];
+    protected $allowedFields = ['name','role_id','email', 'phone', 'password', 'status', 'created_at', 'created_by', 'updated_at', 'updated_by'];
 
     protected $useTimestamps = true;
     protected $createdField = 'created_at';
@@ -31,7 +31,7 @@ class UserModel extends Model
     public function getAllFilteredRecords($searchVal = '', $start = 0, $length = 10, $orderBy = 'u.user_id', $orderDir = 'desc')
 {
     $builder = $this->db->table('user u')
-        ->select('u.user_id, u.user_name, u.email, u.status, r.role_name')
+        ->select('u.user_id, u.name, u.email, u.status, r.role_name')
         ->join('roles r', 'r.role_id = u.role_id', 'left')
         ->where('u.status !=', 9);
 
@@ -40,7 +40,7 @@ class UserModel extends Model
         $noSpaceSearch = str_replace(' ', '', strtolower($searchVal));
         $escaped = $this->db->escapeLikeString($noSpaceSearch);
         $builder->where("( 
-            REPLACE(LOWER(u.user_name), ' ', '') LIKE '%{$escaped}%' 
+            REPLACE(LOWER(u.name), ' ', '') LIKE '%{$escaped}%' 
             OR REPLACE(LOWER(u.email), ' ', '') LIKE '%{$escaped}%' 
             OR REPLACE(LOWER(r.role_name), ' ', '') LIKE '%{$escaped}%'
         )", null, false);
@@ -49,8 +49,18 @@ class UserModel extends Model
     $builder->orderBy($orderBy, $orderDir)
             ->limit($length, $start);
 
-    return $builder->get()->getResult();
+    $users = $builder->get()->getResult();
+
+    // Capitalize first letter of each word in role_name
+    foreach ($users as $user) {
+        if (!empty($user->role_name)) {
+            $user->role_name = ucwords(strtolower($user->role_name));
+        }
+    }
+
+    return $users;
 }
+
 
 
     public function getAllUserCount()
@@ -69,7 +79,7 @@ class UserModel extends Model
 
         if (!empty($searchVal)) {
             $builder->groupStart()
-                ->like('LOWER(u.user_name)', strtolower($searchVal))
+                ->like('LOWER(u.name)', strtolower($searchVal))
                 ->orLike('LOWER(u.email)', strtolower($searchVal))
                 ->orLike('LOWER(r.role_name)', strtolower($searchVal))
                 ->groupEnd();
@@ -78,6 +88,8 @@ class UserModel extends Model
         $row = $builder->get()->getRow();
         return $row ? $row->filRecords : 0;
     }
+
+    
     public function getUserByid($userId)
     {
         return $this->db->table($this->table)
@@ -86,16 +98,12 @@ class UserModel extends Model
             ->getRow();
     }
 
-    /**
-     * Update user by ID
-     */
+    
     public function updateStatus($userId, $data)
     {
         $builder = $this->db->table($this->table);
         $builder->where('user_id', $userId);
         $builder->update($data);
-
-        // Return true if any row affected
         return $this->db->affectedRows() > 0;
     }
 

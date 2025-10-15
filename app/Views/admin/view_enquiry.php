@@ -20,7 +20,7 @@
             <tbody>
               <tr>
                 <td><?= $enquiry->enquiry_id ?></td>
-                <td><?= $enquiry->user_name ?></td>
+                <td><?= $enquiry->name ?></td>
                 <td><?= $enquiry->email ?></td>
                 <td><?= $enquiry->product_name ?></td>
                 <td><?= $enquiry->quantity ?></td>
