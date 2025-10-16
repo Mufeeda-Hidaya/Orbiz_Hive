@@ -135,16 +135,17 @@ class User extends BaseController
             if (!preg_match('/^[0-9 +]+$/', $phone)) {
                 return $this->response->setJSON([
                     'success' => false,
-                    'message' => 'Please Enter A Valid Phone Number.'
+                    'message' => 'Please enter a valid phone number (only digits, +, and space are allowed).'
                 ]);
             }
-            if (strlen($digitsOnly) > 20) {
+            if (strlen(str_replace(' ', '', $phone)) < 6 || strlen(str_replace(' ', '', $phone)) > 15) {
                 return $this->response->setJSON([
                     'success' => false,
-                    'message' => 'Phone Number Must Not Exceed 20 Digits.'
+                    'message' => 'Phone number must be between 6 and 15 characters (including + and space).'
                 ]);
             }
         }
+
         if (empty($user_id) && empty($password)) {
             return $this->response->setJSON([
                 'success' => false,

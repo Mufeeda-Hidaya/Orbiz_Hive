@@ -18,7 +18,12 @@ $routes->get('admin/logout', 'admin\Login::logout');
 //enquiries
 $routes->get('admin/manage_enquiry', 'admin\Enquiry::index');
 $routes->post('admin/manage_enquiry/orderListAjax', 'admin\Enquiry::orderListAjax');
-$routes->get('admin/manage_enquiry/view_enquiry/(:num)', 'admin\Enquiry::view/$1');
+$routes->get('admin/manage_enquiry/view_enquiry/(:num)', 'admin\EnquiryDetail::index/$1');
+$routes->post('admin/manage_enquiry/orderDetailAjax/(:num)', 'admin\EnquiryDetail::orderDetailAjax/$1');
+$routes->post('admin/view_enquiry/delete', 'admin\EnquiryDetail::deleteEnquiry');
+$routes->get('admin/view_enquiry/edit/(:num)', 'admin\EnquiryDetail::edit/$1');
+
+
 
 // $routes->get('admin/profile', 'admin\Profile::index');
 

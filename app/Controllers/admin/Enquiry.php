@@ -29,25 +29,6 @@ class Enquiry extends BaseController
         return $template;
     }
 
-public function view($id)
-{
-    $enquiry = $this->enquiryModel
-        ->select('e.enquiry_id, e.created_at, e.user_id, e.product_name, e.quantity, u.name, u.email')
-        ->from('enquiries e')
-        ->join('user u', 'u.user_id = e.user_id', 'left')
-        ->where('e.enquiry_id', $id)
-        ->get()
-        ->getRow();
-
-    $data['enquiry'] = $enquiry ? $enquiry : null;
-
-    $template  = view('admin/common/header');
-    $template .= view('admin/common/left_menu');
-    $template .= view('admin/view_enquiry', $data);
-    $template .= view('admin/common/footer');
-
-    return $template;
-}
     public function orderListAjax()
     {
         $draw = intval($this->request->getPost('draw') ?? 1);

@@ -50,12 +50,16 @@
               </div>
 
               <div class="col-md-6 mb-3">
-                <label class="form-label">Phone Number</label>
-                <input type="text" name="phone" class="form-control cursor-padding"
-                       maxlength="20"
-                       value="<?= isset($userData['phone']) ? esc($userData['phone']) : '' ?>"
-                       oninput="this.value = this.value.replace(/[^0-9 +]/g, '')"
-                       autocomplete="off">
+                <label for="phone" class="form-label fw-semibold">Phone Number</label>
+                <input
+                  type="text"
+                  id="phone"
+                  name="phone"
+                  class="form-control cursor-padding"
+                  maxlength="15"
+                  value="<?= isset($userData['phone']) ? esc($userData['phone']) : '' ?>"
+                  oninput="this.value = this.value.replace(/[^0-9 +]/g, '')"
+                  autocomplete="off">
               </div>
             </div>
 

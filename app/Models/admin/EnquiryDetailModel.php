@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\admin;
 
 use CodeIgniter\Model;
 
@@ -28,28 +28,43 @@ class EnquiryDetailModel extends Model
             ->where('enquiry_id', $enquiryId)
             ->countAllResults();
     }
-    public function getAllFilteredRecords($enquiryId, $condition, $start, $length, $orderBy = 'enquiry_id', $orderDir = 'desc')
+    public function getAllFilteredRecords($enquiryId, $start, $length, $searchValue = '', $orderBy = 'enquiry_id', $orderDir = 'desc')
     {
-        return $this->db->table('enquiries')
-            ->select('enquiry_id, product_desc, quantity')
-            ->where('status !=', 9)
-            ->where('enquiry_id', $enquiryId)
-            ->where($condition, null, false)
-            ->orderBy($orderBy, $orderDir)
-            ->limit($length, $start)
-            ->get()
-            ->getResult();
-    }
-    public function getFilterOrderCount($enquiryId, $condition)
-    {
-        $row = $this->db->table('enquiries')
-            ->select('COUNT(*) as filRecords')
-            ->where('status !=', 9)
-            ->where('enquiry_id', $enquiryId)
-            ->where($condition, null, false)
-            ->get()
-            ->getRow();
+    $builder = $this->db->table('enquiries')
+        ->select('enquiry_id, product_name, product_desc, quantity')
+        ->where('status !=', 9)
+        ->where('enquiry_id', $enquiryId);
 
+    if(!empty($searchValue)) {
+        $builder->groupStart()
+                ->orLike('product_name', $searchValue)
+                ->orLike('product_desc', $searchValue)
+                ->orLike('quantity', $searchValue)
+                ->groupEnd();
+    }
+
+    $builder->orderBy($orderBy, $orderDir)
+            ->limit($length, $start);
+
+    return $builder->get()->getResult();
+    }
+
+    public function getFilterOrderCount($enquiryId, $searchValue = '')
+    {
+        $builder = $this->db->table('enquiries')
+            ->where('status !=', 9)
+            ->where('enquiry_id', $enquiryId);
+
+        if(!empty($searchValue)) {
+            $builder->groupStart()
+                    ->orLike('product_name', $searchValue)
+                    ->orLike('product_desc', $searchValue)
+                    ->orLike('quantity', $searchValue)
+                    ->groupEnd();
+        }
+
+        $row = $builder->select('COUNT(*) as filRecords')->get()->getRow();
         return $row ?? (object)['filRecords' => 0];
     }
+
 }
