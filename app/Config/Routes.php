@@ -22,7 +22,7 @@ $routes->get('admin/manage_enquiry/view_enquiry/(:num)', 'admin\EnquiryDetail::i
 $routes->post('admin/manage_enquiry/orderDetailAjax/(:num)', 'admin\EnquiryDetail::orderDetailAjax/$1');
 $routes->post('admin/view_enquiry/delete', 'admin\EnquiryDetail::deleteEnquiry');
 $routes->get('admin/view_enquiry/edit/(:num)', 'admin\EnquiryDetail::edit/$1');
-
+$routes->post('admin/view_enquiry/save', 'admin\EnquiryDetail::update');
 
 
 // $routes->get('admin/profile', 'admin\Profile::index');

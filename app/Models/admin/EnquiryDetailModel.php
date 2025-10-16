@@ -21,50 +21,24 @@ class EnquiryDetailModel extends Model
             ->get()
             ->getRow();
     }
-    public function getAllOrderCount($enquiryId)
+    public function getEnquiry($enquiryId)
     {
-        return $this->db->table('enquiries')
-            ->where('status !=', 9)
+        return $this->db->table($this->table)
+            ->select('user_id, created_at')
             ->where('enquiry_id', $enquiryId)
-            ->countAllResults();
-    }
-    public function getAllFilteredRecords($enquiryId, $start, $length, $searchValue = '', $orderBy = 'enquiry_id', $orderDir = 'desc')
-    {
-    $builder = $this->db->table('enquiries')
-        ->select('enquiry_id, product_name, product_desc, quantity')
-        ->where('status !=', 9)
-        ->where('enquiry_id', $enquiryId);
-
-    if(!empty($searchValue)) {
-        $builder->groupStart()
-                ->orLike('product_name', $searchValue)
-                ->orLike('product_desc', $searchValue)
-                ->orLike('quantity', $searchValue)
-                ->groupEnd();
-    }
-
-    $builder->orderBy($orderBy, $orderDir)
-            ->limit($length, $start);
-
-    return $builder->get()->getResult();
-    }
-
-    public function getFilterOrderCount($enquiryId, $searchValue = '')
-    {
-        $builder = $this->db->table('enquiries')
             ->where('status !=', 9)
-            ->where('enquiry_id', $enquiryId);
-
-        if(!empty($searchValue)) {
-            $builder->groupStart()
-                    ->orLike('product_name', $searchValue)
-                    ->orLike('product_desc', $searchValue)
-                    ->orLike('quantity', $searchValue)
-                    ->groupEnd();
-        }
-
-        $row = $builder->select('COUNT(*) as filRecords')->get()->getRow();
-        return $row ?? (object)['filRecords' => 0];
+            ->get()
+            ->getRow();
+    }
+    public function getEnquiryItems($userId, $createdAt)
+    {
+        return $this->db->table($this->table)
+            ->select('enquiry_id, product_name, product_desc, quantity')
+            ->where('status !=', 9)
+            ->where('user_id', $userId)
+            ->where('created_at', $createdAt)
+            ->get()
+            ->getResult();
     }
 
 }

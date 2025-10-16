@@ -89,13 +89,6 @@ body, html {
   align-items: center;
   text-align: center;
 }
-
-
-
-/* .login-card .form-control::placeholder {
-  color: #969393;
-} */
-
 .form-elements{
 
     margin-left:20px;
@@ -122,14 +115,11 @@ body, html {
 .text-center{
     text-align: left !important;
 }
-
-
-  .text-field {
-    background-color: #fff !important;
-    color: #000 !important;
-    border: 1px solid #ced4da !important;
-  }
-
+.text-field {
+  background-color: #fff !important;
+  color: #000 !important;
+  border: 1px solid #ced4da !important;
+}
 .custom-eye {
   cursor: pointer;
   margin-right:30px;     
@@ -152,4 +142,9 @@ input.form-control, select.form-control {
 .cursor-padding {
   padding-left: 10px; 
 }
-
+/* enquiry textarea border */
+/* .custom-textarea {
+    border: 1px solid #ced4da !important;  
+    color: #000 !important;   
+    padding-left: 10px;           
+} */

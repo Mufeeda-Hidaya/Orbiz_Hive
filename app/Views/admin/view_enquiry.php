@@ -5,8 +5,8 @@
     <div class="col-12">
       <div class="card my-4">
         <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-          <div class="bg-gradient-dark shadow-dark border-radius-lg pt-4 pb-3">
-            <h4 class="text-white text-capitalize ps-3 mb-0">Enquiry Details</h4>
+          <div class="bg-gradient-dark shadow-dark border-radius-lg pt-4 pb-3 d-flex justify-content-center">
+            <h5 class="text-white mb-0">Enquiry Details</h5>
           </div>
         </div>
         <div id="messageBox" class="alert d-none text-center" role="alert"></div>
@@ -14,7 +14,7 @@
           <div class="row mb-4">
             <!-- Left: Customer Info -->
             <div class="col-md-6">
-              <h6 class="fw-bold">Customer Info</h6>
+              <!-- <h6 class="fw-bold">Customer Info</h6> -->
               <p class="mb-1"><strong>Name:</strong> <?= $enquiry->name ?></p>
               <p class="mb-1"><strong>Address:</strong> <?= $enquiry->address ?></p>
               <p class="mb-1"><strong>Email:</strong> <?= $enquiry->email ?></p>
@@ -23,7 +23,7 @@
 
             <!-- Right: Enquiry Info -->
             <div class="col-md-6 text-md-end">
-              <h6 class="fw-bold">Enquiry Info</h6>
+              <!-- <h6 class="fw-bold">Enquiry Info</h6> -->
               <p class="mb-1"><strong>Enquiry ID:</strong> <?= $enquiry->enquiry_id ?></p>
               <p class="mb-1"><strong>Date:</strong> <?= date("d M Y", strtotime($enquiry->created_at)) ?></p>
             </div>

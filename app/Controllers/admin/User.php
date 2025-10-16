@@ -88,9 +88,9 @@ class User extends BaseController
 
         $result[] = [
             'slno'          => $slno++,
-            'name'          => $user->name,
+            'name'          => ucwords(strtolower($user->name)),
             'email'         => $user->email,
-            'role_name'     => $user->role_name ?? 'N/A',
+            'role_name'     => !empty($user->role_name) ? ucwords(strtolower($user->role_name)) : 'N/A',
             'status_switch' => $statusBadge,
             'user_id'       => $user->user_id
         ];
