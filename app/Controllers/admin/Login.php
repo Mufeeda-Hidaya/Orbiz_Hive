@@ -56,7 +56,7 @@ class Login extends BaseController
         // Set session data
         $session->set([
             'user_id'    => $user->user_id,
-            'user_name'  => $user->user_name,
+            'name'  => $user->name,
             'user_email' => $user->email,
         ]);
 

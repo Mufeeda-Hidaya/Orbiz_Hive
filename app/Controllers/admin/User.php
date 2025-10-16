@@ -32,12 +32,14 @@ class User extends BaseController
     }
     public function addUser()
     {
-        // $data['roles'] = $this->userModel->getAllRoles();
-        $template = view('admin/common/header');
-        $template.= view('admin/common/left_menu');
-        $template.= view('admin/add_user');
-        $template.= view('admin/common/footer');
-        $template.= view('admin/page_scripts/userjs');
+        $data['roles'] = $this->userModel->getAllRoles();
+
+        $template  = view('admin/common/header');
+        $template .= view('admin/common/left_menu');
+        $template .= view('admin/add_user', $data);
+        $template .= view('admin/common/footer');
+        $template .= view('admin/page_scripts/userjs');
+
         return $template;
     }
     public function edit($id)
@@ -51,7 +53,7 @@ class User extends BaseController
         $template .= view('admin/common/footer');
         $template .= view('admin/page_scripts/userjs');
         return $template;
-}
+    }
    public function userListAjax()
 {
     $draw      = $this->request->getPost('draw') ?? 1;
@@ -61,7 +63,7 @@ class User extends BaseController
 
     $columns = [
         0 => 'u.user_id',
-        1 => 'u.user_name',
+        1 => 'u.name',
         2 => 'u.email',
         3 => 'r.role_name',
         4 => 'u.status',
@@ -86,9 +88,9 @@ class User extends BaseController
 
         $result[] = [
             'slno'          => $slno++,
-            'user_name'     => $user->user_name,
+            'name'          => $user->name,
             'email'         => $user->email,
-            'role_name'     => $user->role_Name ?? 'N/A',
+            'role_name'     => $user->role_name ?? 'N/A',
             'status_switch' => $statusBadge,
             'user_id'       => $user->user_id
         ];
@@ -104,8 +106,7 @@ class User extends BaseController
         "data" => $result
     ]);
 }
-    public function saveUser() 
-    {
+    public function saveUser() {
         $user_id  = $this->request->getPost('user_id');
         $name     = $this->request->getPost('name');
         $email    = $this->request->getPost('email');
@@ -134,16 +135,17 @@ class User extends BaseController
             if (!preg_match('/^[0-9 +]+$/', $phone)) {
                 return $this->response->setJSON([
                     'success' => false,
-                    'message' => 'Please Enter A Valid Phone Number.'
+                    'message' => 'Please enter a valid phone number (only digits, +, and space are allowed).'
                 ]);
             }
-            if (strlen($digitsOnly) > 20) {
+            if (strlen(str_replace(' ', '', $phone)) < 6 || strlen(str_replace(' ', '', $phone)) > 15) {
                 return $this->response->setJSON([
                     'success' => false,
-                    'message' => 'Phone Number Must Not Exceed 20 Digits.'
+                    'message' => 'Phone number must be between 6 and 15 characters (including + and space).'
                 ]);
             }
         }
+
         if (empty($user_id) && empty($password)) {
             return $this->response->setJSON([
                 'success' => false,

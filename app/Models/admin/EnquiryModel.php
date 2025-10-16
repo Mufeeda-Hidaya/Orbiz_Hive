@@ -8,7 +8,7 @@ class EnquiryModel extends Model
 {
     protected $table = 'enquiries';
     protected $primaryKey = 'enquiry_id';
-    protected $allowedFields = ['user_id', 'product_name', 'quantity', 'status', 'created_at', 'updated_at'];
+    protected $allowedFields = ['user_id', 'product_name', 'product_desc', 'quantity', 'status', 'created_at', 'updated_at'];
 
     protected $useTimestamps = true;
     protected $createdField = 'created_at';
@@ -24,7 +24,7 @@ class EnquiryModel extends Model
     public function getAllFilteredRecords($condition, $start, $length, $orderBy = 'e.enquiry_id', $orderDir = 'desc')
     {
         return $this->db->table('enquiries e')
-            ->select('e.enquiry_id, e.created_at, u.user_name')
+            ->select('e.enquiry_id, e.created_at, u.name')
             ->join('user u', 'u.user_id = e.user_id', 'left')
             ->where('e.status !=', 9)
              ->where($condition, null, false) 

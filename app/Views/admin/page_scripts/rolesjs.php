@@ -15,6 +15,7 @@
             $saveBtn.prop('disabled', true).css({ opacity: 0.6, pointerEvents: 'none' });
         }
     }
+
     $roleForm.on('input change', 'input, select, textarea', checkFormChanges);
 
     function resetFormState() {
@@ -37,7 +38,8 @@
             $selectAll.prop("checked", false);
         }
     });
-    $saveBtn.prop('disabled', true).css({ opacity: 0.6, pointerEvents: 'none' });
+
+        $saveBtn.prop('disabled', true).css({ opacity: 0.6, pointerEvents: 'none' });
         function enableSaveButton() {
             $saveBtn.prop('disabled', false).css({ opacity: 1, pointerEvents: 'auto' });
         } 
@@ -73,9 +75,12 @@
                     $('#messageBox').fadeOut();
                 }, 2000);
             }, 'json');
+            
+
         });
 
-});
+    });
+
     
 // data table
 
@@ -98,7 +103,7 @@ $(document).ready(function () {
                 render: function (id) {
                     return `
                         <div class="text-start">
-                            <a href="<?= base_url('admin/manage_roles/edit/') ?>${id}" title="Edit" style="margin-right:5px;">
+                            <a href="<?= base_url('admin/add_role/edit/') ?>${id}" title="Edit" style="margin-right:5px;">
                                 <i class="bi bi-pencil-square"></i>
                             </a>
                             <i class="bi bi-trash text-danger icon-delete" data-id="${id}" style="cursor:pointer;"></i>
@@ -179,38 +184,42 @@ $(document).ready(function () {
 
 //Add category
 
-// var baseUrl = "<?= base_url() ?>";
-// $('#rolesSubmit').click(function(e) {
-//     e.preventDefault(); 
-//     var url = baseUrl + "admin/roles/save"; 
+// var baseUrl = "<?= base_url('/') ?>";
 
-//     $.post(url, $('#createroles').serialize(), function(response) {
+// $('#roleForm').submit(function(e) {
+//     e.preventDefault();
+
+//     var url = baseUrl + "admin/manage_roles/save";
+//     var formData = $(this).serialize();
+
+//     $.post(url, formData, function(response) {
 //         if (response.status == 1) {
 //             $('#messageBox')
-//                 .removeClass('alert-danger')
+//                 .removeClass('alert-danger d-none')
 //                 .addClass('alert-success')
-//                 .text(response.msg || 'Roles Created Successfully!')
+//                 .text(response.msg)
 //                 .show();
 
 //             setTimeout(function() {
-//                 window.location.href = baseUrl + "admin/roles/"; 
+//                 window.location.href = response.redirect;
 //             }, 1500);
 //         } else {
 //             $('#messageBox')
-//                 .removeClass('alert-success')
+//                 .removeClass('alert-success d-none')
 //                 .addClass('alert-danger')
-//                 .text(response.message || 'Please Fill all the Data')
+//                 .text(response.message || 'Please fill all required fields')
 //                 .show();
 //         }
 
 //         setTimeout(function() {
-//             $('#messageBox').empty().hide();
-//         }, 2000);
+//             $('#messageBox').fadeOut();
+//         }, 3000);
 //     }, 'json');
 // });
 
+
 //Active and Inactive status
-var baseUrl = "<?= base_url('/') ?>"; // ensures trailing slash
+var baseUrl = "<?= base_url('/') ?>"; 
 
 $(document).on('click', '.status-toggle', function() {
     var badge = $(this);
@@ -224,8 +233,8 @@ $(document).on('click', '.status-toggle', function() {
         type: 'POST',
         dataType: 'json',
         data: {
-            role_id: roleId,   // must match controller
-            status: newStatus  // must match controller
+            role_id: roleId,   
+            status: newStatus  
         },
         success: function(response) {
             if (response.success) {
