@@ -51,13 +51,12 @@ class UserModel extends Model
 
         $builder->orderBy($orderBy, $orderDir)
                 ->limit($length, $start);
-
         $users = $builder->get()->getResult();
-        foreach ($users as $user) {
-            if (!empty($user->role_name)) {
-                $user->role_name = ucwords(strtolower($user->role_name));
-            }
-        }
+        // foreach ($users as $user) {
+        //     if (!empty($user->role_name)) {
+        //         $user->role_name = ucwords(strtolower($user->role_name));
+        //     }
+        // }
 
         return $users;
     }

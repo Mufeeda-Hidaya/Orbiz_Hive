@@ -36,71 +36,26 @@ class EnquiryDetail extends BaseController
 
     public function orderDetailAjax($enquiryId)
     {
-        $draw = intval($this->request->getPost('draw') ?? 1);
-        $start = intval($this->request->getPost('start') ?? 0);
-        $length = intval($this->request->getPost('length') ?? 10);
-        $searchValue = $this->request->getPost('search')['value'] ?? '';
-
-        $enquiry = $this->enquiryDetailModel->db->table('enquiries')
-            ->select('user_id, created_at')
-            ->where('enquiry_id', $enquiryId)
-            ->where('status !=', 9)
-            ->get()
-            ->getRow();
+        $enquiry = $this->enquiryDetailModel->getEnquiry($enquiryId);
 
         if (!$enquiry) {
-            return $this->response->setJSON([
-                "draw" => $draw,
-                "recordsTotal" => 0,
-                "recordsFiltered" => 0,
-                "data" => []
-            ]);
+            return $this->response->setJSON(["data" => []]);
         }
-
-        $builder = $this->enquiryDetailModel->db->table('enquiries')
-            ->select('enquiry_id, product_name, product_desc, quantity')
-            ->where('status !=', 9)
-            ->where('user_id', $enquiry->user_id)
-            ->where('created_at', $enquiry->created_at);
-
-        if (!empty($searchValue)) {
-            $searchValueNormalized = strtolower(preg_replace('/\s+/', '', $searchValue));
-            $builder->groupStart()
-                ->where("REPLACE(LOWER(product_name), ' ', '') LIKE '%" . $this->enquiryDetailModel->db->escapeLikeString($searchValueNormalized) . "%'", null, false)
-                ->orWhere("REPLACE(LOWER(product_desc), ' ', '') LIKE '%" . $this->enquiryDetailModel->db->escapeLikeString($searchValueNormalized) . "%'", null, false)
-                ->orWhere("REPLACE(LOWER(quantity), ' ', '') LIKE '%" . $this->enquiryDetailModel->db->escapeLikeString($searchValueNormalized) . "%'", null, false)
-                ->groupEnd();
-        }
-
-        $columns = ['product_name', 'product_desc', 'quantity', 'enquiry_id'];
-        $orderColumnIndex = intval($this->request->getPost('order')[0]['column'] ?? 0);
-        $orderDir = $this->request->getPost('order')[0]['dir'] ?? 'asc';
-        $orderBy = $columns[$orderColumnIndex] ?? 'enquiry_id';
-        $builder->orderBy($orderBy, $orderDir);
-
-        $recordsTotal = $this->enquiryDetailModel->getAllOrderCount($enquiryId);
-        $recordsFiltered = $builder->countAllResults(false);
-        $records = $builder->limit($length, $start)->get()->getResult();
-
+        $records = $this->enquiryDetailModel->getEnquiryItems($enquiry->user_id, $enquiry->created_at);
         $data = [];
-        $slno = $start + 1;
+        $slno = 1;
         foreach ($records as $row) {
             $data[] = [
                 'slno' => $slno++,
-                'product_name' => $row->product_name,
-                'product_desc' => $row->product_desc,
+                'product_name' =>  ucwords(strtolower($row->product_name)),
+                'product_desc' =>  ucwords(strtolower($row->product_desc)),
                 'quantity' => $row->quantity,
                 'enquiry_id' => $row->enquiry_id
             ];
         }
-
-        return $this->response->setJSON([
-            "draw" => $draw,
-            "recordsTotal" => $recordsTotal,
-            "recordsFiltered" => $recordsFiltered,
-            "data" => $data
-        ]);
+        return $this->response->setJSON(["data" => $data]);
     }
+
     public function deleteEnquiry()
     {
         $enquiryId = $this->request->getPost('enquiry_id');
@@ -122,7 +77,34 @@ class EnquiryDetail extends BaseController
             'message' => 'Enquiry Deleted Successfully.'
         ]);
     }
+    public function edit($id)
+    {
+        $data['enquiry'] = $this->enquiryDetailModel->find($id);
 
+        $template  = view('admin/common/header');
+        $template .= view('admin/common/left_menu');
+        $template .= view('admin/add_enquiry', $data);
+        $template .= view('admin/common/footer');
+        $template .= view('admin/page_scripts/enquiryjs');
+        return $template;
+    }
+    public function update()
+    {
+        $id = $this->request->getPost('enquiry_id');
+        $data = [
+            'product_name' => $this->request->getPost('product_name'),
+            'product_desc' => $this->request->getPost('product_desc'),
+            'quantity'     => $this->request->getPost('quantity')
+        ];
+
+        $updated = $this->enquiryModel->update($id, $data);
+
+        if ($updated) {
+            return $this->response->setJSON(['status' => true, 'message' => 'Enquiry Updated Successfully.']);
+        } else {
+            return $this->response->setJSON(['status' => false, 'message' => 'Failed To Update Enquiry.']);
+        }
+    }
 
 
 }

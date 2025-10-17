@@ -77,19 +77,14 @@ $(document).ready(function() {
             },
             { data: "enquiry_id", visible: false }
         ],
-        order: [[5, 'asc']],
-        columnDefs: [{ searchable: false, orderable: false, targets: [0, 4] }],
-        language: { infoFiltered: "" },
-        scrollX: false,
+        paging: false,       
+        searching: false,    
+        ordering: false,     
+        info: false,         
+        processing: false,
+        serverSide: false,
+        language: { emptyTable: "No enquiry details available" },
         autoWidth: false
-    });
-    table.on('order.dt search.dt draw.dt', function () {
-        table.column(0, { search: 'applied', order: 'applied' })
-            .nodes()
-            .each(function (cell, i) {
-                var pageInfo = table.page.info();
-                cell.innerHTML = pageInfo.start + i + 1;
-            });
     });
 });
 // Delete enquiry item
@@ -149,6 +144,57 @@ $(document).ready(function() {
             $('#messageBox').addClass('d-none').text('');
         }, 3000);
     }
+    
+     // Save Enquiry Update
+
+    $(document).ready(function() {
+        var $form = $('#editEnquiryForm');
+        var $saveBtn = $('#saveBtn');
+        var originalData = $form.serialize();
+        $saveBtn.prop('disabled', true);
+        $form.on('input change', 'input, textarea, select', function() {
+            var currentData = $form.serialize();
+            if (currentData !== originalData) {
+                $saveBtn.prop('disabled', false); 
+            } else {
+                $saveBtn.prop('disabled', true);  
+            }
+        });
+        $form.on('submit', function(e) {
+            e.preventDefault();
+            $.ajax({
+                url: "<?= base_url('admin/view_enquiry/save') ?>",
+                type: "POST",
+                data: $form.serialize(),
+                dataType: "json",
+                beforeSend: function() {
+                    $saveBtn.prop('disabled', true).text('Saving...');
+                },
+                success: function(res) {
+                    $saveBtn.prop('disabled', false).text('Save');
+                    var alertBox = $('#messageBox');
+
+                    if (res.status) {
+                        alertBox.removeClass('d-none alert-danger').addClass('alert-success').text(res.message);
+                        originalData = $form.serialize();
+                        setTimeout(function() {
+                            window.location.href = document.referrer;
+                        }, 1500);
+                    } else {
+                        alertBox.removeClass('d-none alert-success').addClass('alert-danger').text(res.message);
+                    }
+                },
+                error: function() {
+                    $saveBtn.prop('disabled', false).text('Save');
+                    $('#messageBox').removeClass('d-none alert-success').addClass('alert-danger').text('Something went wrong.');
+                }
+            });
+        });
+        $('#cancelBtn').on('click', function() {
+            window.history.back();
+        });
+    });
+
 
 
 </script>

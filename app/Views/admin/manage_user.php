@@ -12,7 +12,7 @@
       <div class="card my-4">
         <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
           <div class="bg-gradient-dark shadow-dark border-radius-lg pt-4 pb-3 d-flex justify-content-between align-items-center">
-            <h4 class="text-white text-capitalize ps-3 mb-0">User Table</h4>
+            <h5 class="text-white text-capitalize ps-3 mb-0">User Table</h5>
             <button class="btn btn-sm btn-light text-dark me-3" id="addUserBtn">
               <a href="<?= base_url('admin/add_user') ?>">
                   <i class="fas fa-plus me-1"></i> Add User
