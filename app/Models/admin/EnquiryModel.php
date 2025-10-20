@@ -24,7 +24,7 @@ class EnquiryModel extends Model
     public function getAllFilteredRecords($condition, $start, $length, $orderBy = 'e.enquiry_id', $orderDir = 'desc')
     {
         return $this->db->table('enquiries e')
-            ->select('e.enquiry_id, e.created_at, u.name')
+            ->select('e.enquiry_id, e.created_at, u.name , u.email')
             ->join('user u', 'u.user_id = e.user_id', 'left')
             ->where('e.status !=', 9)
              ->where($condition, null, false) 

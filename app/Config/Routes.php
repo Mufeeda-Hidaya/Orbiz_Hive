@@ -7,7 +7,7 @@ use CodeIgniter\Router\RouteCollection;
  */
 $routes->get('/', 'Home::index');
 $routes->get('admin/dashboard', 'admin\Dashboard::index');
-
+$routes->get('admin/user_dashboard', 'admin\UserDashboard::index');
 //admin login
 
 $routes->get('admin', 'admin\Login::index');
@@ -41,6 +41,9 @@ $routes->post('admin/manage_roles/status', 'admin\Roles::changeStatus');
 
 //manage users
 $routes->get('admin/manage_user', 'admin\User::index');
+$routes->post('admin/save/user', 'admin\User::saveUser');
+$routes->get('admin/add_user/edit/(:num)', 'admin\User::edit/$1');
+
 $routes->post('admin/manage_user/userListAjax', 'admin\User::userListAjax');
 $routes->get('admin/add_user', 'admin\User::addUser');
 $routes->post('admin/save/user', 'admin\User::saveUser');
@@ -49,5 +52,5 @@ $routes->post('admin/manage_user/delete', 'admin\User::deleteUser');
 $routes->post('admin/manage_user/status', 'admin\User::changeStatus');
 
 
-
+$routes->get('admin/add_estimate', 'admin\Estimate::add_estimate'); 
 ?>

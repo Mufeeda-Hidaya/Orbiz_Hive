@@ -20,6 +20,11 @@ class EnquiryDetail extends BaseController
         $this->enquiryModel = new EnquiryModel();
         $this->userModel = new UserModel();
         $this->enquiryDetailModel = new EnquiryDetailModel();
+
+        if (!$this->session->has('user_id')) {
+            header('Location: ' . base_url('admin'));
+            exit();
+        }
     }
     public function index($enquiryId)
     {

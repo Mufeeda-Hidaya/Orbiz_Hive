@@ -2,14 +2,47 @@
 // User DataTable
 $(document).ready(function () {
     var baseUrl = "<?= base_url() ?>";
+
+    // Disable save button initially if editing existing user
     if ($('#userForm').data('edit') === true) {  
         $('#saveUserBtn').prop('disabled', true); 
     }
+
     $('#userForm input, #userForm select, #userForm textarea').on('input change', function () {
         $('#saveUserBtn').prop('disabled', false);
     });
-    // ---  Manage admin user Save Button Click ---
-   $(document).ready(function() {
+
+    // --- Initialize intl-tel-input for phone field ---
+    var phoneInput = document.querySelector("#phone");
+    if (phoneInput) {
+        var iti = window.intlTelInput(phoneInput, {
+            separateDialCode: true,
+            initialCountry: "auto",
+            nationalMode: false,
+            autoPlaceholder: "off",
+            geoIpLookup: function (callback) {
+                fetch("https://ipapi.co/json")
+                    .then(res => res.json())
+                    .then(data => callback(data.country_code))
+                    .catch(() => callback("in")); // fallback: India
+            },
+            utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js"
+        });
+
+        // Set initial country code on load
+        phoneInput.addEventListener('load', function () {
+            var countryData = iti.getSelectedCountryData();
+            $("#country_code").val(countryData.dialCode);
+        });
+
+        // Update country code on change
+        phoneInput.addEventListener('countrychange', function () {
+            var countryData = iti.getSelectedCountryData();
+            $("#country_code").val(countryData.dialCode);
+        });
+    }
+
+    // --- Manage admin user Save Button Click ---
     var $form = $('#userForm');
     var $btn = $('#saveUserBtn');
     var isEdit = $("input[name='user_id']").length > 0;
@@ -26,6 +59,8 @@ $(document).ready(function () {
             messageBox.fadeOut();
         }, 2000);
     }
+
+    // Track original values
     var originalValues = {};
     $form.find("input, select, textarea").each(function() {
         if ($(this).is(':checkbox') || $(this).is(':radio')) {
@@ -34,6 +69,7 @@ $(document).ready(function () {
             originalValues[this.name] = $(this).val();
         }
     });
+
     function toggleSaveButton() {
         var changed = false;
         $form.find("input, select, textarea").each(function() {
@@ -53,19 +89,24 @@ $(document).ready(function () {
         });
         $btn.prop('disabled', !changed);
     }
+
     $form.on('input change click', "input, select, textarea", toggleSaveButton);
+
     $btn.click(function(e) {
         e.preventDefault();
+
         var name = $("input[name='name']").val()?.trim();
         var email = $("input[name='email']").val()?.trim();
         var role = $("select[name='role_id']").val();
         var password = $("input[name='password']").val();
         var newPassword = $("input[name='new_password']").val();
         var confirmPassword = $("input[name='confirm_password']").val();
+
         if (!name || !email || !role) {
             showMessage('All Fields Are Required');
             return;
         }
+
         if (!isEdit) {
             if (!password || !confirmPassword) {
                 showMessage('Password And Confirm Password Are Required');
@@ -75,35 +116,42 @@ $(document).ready(function () {
                 showMessage('Password And Confirm Password Do Not Match');
                 return;
             }
-            } else {
-                if ((newPassword || confirmPassword) && newPassword !== confirmPassword) {
-                    showMessage('New Password And Confirm Password Do Not Match');
-                    return;
-                }
+        } else {
+            if ((newPassword || confirmPassword) && newPassword !== confirmPassword) {
+                showMessage('New Password And Confirm Password Do Not Match');
+                return;
             }
-            $btn.prop('disabled', true).text('Saving...');
-            $.post(baseUrl + "admin/save/user", $form.serialize(), function(response) {
-                if (response.success) {
-                    showMessage(response.message, 'success');
-                    $form.find("input, select, textarea").each(function() {
-                        if ($(this).is(':checkbox') || $(this).is(':radio')) {
-                            originalValues[this.name] = $(this).prop('checked');
-                        } else {
-                            originalValues[this.name] = $(this).val();
-                        }
-                    });
-                    toggleSaveButton(); 
-                    if (response.redirect) {
-                        setTimeout(() => window.location.href = response.redirect, 1500);
+        }
+
+        // Update hidden country_code before sending form
+        if (phoneInput) {
+            var countryData = iti.getSelectedCountryData();
+            $("#country_code").val(countryData.dialCode);
+        }
+
+        $btn.prop('disabled', true).text('Saving...');
+
+        $.post(baseUrl + "admin/save/user", $form.serialize(), function(response) {
+            if (response.success) {
+                showMessage(response.message, 'success');
+                $form.find("input, select, textarea").each(function() {
+                    if ($(this).is(':checkbox') || $(this).is(':radio')) {
+                        originalValues[this.name] = $(this).prop('checked');
+                    } else {
+                        originalValues[this.name] = $(this).val();
                     }
-                } else {
-                    showMessage(response.message);
-                    $btn.prop('disabled', false).text('Save User');
+                });
+                toggleSaveButton(); 
+                if (response.redirect) {
+                    setTimeout(() => window.location.href = response.redirect, 1500);
                 }
-            }, 'json').fail(function() {
-                showMessage('Server Error. Please try again.');
+            } else {
+                showMessage(response.message);
                 $btn.prop('disabled', false).text('Save User');
-            });
+            }
+        }, 'json').fail(function() {
+            showMessage('Server Error. Please try again.');
+            $btn.prop('disabled', false).text('Save User');
         });
     });
 });

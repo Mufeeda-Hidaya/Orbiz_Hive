@@ -13,6 +13,7 @@ $(document).ready(function() {
             { data: "slno", className: "text-start" },
             { data: "created_at", className: "text-start" },
             { data: "customer_name", className: "text-start" },
+            { data: "email", className: "text-start" },
             {
                 data: "enquiry_id",
                 render: function(id) {
@@ -28,8 +29,8 @@ $(document).ready(function() {
             },
             { data: "enquiry_id", visible: false }
         ],
-        order: [[4, 'desc']],
-        columnDefs: [{ searchable: false, orderable: false, targets: [0, 3] }],
+        order: [[5, 'desc']],
+        columnDefs: [{ searchable: false, orderable: false, targets: [0, 4] }],
         language: { infoFiltered: "" },
         scrollX: false,
         autoWidth: false

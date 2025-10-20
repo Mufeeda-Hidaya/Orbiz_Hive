@@ -18,7 +18,7 @@
             </div>
             <div class="mb-3">
               <label for="product_desc" class="form-label fw-bold">Product Description</label>
-              <textarea name="product_desc" id="product_desc" class="form-control custom-textarea" rows="3"><?= isset($enquiry['product_desc']) ? esc($enquiry['product_desc']) : '' ?></textarea>
+              <textarea name="product_desc" id="product_desc" class="form-control cursor-padding" rows="3"><?= isset($enquiry['product_desc']) ? esc($enquiry['product_desc']) : '' ?></textarea>
             </div>
             <div class="mb-3">
               <label for="quantity" class="form-label fw-bold">Quantity</label>
@@ -30,15 +30,8 @@
             </div>
           </form>
         </div>
-
       </div>
     </div>
   </div>
 </div>
-<style>
-.custom-textarea {
-    border: 1px solid #ced4da !important;  
-    color: #000 !important;   
-    padding-left: 10px;           
-}
-</style>
+

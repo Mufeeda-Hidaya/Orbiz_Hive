@@ -17,6 +17,11 @@ class Enquiry extends BaseController
         $this->session = \Config\Services::session();
         $this->input = \Config\Services::request();
         $this->enquiryModel = new EnquiryModel();
+
+        if (!$this->session->has('user_id')) {
+            header('Location: ' . base_url('admin'));
+            exit();
+        }
     }
 
     public function index()
@@ -41,10 +46,10 @@ class Enquiry extends BaseController
         if (!empty($searchValue)) {
             $searchValue = trim(preg_replace('/\s+/', ' ', $searchValue));
             $noSpaceSearch = str_replace(' ', '', strtolower($searchValue));
-            $condition .= " AND REPLACE(LOWER(u.name), ' ', '') LIKE '%" .
-                $this->enquiryModel->db->escapeLikeString($noSpaceSearch) . "%'";
+            $escapedSearch = $this->enquiryModel->db->escapeLikeString($noSpaceSearch);
+            $condition .= " AND (REPLACE(LOWER(u.name), ' ', '') LIKE '%{$escapedSearch}%' 
+                            OR REPLACE(LOWER(u.email), ' ', '') LIKE '%{$escapedSearch}%')";
         }
-
         $columns = ['u.name', 'e.created_at', 'e.enquiry_id'];
         $orderColumnIndex = intval($this->request->getPost('order')[0]['column'] ?? 0);
         $orderDir = $this->request->getPost('order')[0]['dir'] ?? 'desc';
@@ -60,6 +65,7 @@ class Enquiry extends BaseController
                 'slno' => $slno++,
                 'enquiry_id' => $row->enquiry_id,
                 'customer_name' => $row->name,
+                'email' => $row->email,
                 'created_at' => date("d M Y", strtotime($row->created_at))
             ];
         }

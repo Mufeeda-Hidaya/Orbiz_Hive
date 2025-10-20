@@ -3,9 +3,9 @@
       <div class="row">
         <div class="ms-3">
           <h3 class="mb-0 h4 font-weight-bolder">Dashboard</h3>
-          <p class="mb-4">
+          <!-- <p class="mb-4">
             Check the sales, value and bounce rate by country.
-          </p>
+          </p> -->
         </div>
         <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
           <div class="card">
@@ -84,7 +84,23 @@
           </div>
         </div>
       </div>
-      <div class="row">
+      <div class="right_container">
+    <div class="welcome-container">
+        <div class="welcome-card-color">
+            <?php
+            $session = session();
+            $displayName = $session->get('role_name') === 'admin'
+                ? ucfirst($session->get('role_name'))
+                : ucfirst($session->get('user_name')); 
+            ?>
+            
+            <h2>Welcome Back, <?= $displayName ?>! 🎉</h2>
+            <p>We're thrilled to have you here. Explore your dashboard and manage your tasks efficiently.</p>
+        </div>
+    </div>
+</div>
+</div>
+      <!-- <div class="row">
         <div class="col-lg-4 col-md-6 mt-4 mb-4">
           <div class="card">
             <div class="card-body">
@@ -139,9 +155,9 @@
             </div>
           </div>
         </div>
-      </div>
-<div class="row mb-4">
-        <div class="col-lg-8 col-md-6 mb-md-0 mb-4">
+      </div> -->
+
+        <!-- <div class="col-lg-8 col-md-6 mb-md-0 mb-4">
           <div class="card">
             <div class="card-header pb-0">
               <div class="row">
@@ -414,8 +430,8 @@
               </div>
             </div>
           </div>
-        </div>
-        <div class="col-lg-4 col-md-6">
+        </div> -->
+        <!-- <div class="col-lg-4 col-md-6">
           <div class="card h-100">
             <div class="card-header pb-0">
               <h6>Orders overview</h6>
@@ -483,5 +499,5 @@
               </div>
             </div>
           </div>
-        </div>
-      </div>
+        </div> -->
+</div>

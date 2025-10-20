@@ -7,20 +7,28 @@ class LoginModel extends Model
 {
     protected $table = 'user';
     protected $primaryKey = 'user_id';
-    protected $allowedFields = ['user_name', 'email','phone', 'password', 'status', 'created_at','created_by', 'updated_at','updated_by'];
+    protected $allowedFields = ['user_name', 'email', 'country_code','phone', 'password', 'status', 'created_at','created_by', 'updated_at','updated_by'];
 
     public function checkLoginUser($email, $password)
     {
-        $user = $this->where('email', $email)->first();
-
-        if (!$user) {
+        $users = $this->where('email', $email)
+                      ->orderBy('user_id', 'DESC')
+                      ->findAll();
+        if (!$users) {
             return 'invalid';
         }
-
-        if (!password_verify($password, $user['password'])) {
-            return 'invalid';
+        foreach ($users as $user) {
+            if ($user['status'] == 9) {
+                continue;
+            }
+            if (!password_verify($password, $user['password'])) {
+                continue;
+            }
+            if ($user['role_id'] != 1 && $user['status'] == 2) {
+                return 'suspended';
+            }
+            return (object) $user;
         }
-
-        return (object) $user;
+        return 'invalid';
     }
 } 

@@ -1,3 +1,7 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js"></script>
+
+
 <div class="container-fluid py-2">
   <div class="row">
     <div class="col-12">
@@ -50,17 +54,11 @@
               </div>
 
               <div class="col-md-6 mb-3">
-                <label for="phone" class="form-label fw-semibold">Phone Number</label>
-                <input
-                  type="text"
-                  id="phone"
-                  name="phone"
-                  class="form-control cursor-padding"
-                  maxlength="15"
-                  value="<?= isset($userData['phone']) ? esc($userData['phone']) : '' ?>"
-                  oninput="this.value = this.value.replace(/[^0-9 +]/g, '')"
-                  autocomplete="off">
+                <label for="phone" class="form-label">Phone Number <span class="text-danger">*</span></label>
+                <input type="tel" id="phone" name="phone" class="form-control" autocomplete="off" required>
+                <input type="hidden" id="country_code" name="country_code" value="<?= isset($userData['country_code']) ? esc($userData['country_code']) : '' ?>">
               </div>
+
             </div>
 
             <?php if (!isset($userData['user_id'])): ?>

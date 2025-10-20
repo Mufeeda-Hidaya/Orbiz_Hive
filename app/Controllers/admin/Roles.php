@@ -13,7 +13,8 @@ class Roles extends BaseController
         $this->roleMenuModel = new RoleMenuModel();
         $this->session = \Config\Services::session();
         $this->input = \Config\Services::request();
-         if (!$this->session->has('user_id')) {
+
+        if (!$this->session->has('user_id')) {
             header('Location: ' . base_url('admin'));
             exit();
         }

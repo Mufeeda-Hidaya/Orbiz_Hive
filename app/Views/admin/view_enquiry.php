@@ -24,8 +24,8 @@
             <!-- Right: Enquiry Info -->
             <div class="col-md-6 text-md-end">
               <!-- <h6 class="fw-bold">Enquiry Info</h6> -->
-              <p class="mb-1"><strong>Enquiry ID:</strong> <?= $enquiry->enquiry_id ?></p>
-              <p class="mb-1"><strong>Date:</strong> <?= date("d M Y", strtotime($enquiry->created_at)) ?></p>
+              <p class="enq-align"><strong>Enquiry ID:</strong> <?= $enquiry->enquiry_id ?></p>
+              <p class="enq-align"><strong>Date:</strong> <?= date("d M Y", strtotime($enquiry->created_at)) ?></p>
             </div>
           </div>
           <div class="table-responsive p-0">
