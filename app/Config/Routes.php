@@ -49,6 +49,9 @@ $routes->post('rolemanagement/update/(:num)', 'Rolemanagement::update/$1');
 $routes->post('rolemanagement/delete', 'Rolemanagement::delete');
 
 
+
+
+
 $routes->get('add_estimate', 'Estimate::add_estimate'); 
 $routes->post('estimate/save', 'Estimate::save'); 
 $routes->post('estimate/estimatelistajax', 'Estimate::estimatelistajax');
@@ -119,9 +122,22 @@ $routes->get('customerreport', 'CustomerReport::index');
 $routes->post('customerreport/getReport', 'CustomerReport::getReport');
 
 
+$routes->get('add_estimate', 'Estimate::add_estimate'); 
+$routes->post('estimate/save', 'Estimate::save'); 
+$routes->post('estimate/estimatelistajax', 'Estimate::estimatelistajax');
+$routes->post('estimate/delete', 'Estimate::delete');
+$routes->get('estimatelist', 'Estimate::estimatelist');
+$routes->get('estimate/edit/(:num)', 'Estimate::edit/$1');
+$routes->get('estimate/generateEstimate/(:num)', 'Estimate::generateEstimate/$1');
+$routes->post('save', 'Estimate::saveEstimate');
+$routes->get('estimate/generateEstimate/(:segment)', 'Estimate::generateEstimate/$1');
 
 
 
+
+
+
+$routes->get('add_enquiry', 'Supplier::add_enquiry'); 
 $routes->get('supplier/list', 'Supplier::list');
 $routes->post('supplier/fetch', 'Supplier::fetch');
 $routes->post('supplier/create', 'Supplier::create');

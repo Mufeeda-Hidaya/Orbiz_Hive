@@ -133,13 +133,13 @@ if ($company_id) {
             <li class="nav-item">
               <a class="nav-link <?= strpos($currentPath, 'supplier') !== false ? 'active' : '' ?>"
                 href="<?= base_url('supplier/list') ?>">
-                <i class="mdi mdi-truck menu-icon"></i>
-                <span class="menu-title">Supplier List</span>
+                <i class="mdi mdi-file-outline menu-icon"></i>
+                <span class="menu-title">Enquiry List</span>
               </a>
             </li>
           <?php endif; ?>
 
-        <?php if (in_array('enquirylist', $allowedMenus)): ?>
+        <!-- <?php if (in_array('enquirylist', $allowedMenus)): ?>
           <li class="nav-item">
            <a class="nav-link <?= strpos(uri_string(), 'enquiry') !== false ? 'active' : '' ?>"
               href="<?= base_url('enquirylist') ?>">
@@ -147,7 +147,7 @@ if ($company_id) {
               <span class="menu-title">Enquiry</span>
             </a>
           </li>
-        <?php endif; ?>
+        <?php endif; ?> -->
         <?php if (in_array('estimatelist', $allowedMenus)): ?>
           <li class="nav-item">
            <a class="nav-link <?= strpos(uri_string(), 'estimate') !== false || uri_string() == 'estimatelist' ? 'active' : '' ?>"

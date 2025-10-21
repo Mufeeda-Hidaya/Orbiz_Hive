@@ -14,7 +14,6 @@ class Rolemanagement extends Controller
     'dashboard'         => 'Dashboard',
     'adduserlist'       => 'Users',
     'companylist'       => 'Companies',
-	'enquirylist'       => 'Enquiries',
     'estimatelist'      => 'Estimates',
     'invoices'          => 'Invoice',
     'expense'           => 'Expense',
