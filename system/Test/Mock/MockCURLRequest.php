@@ -23,14 +23,7 @@ use CodeIgniter\HTTP\URI;
  */
 class MockCURLRequest extends CURLRequest
 {
-    /**
-     * @var array<int, mixed>
-     */
     public $curl_options;
-
-    /**
-     * @var string
-     */
     protected $output = '';
 
     /**
@@ -45,13 +38,11 @@ class MockCURLRequest extends CURLRequest
         return $this;
     }
 
-    /**
-     * @param array<int, mixed> $curlOptions
-     */
     protected function sendRequest(array $curlOptions = []): string
     {
         $this->response = clone $this->responseOrig;
 
+        // Save so we can access later.
         $this->curl_options = $curlOptions;
 
         return $this->output;

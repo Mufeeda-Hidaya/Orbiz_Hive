@@ -85,10 +85,11 @@ class SiteURI extends URI
     private string $routePath;
 
     /**
-     * @param string              $relativePath URI path relative to baseURL. May include
-     *                                          queries or fragments.
-     * @param string|null         $host         Optional current hostname.
-     * @param 'http'|'https'|null $scheme       Optional scheme. 'http' or 'https'.
+     * @param         string              $relativePath URI path relative to baseURL. May include
+     *                                                  queries or fragments.
+     * @param         string|null         $host         Optional current hostname.
+     * @param         string|null         $scheme       Optional scheme. 'http' or 'https'.
+     * @phpstan-param 'http'|'https'|null $scheme
      */
     public function __construct(
         App $configApp,

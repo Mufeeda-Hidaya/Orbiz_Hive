@@ -8,6 +8,8 @@ use CodeIgniter\HTTP\IncomingRequest;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use Psr\Log\LoggerInterface;
+use App\Models\Managecompany_Model; // Make sure the model path is correct
+use App\Models\Manageuser_Model; 
 
 /**
  * Class BaseController
@@ -50,9 +52,25 @@ abstract class BaseController extends Controller
     {
         // Do Not Edit This Line
         parent::initController($request, $response, $logger);
+        $this->session = \Config\Services::session();
 
         // Preload any models, libraries, etc, here.
 
-        // E.g.: $this->session = service('session');
+        $userId = $this->session->get('user_id');
+    $companyData = null;
+
+    if ($userId) {
+        $userModel = new \App\Models\Manageuser_Model();
+        $user = $userModel->find($userId);
+
+        if ($user && isset($user['company_id'])) {
+            $companyModel = new \App\Models\Managecompany_Model();
+            $companyData = $companyModel->find($user['company_id']);
+        }
     }
+    $renderer = \Config\Services::renderer();
+    $renderer->setVar('company', $companyData);
+    }
+
+    
 }

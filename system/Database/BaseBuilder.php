@@ -256,7 +256,7 @@ class BaseBuilder
      * Specifies which sql statements
      * support the ignore option.
      *
-     * @var array<string, string>
+     * @var array
      */
     protected $supportedIgnoreStatements = [];
 

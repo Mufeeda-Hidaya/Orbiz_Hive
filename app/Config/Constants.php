@@ -77,4 +77,5 @@ defined('EXIT_USER_INPUT')     || define('EXIT_USER_INPUT', 7);     // invalid u
 defined('EXIT_DATABASE')       || define('EXIT_DATABASE', 8);       // database error
 defined('EXIT__AUTO_MIN')      || define('EXIT__AUTO_MIN', 9);      // lowest automatically-assigned error code
 defined('EXIT__AUTO_MAX')      || define('EXIT__AUTO_MAX', 125);    // highest automatically-assigned error code
-defined('ASSET_PATH')          || define('ASSET_PATH', "public/");
+defined('ASSET_PATH')		   || define('ASSET_PATH', "http://" . $_SERVER['SERVER_NAME'] . "/Orbiz_Hive/public/");
+defined('ROUTE_PATH')		   || define('ROUTE_PATH', "http://" . $_SERVER['SERVER_NAME'] . "/Orbiz_Hive/");
