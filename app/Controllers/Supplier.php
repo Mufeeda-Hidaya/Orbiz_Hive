@@ -2,6 +2,9 @@
 namespace App\Controllers;
 
 use App\Models\SupplierModel;
+use App\Models\EstimateModel;
+use App\Models\EstimateItemModel;
+use App\Models\customerModel;
 use CodeIgniter\Controller;
 
 class Supplier extends BaseController
@@ -14,67 +17,37 @@ class Supplier extends BaseController
         }
     }
 
-    // Create or Update Supplier
-    public function create()
+    // Create or Update 
+    public function add_enquiry($id = null)
     {
-        $session = session();
-        $name = ucwords(strtolower(trim($this->request->getPost('name'))));
-        $address = ucfirst(strtolower(trim($this->request->getPost('address'))));
-        $supplier_id = $this->request->getPost('supplier_id');
-
-        if (empty($name) || empty($address)) {
-            return $this->response->setJSON([
-                'status' => 'error',
-                'message' => 'Name and Address are required'
-            ]);
+        $estimateModel = new EstimateModel();
+        $estimateItemModel = new EstimateItemModel();
+        $customerModel = new customerModel();
+ 
+        $companyId = 1;
+        $data['customers'] = $customerModel
+            ->where('is_deleted', 0)
+            ->where('company_id', $companyId)
+            ->orderBy('customer_id', 'DESC')
+            ->findAll();
+ 
+        $data['enquiry'] = null;
+        $data['items'] = [];
+ 
+        if ($id) {
+            $data['enquiry'] = $estimateModel->find($id);
+            $data['items'] = $estimateItemModel->where('enquiry_id', $id)->findAll();
         }
-
-        $model = new SupplierModel();
-        $data = [
-            'name'       => $name,
-            'address'    => $address,
-            'company_id' => $session->get('company_id'),
-            'is_deleted' => 0
-        ];
-
-        if (!empty($supplier_id)) {
-            $updated = $model->update($supplier_id, $data);
-
-            if ($updated) {
-                $data['supplier_id'] = $supplier_id;
-                return $this->response->setJSON([
-                    'status'   => 'success',
-                    'message'  => 'Supplier Updated Successfully',
-                    'supplier' => $data
-                ]);
-            }
-            return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => 'Failed to Update Supplier'
-            ]);
-        } else {
-            $id = $model->insert($data);
-            if ($id) {
-                $data['supplier_id'] = $id;
-                return $this->response->setJSON([
-                    'status'   => 'success',
-                    'message'  => 'Supplier Created Successfully',
-                    'supplier' => $data
-                ]);
-            }
-            return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => 'Failed to Save Supplier'
-            ]);
-        }
+ 
+        return view('add_enquiry', $data);
     }
 
-    // Get Supplier Address
+    // Get customer Address
     public function get_address()
     {
-        $supplier_id = $this->request->getPost('supplier_id');
+        $enquiry_id = $this->request->getPost('enquiry_id');
         $model = new SupplierModel();
-        $supplier = $model->find($supplier_id);
+        $supplier = $model->find($enquiry_id);
 
         if ($supplier) {
             return $this->response->setJSON(['status' => 'success', 'address' => $supplier['address']]);
@@ -82,7 +55,7 @@ class Supplier extends BaseController
         return $this->response->setJSON(['status' => 'error', 'message' => 'Supplier Not Found']);
     }
 
-    // Search Supplier for Select2 / autocomplete
+    // Search 
     public function search()
     {
         $term = $this->request->getGet('term');
@@ -90,14 +63,14 @@ class Supplier extends BaseController
         $results = $model
             ->where('is_deleted', 0)
             ->like('name', $term)
-            ->select('supplier_id, name, address')
-            ->orderBy('supplier_id', 'DESC')
+            ->select('enquiry_id, name, address')
+            ->orderBy('enquiry_id', 'DESC')
             ->findAll(10);
 
         $data = [];
         foreach ($results as $row) {
             $data[] = [
-                'id'      => $row['supplier_id'],
+                'id'      => $row['enquiry_id'],
                 'text'    => $row['name'],
                 'address' => $row['address']
             ];
@@ -105,14 +78,14 @@ class Supplier extends BaseController
         return $this->response->setJSON($data);
     }
 
-    // List all suppliers (basic)
+    // List all enquiries (basic)
     public function list()
     {
         $session = session();
         $SupplierModel = new SupplierModel();
         $company_id = $session->get('company_id');
 
-        $data['suppliers'] = $SupplierModel
+        $data['enquiries'] = $SupplierModel
             ->where('company_id', $company_id)
             ->where('is_deleted', 0)
             ->findAll();
@@ -138,27 +111,27 @@ class Supplier extends BaseController
         $orderDir = $order[0]['dir'] ?? 'desc';
 
         $columnMap = [
-            0 => 'supplier_id',
+            0 => 'enquiry_id',
             1 => 'name',
             2 => 'address'
         ];
-        $orderColumn = $columnMap[$columnIndex] ?? 'supplier_id';
+        $orderColumn = $columnMap[$columnIndex] ?? 'enquiry_id';
 
-        $suppliers = $model->getAllFilteredRecords($search, $start, $length, $orderColumn, $orderDir, $company_id);
+        $enquiries = $model->getAllFilteredRecords($search, $start, $length, $orderColumn, $orderDir, $company_id);
 
         $result = [];
         $slno = $start + 1;
 
-        foreach ($suppliers as $row) {
+        foreach ($enquiries as $row) {
             $result[] = [
                 'slno'        => $slno++,
-                'supplier_id' => $row['supplier_id'],
+                'enquiry_id' => $row['enquiry_id'],
                 'name'        => ucwords(strtolower($row['name'])),
                 'address'     => ucwords(strtolower($row['address'])),
             ];
         }
 
-        $filteredTotal = $model->getFilteredSupplierCount($search, $company_id)->countSuppliers;
+        $filteredTotal = $model->getFilteredSupplierCount($search, $company_id)->countEnquiries;
 
         return $this->response->setJSON([
             'draw'            => intval($draw),
@@ -168,7 +141,7 @@ class Supplier extends BaseController
         ]);
     }
 
-    // Get single supplier
+    // Get single enquiry
     public function getSupplier($id)
     {
         $model = new SupplierModel();
@@ -180,7 +153,7 @@ class Supplier extends BaseController
         return $this->response->setJSON(['status' => 'error', 'message' => 'Supplier Not Found']);
     }
 
-    // Edit Supplier View
+    // Edit 
     public function edit($id)
     {
         $model = new SupplierModel();
@@ -192,7 +165,7 @@ class Supplier extends BaseController
         return view('editsupplier', $data);
     }
 
-    // Soft Delete Supplier
+    // Soft Delete 
     public function delete()
     {
         $id = $this->request->getPost('id');
