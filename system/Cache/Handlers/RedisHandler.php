@@ -29,13 +29,7 @@ class RedisHandler extends BaseHandler
     /**
      * Default config
      *
-     * @var array{
-     *   host: string,
-     *   password: string|null,
-     *   port: int,
-     *   timeout: int,
-     *   database: int,
-     * }
+     * @var array
      */
     protected $config = [
         'host'     => '127.0.0.1',

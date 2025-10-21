@@ -1,0 +1,452 @@
+CRITICAL - 2025-06-18 11:46:38 --> ErrorException: Undefined property: App\Controllers\Rolemanagement::$input
+[Method: GET, Route: rolemanagement/rolelistajax]
+in APPPATH\Controllers\Rolemanagement.php on line 75.
+ 1 APPPATH\Controllers\Rolemanagement.php(75): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined property: App\\Controllers\\Rolemanagement::$input', 'C:\\wamp64\\www\\kuwaitadvertising\\app\\Controllers\\Rolemanagement.php', 75)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Rolemanagement->rolelistajax()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Rolemanagement))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-06-18 11:47:32 --> Error: Undefined constant "App\Controllers\order"
+[Method: GET, Route: rolemanagement/rolelistajax]
+in APPPATH\Controllers\Rolemanagement.php on line 76.
+ 1 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Rolemanagement->rolelistajax()
+ 2 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Rolemanagement))
+ 3 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-06-18 11:55:46 --> ParseError: syntax error, unexpected token "}", expecting ";"
+[Method: POST, Route: rolemanagement/rolelistajax]
+in APPPATH\Models\RoleModel.php on line 15.
+ 1 SYSTEMPATH\Autoloader\Autoloader.php(295): CodeIgniter\Autoloader\Autoloader->includeFile('C:\\wamp64\\www\\kuwaitadvertising\\app\\Models\\RoleModel.php')
+ 2 SYSTEMPATH\Autoloader\Autoloader.php(271): CodeIgniter\Autoloader\Autoloader->loadInNamespace('App\\Models\\RoleModel')
+ 3 APPPATH\Controllers\Rolemanagement.php(17): CodeIgniter\Autoloader\Autoloader->loadClass('App\\Models\\RoleModel')
+ 4 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\Rolemanagement->__construct()
+ 5 SYSTEMPATH\CodeIgniter.php(498): CodeIgniter\CodeIgniter->createController()
+ 6 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-06-18 11:56:05 --> ParseError: syntax error, unexpected token "}", expecting ";"
+[Method: POST, Route: rolemanagement/rolelistajax]
+in APPPATH\Models\RoleModel.php on line 15.
+ 1 SYSTEMPATH\Autoloader\Autoloader.php(295): CodeIgniter\Autoloader\Autoloader->includeFile('C:\\wamp64\\www\\kuwaitadvertising\\app\\Models\\RoleModel.php')
+ 2 SYSTEMPATH\Autoloader\Autoloader.php(271): CodeIgniter\Autoloader\Autoloader->loadInNamespace('App\\Models\\RoleModel')
+ 3 APPPATH\Controllers\Rolemanagement.php(17): CodeIgniter\Autoloader\Autoloader->loadClass('App\\Models\\RoleModel')
+ 4 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\Rolemanagement->__construct()
+ 5 SYSTEMPATH\CodeIgniter.php(498): CodeIgniter\CodeIgniter->createController()
+ 6 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ERROR - 2025-06-18 11:58:46 --> mysqli_sql_exception: Undeclared variable: $limit in C:\wamp64\www\kuwaitadvertising\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\wamp64\www\kuwaitadvertising\system\Database\MySQLi\Connection.php(327): mysqli->query('select * from r...', 0)
+#1 C:\wamp64\www\kuwaitadvertising\system\Database\BaseConnection.php(738): CodeIgniter\Database\MySQLi\Connection->execute('select * from r...')
+#2 C:\wamp64\www\kuwaitadvertising\system\Database\BaseConnection.php(652): CodeIgniter\Database\BaseConnection->simpleQuery('select * from r...')
+#3 C:\wamp64\www\kuwaitadvertising\app\Models\RoleModel.php(14): CodeIgniter\Database\BaseConnection->query('select * from r...')
+#4 C:\wamp64\www\kuwaitadvertising\app\Controllers\Rolemanagement.php(83): App\Models\RoleModel->getRolelist('0', 10)
+#5 C:\wamp64\www\kuwaitadvertising\system\CodeIgniter.php(933): App\Controllers\Rolemanagement->rolelistajax()
+#6 C:\wamp64\www\kuwaitadvertising\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Rolemanagement))
+#7 C:\wamp64\www\kuwaitadvertising\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#8 C:\wamp64\www\kuwaitadvertising\system\Boot.php(334): CodeIgniter\CodeIgniter->run()
+#9 C:\wamp64\www\kuwaitadvertising\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#10 C:\wamp64\www\kuwaitadvertising\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#11 {main}
+CRITICAL - 2025-06-18 11:58:46 --> CodeIgniter\Database\Exceptions\DatabaseException: Undeclared variable: $limit
+[Method: POST, Route: rolemanagement/rolelistajax]
+in SYSTEMPATH\Database\BaseConnection.php on line 692.
+ 1 APPPATH\Models\RoleModel.php(14): CodeIgniter\Database\BaseConnection->query('select * from role_acces where 1=1 limit 0, $limit')
+ 2 APPPATH\Controllers\Rolemanagement.php(83): App\Models\RoleModel->getRolelist('0', 10)
+ 3 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Rolemanagement->rolelistajax()
+ 4 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Rolemanagement))
+ 5 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 6 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 7 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 8 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-06-18 11:58:46 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Undeclared variable: $limit
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 332.
+ 1 SYSTEMPATH\Database\BaseConnection.php(738): CodeIgniter\Database\MySQLi\Connection->execute('select * from role_acces where 1=1 limit 0, $limit')
+ 2 SYSTEMPATH\Database\BaseConnection.php(652): CodeIgniter\Database\BaseConnection->simpleQuery('select * from role_acces where 1=1 limit 0, $limit')
+ 3 APPPATH\Models\RoleModel.php(14): CodeIgniter\Database\BaseConnection->query('select * from role_acces where 1=1 limit 0, $limit')
+ 4 APPPATH\Controllers\Rolemanagement.php(83): App\Models\RoleModel->getRolelist('0', 10)
+ 5 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Rolemanagement->rolelistajax()
+ 6 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Rolemanagement))
+ 7 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-06-18 11:58:46 --> [Caused by] mysqli_sql_exception: Undeclared variable: $limit
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 327.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(327): mysqli->query('select * from role_acces where 1=1 limit 0, $limit', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(738): CodeIgniter\Database\MySQLi\Connection->execute('select * from role_acces where 1=1 limit 0, $limit')
+ 3 SYSTEMPATH\Database\BaseConnection.php(652): CodeIgniter\Database\BaseConnection->simpleQuery('select * from role_acces where 1=1 limit 0, $limit')
+ 4 APPPATH\Models\RoleModel.php(14): CodeIgniter\Database\BaseConnection->query('select * from role_acces where 1=1 limit 0, $limit')
+ 5 APPPATH\Controllers\Rolemanagement.php(83): App\Models\RoleModel->getRolelist('0', 10)
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Rolemanagement->rolelistajax()
+ 7 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Rolemanagement))
+ 8 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ERROR - 2025-06-18 11:58:57 --> mysqli_sql_exception: Undeclared variable: $limit in C:\wamp64\www\kuwaitadvertising\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\wamp64\www\kuwaitadvertising\system\Database\MySQLi\Connection.php(327): mysqli->query('select * from r...', 0)
+#1 C:\wamp64\www\kuwaitadvertising\system\Database\BaseConnection.php(738): CodeIgniter\Database\MySQLi\Connection->execute('select * from r...')
+#2 C:\wamp64\www\kuwaitadvertising\system\Database\BaseConnection.php(652): CodeIgniter\Database\BaseConnection->simpleQuery('select * from r...')
+#3 C:\wamp64\www\kuwaitadvertising\app\Models\RoleModel.php(14): CodeIgniter\Database\BaseConnection->query('select * from r...')
+#4 C:\wamp64\www\kuwaitadvertising\app\Controllers\Rolemanagement.php(83): App\Models\RoleModel->getRolelist('0', 10)
+#5 C:\wamp64\www\kuwaitadvertising\system\CodeIgniter.php(933): App\Controllers\Rolemanagement->rolelistajax()
+#6 C:\wamp64\www\kuwaitadvertising\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Rolemanagement))
+#7 C:\wamp64\www\kuwaitadvertising\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#8 C:\wamp64\www\kuwaitadvertising\system\Boot.php(334): CodeIgniter\CodeIgniter->run()
+#9 C:\wamp64\www\kuwaitadvertising\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#10 C:\wamp64\www\kuwaitadvertising\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#11 {main}
+CRITICAL - 2025-06-18 11:58:57 --> CodeIgniter\Database\Exceptions\DatabaseException: Undeclared variable: $limit
+[Method: POST, Route: rolemanagement/rolelistajax]
+in SYSTEMPATH\Database\BaseConnection.php on line 692.
+ 1 APPPATH\Models\RoleModel.php(14): CodeIgniter\Database\BaseConnection->query('select * from role_acces where 1=1 limit 0, $limit')
+ 2 APPPATH\Controllers\Rolemanagement.php(83): App\Models\RoleModel->getRolelist('0', 10)
+ 3 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Rolemanagement->rolelistajax()
+ 4 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Rolemanagement))
+ 5 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 6 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 7 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 8 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-06-18 11:58:57 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Undeclared variable: $limit
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 332.
+ 1 SYSTEMPATH\Database\BaseConnection.php(738): CodeIgniter\Database\MySQLi\Connection->execute('select * from role_acces where 1=1 limit 0, $limit')
+ 2 SYSTEMPATH\Database\BaseConnection.php(652): CodeIgniter\Database\BaseConnection->simpleQuery('select * from role_acces where 1=1 limit 0, $limit')
+ 3 APPPATH\Models\RoleModel.php(14): CodeIgniter\Database\BaseConnection->query('select * from role_acces where 1=1 limit 0, $limit')
+ 4 APPPATH\Controllers\Rolemanagement.php(83): App\Models\RoleModel->getRolelist('0', 10)
+ 5 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Rolemanagement->rolelistajax()
+ 6 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Rolemanagement))
+ 7 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-06-18 11:58:57 --> [Caused by] mysqli_sql_exception: Undeclared variable: $limit
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 327.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(327): mysqli->query('select * from role_acces where 1=1 limit 0, $limit', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(738): CodeIgniter\Database\MySQLi\Connection->execute('select * from role_acces where 1=1 limit 0, $limit')
+ 3 SYSTEMPATH\Database\BaseConnection.php(652): CodeIgniter\Database\BaseConnection->simpleQuery('select * from role_acces where 1=1 limit 0, $limit')
+ 4 APPPATH\Models\RoleModel.php(14): CodeIgniter\Database\BaseConnection->query('select * from role_acces where 1=1 limit 0, $limit')
+ 5 APPPATH\Controllers\Rolemanagement.php(83): App\Models\RoleModel->getRolelist('0', 10)
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Rolemanagement->rolelistajax()
+ 7 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Rolemanagement))
+ 8 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ERROR - 2025-06-18 12:00:56 --> mysqli_sql_exception: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '$limit' at line 1 in C:\wamp64\www\kuwaitadvertising\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\wamp64\www\kuwaitadvertising\system\Database\MySQLi\Connection.php(327): mysqli->query('select * from r...', 0)
+#1 C:\wamp64\www\kuwaitadvertising\system\Database\BaseConnection.php(738): CodeIgniter\Database\MySQLi\Connection->execute('select * from r...')
+#2 C:\wamp64\www\kuwaitadvertising\system\Database\BaseConnection.php(652): CodeIgniter\Database\BaseConnection->simpleQuery('select * from r...')
+#3 C:\wamp64\www\kuwaitadvertising\app\Models\RoleModel.php(14): CodeIgniter\Database\BaseConnection->query('select * from r...')
+#4 C:\wamp64\www\kuwaitadvertising\app\Controllers\Rolemanagement.php(83): App\Models\RoleModel->getRolelist('0', 10)
+#5 C:\wamp64\www\kuwaitadvertising\system\CodeIgniter.php(933): App\Controllers\Rolemanagement->rolelistajax()
+#6 C:\wamp64\www\kuwaitadvertising\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Rolemanagement))
+#7 C:\wamp64\www\kuwaitadvertising\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#8 C:\wamp64\www\kuwaitadvertising\system\Boot.php(334): CodeIgniter\CodeIgniter->run()
+#9 C:\wamp64\www\kuwaitadvertising\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#10 C:\wamp64\www\kuwaitadvertising\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#11 {main}
+CRITICAL - 2025-06-18 12:00:56 --> CodeIgniter\Database\Exceptions\DatabaseException: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '$limit' at line 1
+[Method: POST, Route: rolemanagement/rolelistajax]
+in SYSTEMPATH\Database\BaseConnection.php on line 692.
+ 1 APPPATH\Models\RoleModel.php(14): CodeIgniter\Database\BaseConnection->query('select * from role_acces where 1=1 limit $start $limit')
+ 2 APPPATH\Controllers\Rolemanagement.php(83): App\Models\RoleModel->getRolelist('0', 10)
+ 3 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Rolemanagement->rolelistajax()
+ 4 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Rolemanagement))
+ 5 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 6 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 7 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 8 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-06-18 12:00:56 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '$limit' at line 1
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 332.
+ 1 SYSTEMPATH\Database\BaseConnection.php(738): CodeIgniter\Database\MySQLi\Connection->execute('select * from role_acces where 1=1 limit $start $limit')
+ 2 SYSTEMPATH\Database\BaseConnection.php(652): CodeIgniter\Database\BaseConnection->simpleQuery('select * from role_acces where 1=1 limit $start $limit')
+ 3 APPPATH\Models\RoleModel.php(14): CodeIgniter\Database\BaseConnection->query('select * from role_acces where 1=1 limit $start $limit')
+ 4 APPPATH\Controllers\Rolemanagement.php(83): App\Models\RoleModel->getRolelist('0', 10)
+ 5 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Rolemanagement->rolelistajax()
+ 6 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Rolemanagement))
+ 7 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-06-18 12:00:56 --> [Caused by] mysqli_sql_exception: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '$limit' at line 1
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 327.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(327): mysqli->query('select * from role_acces where 1=1 limit $start $limit', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(738): CodeIgniter\Database\MySQLi\Connection->execute('select * from role_acces where 1=1 limit $start $limit')
+ 3 SYSTEMPATH\Database\BaseConnection.php(652): CodeIgniter\Database\BaseConnection->simpleQuery('select * from role_acces where 1=1 limit $start $limit')
+ 4 APPPATH\Models\RoleModel.php(14): CodeIgniter\Database\BaseConnection->query('select * from role_acces where 1=1 limit $start $limit')
+ 5 APPPATH\Controllers\Rolemanagement.php(83): App\Models\RoleModel->getRolelist('0', 10)
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Rolemanagement->rolelistajax()
+ 7 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Rolemanagement))
+ 8 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ERROR - 2025-06-18 12:01:14 --> mysqli_sql_exception: Undeclared variable: $start in C:\wamp64\www\kuwaitadvertising\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\wamp64\www\kuwaitadvertising\system\Database\MySQLi\Connection.php(327): mysqli->query('select * from r...', 0)
+#1 C:\wamp64\www\kuwaitadvertising\system\Database\BaseConnection.php(738): CodeIgniter\Database\MySQLi\Connection->execute('select * from r...')
+#2 C:\wamp64\www\kuwaitadvertising\system\Database\BaseConnection.php(652): CodeIgniter\Database\BaseConnection->simpleQuery('select * from r...')
+#3 C:\wamp64\www\kuwaitadvertising\app\Models\RoleModel.php(14): CodeIgniter\Database\BaseConnection->query('select * from r...')
+#4 C:\wamp64\www\kuwaitadvertising\app\Controllers\Rolemanagement.php(83): App\Models\RoleModel->getRolelist('0', 10)
+#5 C:\wamp64\www\kuwaitadvertising\system\CodeIgniter.php(933): App\Controllers\Rolemanagement->rolelistajax()
+#6 C:\wamp64\www\kuwaitadvertising\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Rolemanagement))
+#7 C:\wamp64\www\kuwaitadvertising\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#8 C:\wamp64\www\kuwaitadvertising\system\Boot.php(334): CodeIgniter\CodeIgniter->run()
+#9 C:\wamp64\www\kuwaitadvertising\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#10 C:\wamp64\www\kuwaitadvertising\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#11 {main}
+CRITICAL - 2025-06-18 12:01:14 --> CodeIgniter\Database\Exceptions\DatabaseException: Undeclared variable: $start
+[Method: POST, Route: rolemanagement/rolelistajax]
+in SYSTEMPATH\Database\BaseConnection.php on line 692.
+ 1 APPPATH\Models\RoleModel.php(14): CodeIgniter\Database\BaseConnection->query('select * from role_acces where 1=1 limit $start , $limit')
+ 2 APPPATH\Controllers\Rolemanagement.php(83): App\Models\RoleModel->getRolelist('0', 10)
+ 3 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Rolemanagement->rolelistajax()
+ 4 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Rolemanagement))
+ 5 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 6 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 7 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 8 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-06-18 12:01:14 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Undeclared variable: $start
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 332.
+ 1 SYSTEMPATH\Database\BaseConnection.php(738): CodeIgniter\Database\MySQLi\Connection->execute('select * from role_acces where 1=1 limit $start , $limit')
+ 2 SYSTEMPATH\Database\BaseConnection.php(652): CodeIgniter\Database\BaseConnection->simpleQuery('select * from role_acces where 1=1 limit $start , $limit')
+ 3 APPPATH\Models\RoleModel.php(14): CodeIgniter\Database\BaseConnection->query('select * from role_acces where 1=1 limit $start , $limit')
+ 4 APPPATH\Controllers\Rolemanagement.php(83): App\Models\RoleModel->getRolelist('0', 10)
+ 5 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Rolemanagement->rolelistajax()
+ 6 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Rolemanagement))
+ 7 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-06-18 12:01:14 --> [Caused by] mysqli_sql_exception: Undeclared variable: $start
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 327.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(327): mysqli->query('select * from role_acces where 1=1 limit $start , $limit', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(738): CodeIgniter\Database\MySQLi\Connection->execute('select * from role_acces where 1=1 limit $start , $limit')
+ 3 SYSTEMPATH\Database\BaseConnection.php(652): CodeIgniter\Database\BaseConnection->simpleQuery('select * from role_acces where 1=1 limit $start , $limit')
+ 4 APPPATH\Models\RoleModel.php(14): CodeIgniter\Database\BaseConnection->query('select * from role_acces where 1=1 limit $start , $limit')
+ 5 APPPATH\Controllers\Rolemanagement.php(83): App\Models\RoleModel->getRolelist('0', 10)
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Rolemanagement->rolelistajax()
+ 7 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Rolemanagement))
+ 8 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ERROR - 2025-06-18 12:02:28 --> mysqli_sql_exception: Undeclared variable: $fromstart in C:\wamp64\www\kuwaitadvertising\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\wamp64\www\kuwaitadvertising\system\Database\MySQLi\Connection.php(327): mysqli->query('select * from r...', 0)
+#1 C:\wamp64\www\kuwaitadvertising\system\Database\BaseConnection.php(738): CodeIgniter\Database\MySQLi\Connection->execute('select * from r...')
+#2 C:\wamp64\www\kuwaitadvertising\system\Database\BaseConnection.php(652): CodeIgniter\Database\BaseConnection->simpleQuery('select * from r...')
+#3 C:\wamp64\www\kuwaitadvertising\app\Models\RoleModel.php(14): CodeIgniter\Database\BaseConnection->query('select * from r...')
+#4 C:\wamp64\www\kuwaitadvertising\app\Controllers\Rolemanagement.php(83): App\Models\RoleModel->getRolelist('0', 10)
+#5 C:\wamp64\www\kuwaitadvertising\system\CodeIgniter.php(933): App\Controllers\Rolemanagement->rolelistajax()
+#6 C:\wamp64\www\kuwaitadvertising\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Rolemanagement))
+#7 C:\wamp64\www\kuwaitadvertising\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#8 C:\wamp64\www\kuwaitadvertising\system\Boot.php(334): CodeIgniter\CodeIgniter->run()
+#9 C:\wamp64\www\kuwaitadvertising\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#10 C:\wamp64\www\kuwaitadvertising\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#11 {main}
+CRITICAL - 2025-06-18 12:02:28 --> CodeIgniter\Database\Exceptions\DatabaseException: Undeclared variable: $fromstart
+[Method: POST, Route: rolemanagement/rolelistajax]
+in SYSTEMPATH\Database\BaseConnection.php on line 692.
+ 1 APPPATH\Models\RoleModel.php(14): CodeIgniter\Database\BaseConnection->query('select * from role_acces where 1=1 limit $fromstart , $tolimit')
+ 2 APPPATH\Controllers\Rolemanagement.php(83): App\Models\RoleModel->getRolelist('0', 10)
+ 3 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Rolemanagement->rolelistajax()
+ 4 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Rolemanagement))
+ 5 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 6 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 7 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 8 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-06-18 12:02:28 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Undeclared variable: $fromstart
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 332.
+ 1 SYSTEMPATH\Database\BaseConnection.php(738): CodeIgniter\Database\MySQLi\Connection->execute('select * from role_acces where 1=1 limit $fromstart , $tolimit')
+ 2 SYSTEMPATH\Database\BaseConnection.php(652): CodeIgniter\Database\BaseConnection->simpleQuery('select * from role_acces where 1=1 limit $fromstart , $tolimit')
+ 3 APPPATH\Models\RoleModel.php(14): CodeIgniter\Database\BaseConnection->query('select * from role_acces where 1=1 limit $fromstart , $tolimit')
+ 4 APPPATH\Controllers\Rolemanagement.php(83): App\Models\RoleModel->getRolelist('0', 10)
+ 5 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Rolemanagement->rolelistajax()
+ 6 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Rolemanagement))
+ 7 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-06-18 12:02:28 --> [Caused by] mysqli_sql_exception: Undeclared variable: $fromstart
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 327.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(327): mysqli->query('select * from role_acces where 1=1 limit $fromstart , $tolimit', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(738): CodeIgniter\Database\MySQLi\Connection->execute('select * from role_acces where 1=1 limit $fromstart , $tolimit')
+ 3 SYSTEMPATH\Database\BaseConnection.php(652): CodeIgniter\Database\BaseConnection->simpleQuery('select * from role_acces where 1=1 limit $fromstart , $tolimit')
+ 4 APPPATH\Models\RoleModel.php(14): CodeIgniter\Database\BaseConnection->query('select * from role_acces where 1=1 limit $fromstart , $tolimit')
+ 5 APPPATH\Controllers\Rolemanagement.php(83): App\Models\RoleModel->getRolelist('0', 10)
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Rolemanagement->rolelistajax()
+ 7 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Rolemanagement))
+ 8 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ERROR - 2025-06-18 12:02:56 --> mysqli_sql_exception: Undeclared variable: $fromstart in C:\wamp64\www\kuwaitadvertising\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\wamp64\www\kuwaitadvertising\system\Database\MySQLi\Connection.php(327): mysqli->query('select * from r...', 0)
+#1 C:\wamp64\www\kuwaitadvertising\system\Database\BaseConnection.php(738): CodeIgniter\Database\MySQLi\Connection->execute('select * from r...')
+#2 C:\wamp64\www\kuwaitadvertising\system\Database\BaseConnection.php(652): CodeIgniter\Database\BaseConnection->simpleQuery('select * from r...')
+#3 C:\wamp64\www\kuwaitadvertising\app\Models\RoleModel.php(14): CodeIgniter\Database\BaseConnection->query('select * from r...')
+#4 C:\wamp64\www\kuwaitadvertising\app\Controllers\Rolemanagement.php(83): App\Models\RoleModel->getRolelist('0', 10)
+#5 C:\wamp64\www\kuwaitadvertising\system\CodeIgniter.php(933): App\Controllers\Rolemanagement->rolelistajax()
+#6 C:\wamp64\www\kuwaitadvertising\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Rolemanagement))
+#7 C:\wamp64\www\kuwaitadvertising\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#8 C:\wamp64\www\kuwaitadvertising\system\Boot.php(334): CodeIgniter\CodeIgniter->run()
+#9 C:\wamp64\www\kuwaitadvertising\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#10 C:\wamp64\www\kuwaitadvertising\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#11 {main}
+CRITICAL - 2025-06-18 12:02:56 --> CodeIgniter\Database\Exceptions\DatabaseException: Undeclared variable: $fromstart
+[Method: POST, Route: rolemanagement/rolelistajax]
+in SYSTEMPATH\Database\BaseConnection.php on line 692.
+ 1 APPPATH\Models\RoleModel.php(14): CodeIgniter\Database\BaseConnection->query('select * from role_acces where 1=1 limit $fromstart , $tolimit')
+ 2 APPPATH\Controllers\Rolemanagement.php(83): App\Models\RoleModel->getRolelist('0', 10)
+ 3 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Rolemanagement->rolelistajax()
+ 4 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Rolemanagement))
+ 5 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 6 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 7 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 8 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-06-18 12:02:56 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Undeclared variable: $fromstart
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 332.
+ 1 SYSTEMPATH\Database\BaseConnection.php(738): CodeIgniter\Database\MySQLi\Connection->execute('select * from role_acces where 1=1 limit $fromstart , $tolimit')
+ 2 SYSTEMPATH\Database\BaseConnection.php(652): CodeIgniter\Database\BaseConnection->simpleQuery('select * from role_acces where 1=1 limit $fromstart , $tolimit')
+ 3 APPPATH\Models\RoleModel.php(14): CodeIgniter\Database\BaseConnection->query('select * from role_acces where 1=1 limit $fromstart , $tolimit')
+ 4 APPPATH\Controllers\Rolemanagement.php(83): App\Models\RoleModel->getRolelist('0', 10)
+ 5 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Rolemanagement->rolelistajax()
+ 6 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Rolemanagement))
+ 7 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-06-18 12:02:56 --> [Caused by] mysqli_sql_exception: Undeclared variable: $fromstart
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 327.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(327): mysqli->query('select * from role_acces where 1=1 limit $fromstart , $tolimit', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(738): CodeIgniter\Database\MySQLi\Connection->execute('select * from role_acces where 1=1 limit $fromstart , $tolimit')
+ 3 SYSTEMPATH\Database\BaseConnection.php(652): CodeIgniter\Database\BaseConnection->simpleQuery('select * from role_acces where 1=1 limit $fromstart , $tolimit')
+ 4 APPPATH\Models\RoleModel.php(14): CodeIgniter\Database\BaseConnection->query('select * from role_acces where 1=1 limit $fromstart , $tolimit')
+ 5 APPPATH\Controllers\Rolemanagement.php(83): App\Models\RoleModel->getRolelist('0', 10)
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Rolemanagement->rolelistajax()
+ 7 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Rolemanagement))
+ 8 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-06-18 12:08:51 --> Error: Undefined constant "App\Controllers\order"
+[Method: POST, Route: rolemanagement/rolelistajax]
+in APPPATH\Controllers\Rolemanagement.php on line 76.
+ 1 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Rolemanagement->rolelistajax()
+ 2 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Rolemanagement))
+ 3 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-06-18 12:37:10 --> TypeError: Unsupported operand types: string + int
+[Method: POST, Route: rolemanagement/rolelistajax]
+in APPPATH\Controllers\Rolemanagement.php on line 80.
+ 1 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Rolemanagement->rolelistajax()
+ 2 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Rolemanagement))
+ 3 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-06-18 12:37:36 --> Error: Call to undefined function App\Controllers\int()
+[Method: POST, Route: rolemanagement/rolelistajax]
+in APPPATH\Controllers\Rolemanagement.php on line 80.
+ 1 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Rolemanagement->rolelistajax()
+ 2 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Rolemanagement))
+ 3 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-06-18 12:37:53 --> ParseError: syntax error, unexpected variable "$start"
+[Method: GET, Route: rolemanagement/rolelist]
+in APPPATH\Controllers\Rolemanagement.php on line 80.
+ 1 SYSTEMPATH\Autoloader\Autoloader.php(295): CodeIgniter\Autoloader\Autoloader->includeFile('C:\\wamp64\\www\\kuwaitadvertising\\app\\Controllers\\Rolemanagement.php')
+ 2 SYSTEMPATH\Autoloader\Autoloader.php(271): CodeIgniter\Autoloader\Autoloader->loadInNamespace('App\\Controllers\\Rolemanagement')
+ 3 [internal function]: CodeIgniter\Autoloader\Autoloader->loadClass('App\\Controllers\\Rolemanagement')
+ 4 SYSTEMPATH\CodeIgniter.php(885): class_exists('\\App\\Controllers\\Rolemanagement', true)
+ 5 SYSTEMPATH\CodeIgniter.php(494): CodeIgniter\CodeIgniter->startController()
+ 6 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-06-18 12:38:39 --> ErrorException: Attempt to read property "filRecords" on null
+[Method: POST, Route: rolemanagement/rolelistajax]
+in APPPATH\Controllers\Rolemanagement.php on line 114.
+ 1 APPPATH\Controllers\Rolemanagement.php(114): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Attempt to read property "filRecords" on null', 'C:\\wamp64\\www\\kuwaitadvertising\\app\\Controllers\\Rolemanagement.php', 114)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Rolemanagement->rolelistajax()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Rolemanagement))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-06-18 12:38:42 --> ErrorException: Attempt to read property "filRecords" on null
+[Method: POST, Route: rolemanagement/rolelistajax]
+in APPPATH\Controllers\Rolemanagement.php on line 114.
+ 1 APPPATH\Controllers\Rolemanagement.php(114): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Attempt to read property "filRecords" on null', 'C:\\wamp64\\www\\kuwaitadvertising\\app\\Controllers\\Rolemanagement.php', 114)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Rolemanagement->rolelistajax()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Rolemanagement))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ERROR - 2025-06-18 12:46:54 --> mysqli_sql_exception: Unknown column 'a' in 'where clause' in C:\wamp64\www\kuwaitadvertising\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\wamp64\www\kuwaitadvertising\system\Database\MySQLi\Connection.php(327): mysqli->query('select * from r...', 0)
+#1 C:\wamp64\www\kuwaitadvertising\system\Database\BaseConnection.php(738): CodeIgniter\Database\MySQLi\Connection->execute('select * from r...')
+#2 C:\wamp64\www\kuwaitadvertising\system\Database\BaseConnection.php(652): CodeIgniter\Database\BaseConnection->simpleQuery('select * from r...')
+#3 C:\wamp64\www\kuwaitadvertising\app\Models\RoleModel.php(17): CodeIgniter\Database\BaseConnection->query('select * from r...')
+#4 C:\wamp64\www\kuwaitadvertising\app\Controllers\Rolemanagement.php(86): App\Models\RoleModel->getAllFilteredRecords(' and role_name ...', '0', 10)
+#5 C:\wamp64\www\kuwaitadvertising\system\CodeIgniter.php(933): App\Controllers\Rolemanagement->rolelistajax()
+#6 C:\wamp64\www\kuwaitadvertising\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Rolemanagement))
+#7 C:\wamp64\www\kuwaitadvertising\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#8 C:\wamp64\www\kuwaitadvertising\system\Boot.php(334): CodeIgniter\CodeIgniter->run()
+#9 C:\wamp64\www\kuwaitadvertising\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#10 C:\wamp64\www\kuwaitadvertising\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#11 {main}
+CRITICAL - 2025-06-18 12:46:54 --> CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'a' in 'where clause'
+[Method: POST, Route: rolemanagement/rolelistajax]
+in SYSTEMPATH\Database\BaseConnection.php on line 692.
+ 1 APPPATH\Models\RoleModel.php(17): CodeIgniter\Database\BaseConnection->query('select * from role_acces where \' and role_name like \'%a%\'\' limit 0,10')
+ 2 APPPATH\Controllers\Rolemanagement.php(86): App\Models\RoleModel->getAllFilteredRecords(' and role_name like \'%a%\'', '0', 10)
+ 3 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Rolemanagement->rolelistajax()
+ 4 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Rolemanagement))
+ 5 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 6 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 7 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 8 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-06-18 12:46:54 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'a' in 'where clause'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 332.
+ 1 SYSTEMPATH\Database\BaseConnection.php(738): CodeIgniter\Database\MySQLi\Connection->execute('select * from role_acces where \' and role_name like \'%a%\'\' limit 0,10')
+ 2 SYSTEMPATH\Database\BaseConnection.php(652): CodeIgniter\Database\BaseConnection->simpleQuery('select * from role_acces where \' and role_name like \'%a%\'\' limit 0,10')
+ 3 APPPATH\Models\RoleModel.php(17): CodeIgniter\Database\BaseConnection->query('select * from role_acces where \' and role_name like \'%a%\'\' limit 0,10')
+ 4 APPPATH\Controllers\Rolemanagement.php(86): App\Models\RoleModel->getAllFilteredRecords(' and role_name like \'%a%\'', '0', 10)
+ 5 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Rolemanagement->rolelistajax()
+ 6 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Rolemanagement))
+ 7 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-06-18 12:46:54 --> [Caused by] mysqli_sql_exception: Unknown column 'a' in 'where clause'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 327.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(327): mysqli->query('select * from role_acces where \' and role_name like \'%a%\'\' limit 0,10', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(738): CodeIgniter\Database\MySQLi\Connection->execute('select * from role_acces where \' and role_name like \'%a%\'\' limit 0,10')
+ 3 SYSTEMPATH\Database\BaseConnection.php(652): CodeIgniter\Database\BaseConnection->simpleQuery('select * from role_acces where \' and role_name like \'%a%\'\' limit 0,10')
+ 4 APPPATH\Models\RoleModel.php(17): CodeIgniter\Database\BaseConnection->query('select * from role_acces where \' and role_name like \'%a%\'\' limit 0,10')
+ 5 APPPATH\Controllers\Rolemanagement.php(86): App\Models\RoleModel->getAllFilteredRecords(' and role_name like \'%a%\'', '0', 10)
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Rolemanagement->rolelistajax()
+ 7 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Rolemanagement))
+ 8 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))

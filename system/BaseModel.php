@@ -532,8 +532,9 @@ abstract class BaseModel
      * Compiles a replace and runs the query.
      * This method works only with dbCalls.
      *
-     * @param row_array|null $row       Row data
-     * @param bool           $returnSQL Set to true to return Query String
+     * @param         array|null     $row       Row data
+     * @phpstan-param row_array|null $row
+     * @param         bool           $returnSQL Set to true to return Query String
      *
      * @return BaseResult|false|Query|string
      */
@@ -551,7 +552,8 @@ abstract class BaseModel
      * Public getter to return the id value using the idValue() method.
      * For example with SQL this will return $data->$this->primaryKey.
      *
-     * @param object|row_array $row Row data
+     * @param         array|object     $row Row data
+     * @phpstan-param row_array|object $row
      *
      * @return array|int|string|null
      */
@@ -735,7 +737,8 @@ abstract class BaseModel
      * you must ensure that the class will provide access to the class
      * variables, even if through a magic method.
      *
-     * @param object|row_array $row Row data
+     * @param         array|object     $row Row data
+     * @phpstan-param row_array|object $row
      *
      * @throws ReflectionException
      */
@@ -786,10 +789,12 @@ abstract class BaseModel
      * Inserts data into the database. If an object is provided,
      * it will attempt to convert it to an array.
      *
-     * @param object|row_array|null $row      Row data
-     * @param bool                  $returnID Whether insert ID should be returned or not.
+     * @param         array|object|null     $row      Row data
+     * @phpstan-param row_array|object|null $row
+     * @param         bool                  $returnID Whether insert ID should be returned or not.
      *
-     * @return ($returnID is true ? false|int|string : bool)
+     * @return         bool|int|string                               insert ID or true on success. false on failure.
+     * @phpstan-return ($returnID is true ? int|string|false : bool)
      *
      * @throws ReflectionException
      */
@@ -862,8 +867,8 @@ abstract class BaseModel
     /**
      * Set datetime to created field.
      *
-     * @param row_array  $row
-     * @param int|string $date timestamp or datetime string
+     * @phpstan-param row_array  $row
+     * @param         int|string $date timestamp or datetime string
      */
     protected function setCreatedField(array $row, $date): array
     {
@@ -877,8 +882,8 @@ abstract class BaseModel
     /**
      * Set datetime to updated field.
      *
-     * @param row_array  $row
-     * @param int|string $date timestamp or datetime string
+     * @phpstan-param row_array  $row
+     * @param         int|string $date timestamp or datetime string
      */
     protected function setUpdatedField(array $row, $date): array
     {
@@ -892,10 +897,11 @@ abstract class BaseModel
     /**
      * Compiles batch insert runs the queries, validating each row prior.
      *
-     * @param list<object|row_array>|null $set       an associative array of insert values
-     * @param bool|null                   $escape    Whether to escape values
-     * @param int                         $batchSize The size of the batch to run
-     * @param bool                        $testing   True means only number of records is returned, false will execute the query
+     * @param         list<array|object>|null     $set       an associative array of insert values
+     * @phpstan-param list<row_array|object>|null $set
+     * @param         bool|null                   $escape    Whether to escape values
+     * @param         int                         $batchSize The size of the batch to run
+     * @param         bool                        $testing   True means only number of records is returned, false will execute the query
      *
      * @return bool|int Number of rows inserted or FALSE on failure
      *
@@ -1037,10 +1043,11 @@ abstract class BaseModel
     /**
      * Compiles an update and runs the query.
      *
-     * @param list<object|row_array>|null $set       an associative array of insert values
-     * @param string|null                 $index     The where key
-     * @param int                         $batchSize The size of the batch to run
-     * @param bool                        $returnSQL True means SQL is returned, false will execute the query
+     * @param         list<array|object>|null     $set       an associative array of insert values
+     * @phpstan-param list<row_array|object>|null $set
+     * @param         string|null                 $index     The where key
+     * @param         int                         $batchSize The size of the batch to run
+     * @param         bool                        $returnSQL True means SQL is returned, false will execute the query
      *
      * @return false|int|list<string> Number of rows affected or FALSE on failure, SQL array when testMode
      *
@@ -1087,7 +1094,9 @@ abstract class BaseModel
                 $row = $this->doProtectFields($row);
 
                 // Restore updateIndex value in case it was wiped out
-                $row[$index] = $updateIndex;
+                if ($updateIndex !== null) {
+                    $row[$index] = $updateIndex;
+                }
 
                 $row = $this->setUpdatedField($row, $this->setDate());
             }
@@ -1119,8 +1128,8 @@ abstract class BaseModel
     /**
      * Deletes a single record from the database where $id matches.
      *
-     * @param int|list<int|string>|string|null $id    The rows primary key(s)
-     * @param bool                             $purge Allows overriding the soft deletes setting.
+     * @param array|int|string|null $id    The rows primary key(s)
+     * @param bool                  $purge Allows overriding the soft deletes setting.
      *
      * @return BaseResult|bool
      *
@@ -1208,8 +1217,9 @@ abstract class BaseModel
     /**
      * Compiles a replace and runs the query.
      *
-     * @param row_array|null $row       Row data
-     * @param bool           $returnSQL Set to true to return Query String
+     * @param         array|null     $row       Row data
+     * @phpstan-param row_array|null $row
+     * @param         bool           $returnSQL Set to true to return Query String
      *
      * @return BaseResult|false|Query|string
      */
@@ -1803,8 +1813,9 @@ abstract class BaseModel
     /**
      * Transform data to array.
      *
-     * @param object|row_array|null $row  Row data
-     * @param string                $type Type of data (insert|update)
+     * @param         array|object|null     $row  Row data
+     * @phpstan-param row_array|object|null $row
+     * @param         string                $type Type of data (insert|update)
      *
      * @throws DataException
      * @throws InvalidArgumentException
