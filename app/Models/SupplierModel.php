@@ -6,31 +6,37 @@ use CodeIgniter\Model;
 class SupplierModel extends Model
 {
     protected $table      = 'enquiries';
-    protected $primaryKey = 'enquiries_id';
-    protected $allowedFields = ['name', 'address', 'company_id', 'is_deleted'];
+    protected $primaryKey = 'enquiry_id';
+    protected $allowedFields = [
+        'enquiry_no','customer_id','address','phone','name','user_id',
+    'created_by','created_at','company_id','is_deleted','updated_by','updated_at'
+    ];
     protected $returnType = 'array';
-    protected $defaultCompanyId = 1; 
+    // protected $defaultCompanyId = 1; 
 
     public function getAllSupplierCount($company_id = null)
     {
         $builder = $this->db->table($this->table)
             ->where('is_deleted', 0);
 
-        $company_id = $company_id ?? $this->defaultCompanyId;
-        $builder->where('company_id', $company_id);
+        if ($company_id) {
+            $builder->where('company_id', $company_id);
+        }
 
         $count = $builder->countAllResults();
-        return (object)['totEnquiries' => $count];
+        return (object)['totSuppliers' => $count];
     }
 
+    // Filtered count for DataTables
     public function getFilteredSupplierCount($search = '', $company_id = null)
     {
         $search = trim($search);
         $builder = $this->db->table($this->table)
             ->where('is_deleted', 0);
 
-        $company_id = $company_id ?? $this->defaultCompanyId;
-        $builder->where('company_id', $company_id);
+        if ($company_id) {
+            $builder->where('company_id', $company_id);
+        }
 
         if (!empty($search)) {
             $normalizedSearch = str_replace(' ', '', strtolower($search));
@@ -45,9 +51,10 @@ class SupplierModel extends Model
         }
 
         $count = $builder->countAllResults();
-        return (object)['countEnquiries' => $count];
+        return (object)['countSuppliers' => $count];
     }
 
+    // Fetch filtered suppliers for DataTables
     public function getAllFilteredRecords($search = '', $fromstart = 0, $tolimit = 10, $orderColumn = 'enquiry_id', $orderDir = 'DESC', $company_id = null)
     {
         $search = trim($search);
@@ -60,8 +67,9 @@ class SupplierModel extends Model
         $builder = $this->db->table($this->table)
             ->where('is_deleted', 0);
 
-        $company_id = $company_id ?? $this->defaultCompanyId;
-        $builder->where('company_id', $company_id);
+        if ($company_id) {
+            $builder->where('company_id', $company_id);
+        }
 
         if (!empty($search)) {
             $normalizedSearch = str_replace(' ', '', strtolower($search));

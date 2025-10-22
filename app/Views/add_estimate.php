@@ -205,11 +205,15 @@
                             <!-- <input type="text" name="description[]" class="form-control description" required> -->
                             <textarea class="form-control" id="popup_address" rows="3" required></textarea>
                         </div>
+                        <div class="form-group">
+                            <label>Customer Phone</label>
+                            <input type="text" class="form-control" id="popup_phone" required>
+                        </div>
                         <div class="alert alert-danger d-none" id="customerError"></div>
-                        <div class="mb-3">
-                    <label>Maximum Discount (KWD)</label>
-                    <input type="number" name="max_discount" id="max_discount" class="form-control" min="0" step="0.000001" placeholder="Enter maximum discount amount">
-                </div>
+                        <!-- <div class="mb-3">
+                            <label>Maximum Discount (KWD)</label>
+                            <input type="number" name="max_discount" id="max_discount" class="form-control" min="0" step="0.000001" placeholder="Enter maximum discount amount">
+                        </div> -->
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-primary" id="saveCustomerBtn">Save</button>
@@ -387,16 +391,18 @@
         });
 
         // ✅ Enable Save button only when required fields are filled
-        $('#popup_name, #popup_address').on('input', function() {
+        $('#popup_name, #popup_address, #popup_phone').on('input', function() {
             let name = $('#popup_name').val().trim();
             let address = $('#popup_address').val().trim();
+            let phone = $('#popup_phone').val().trim();
 
-            if (name !== '' && address !== '') {
+            if (name !== '' && address !== '' && phone !== '') {
                 saveCustomerBtn.prop('disabled', false);
             } else {
                 saveCustomerBtn.prop('disabled', true);
             }
         });
+
 
         // ✅ Handle customer form submit
         $('#customerForm').submit(function(e) {
@@ -404,7 +410,8 @@
 
             let name = $('#popup_name').val().trim();
             let address = $('#popup_address').val().trim();
-            let max_discount = $('#max_discount').val().trim();
+            // let max_discount = $('#max_discount').val().trim();
+            let phone = $('#popup_phone').val().trim();
 
             name = name.replace(/\b\w/g, char => char.toUpperCase());
             address = address.replace(/(^\s*\w|[.!?]\s*\w)/g, char => char.toUpperCase());
@@ -423,7 +430,8 @@
                 data: {
                     name,
                     address,
-                    max_discount
+                    phone,
+                    // max_discount
                 },
                 dataType: "json",
                 success: function(res) {
@@ -432,7 +440,8 @@
                         $('#customer_id').append(newOption).trigger('change');
                         $('#popup_name').val('');
                         $('#popup_address').val('');
-                        $('#max_discount').val('');
+                        // $('#max_discount').val('');
+                        $('#popup_phone').val(''); 
                         $('#customerModal').modal('hide');
                         $('.alert')
                             .removeClass('d-none alert-danger')

@@ -5,6 +5,7 @@ use App\Models\SupplierModel;
 use App\Models\EstimateModel;
 use App\Models\EstimateItemModel;
 use App\Models\customerModel;
+use App\Models\EnquiryItemModel;
 use CodeIgniter\Controller;
 
 class Supplier extends BaseController
@@ -41,6 +42,74 @@ class Supplier extends BaseController
  
         return view('add_enquiry', $data);
     }
+    public function saveEnquiry()
+{
+    $enquiryModel     = new SupplierModel();
+    $enquiryItemModel = new EnquiryItemModel();
+    $customerModel    = new CustomerModel();
+
+    $enquiry_id   = $this->request->getPost('enquiry_id');
+    $customer_id  = $this->request->getPost('customer_id');
+    $address      = $this->request->getPost('customer_address');
+    $descriptions = $this->request->getPost('description'); 
+    $quantities   = $this->request->getPost('quantity');    
+
+    if (!$customer_id || !$address || empty($descriptions) || empty($quantities)) {
+        return $this->response->setJSON([
+            'status' => 'error',
+            'message' => 'Please fill all required fields and add at least one item.'
+        ]);
+    }
+
+    $customer = $customerModel->find($customer_id);
+    if (!$customer) {
+        return $this->response->setJSON(['status'=>'error','message'=>'Customer not found']);
+    }
+
+    $name  = $customer['name'];
+    $phone = $customer['phone'];
+    $user_id = session()->get('user_id') ?? 1;
+
+    // Create enquiry
+    $enquiryData = [
+        'enquiry_no' => $enquiry_id ? null : 'ENQ-'.strtoupper(uniqid()),
+        'customer_id'=> $customer_id,
+        'name'       => $name,
+        'address'    => $address,
+        'user_id'    => $user_id,
+        'phone'      => $phone,
+        'created_by' => $user_id,
+        'created_at' => date('Y-m-d H:i:s'),
+        'company_id' => 1,
+        'is_deleted' => 0
+    ];
+
+    if ($enquiry_id) {
+        $enquiryData['updated_by'] = $user_id;
+        $enquiryData['updated_at'] = date('Y-m-d H:i:s');
+        $enquiryModel->update($enquiry_id, $enquiryData);
+        $enquiry_id = $enquiry_id;
+        // Optional: delete old items and re-insert
+        $enquiryItemModel->where('enquiry_id',$enquiry_id)->delete();
+    } else {
+        $enquiry_id = $enquiryModel->insert($enquiryData);
+    }
+
+    // Insert enquiry items
+    foreach ($descriptions as $key => $desc) {
+        if(!empty($desc) && !empty($quantities[$key])){
+            $enquiryItemModel->insert([
+                'enquiry_id' => $enquiry_id,
+                'description'=> $desc,
+                'quantity'   => $quantities[$key],
+                'created_at' => date('Y-m-d H:i:s')
+            ]);
+        }
+    }
+
+    return $this->response->setJSON(['status'=>'success','message'=>'Enquiry saved successfully']);
+}
+
 
     // Get customer Address
     public function get_address()

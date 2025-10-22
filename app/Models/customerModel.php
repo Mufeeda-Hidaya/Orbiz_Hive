@@ -1,78 +1,76 @@
 <?php
-namespace App\Models;
 
+namespace App\Models;
 use CodeIgniter\Model;
 
-class customerModel extends Model
+class CustomerModel extends Model
 {
     protected $table = 'customers';
     protected $primaryKey = 'customer_id';
-    protected $allowedFields = ['name', 'address','company_id','shipping_address','is_deleted', 'max_discount'];
-    protected $returnType = 'array';
+    protected $allowedFields = ['name', 'address', 'phone', 'company_id', 'shipping_address', 'is_deleted', 'max_discount'];
 
+    // Count all customers
     public function getAllCustomerCount()
     {
-        return $this->db->query("SELECT COUNT(*) AS totcustomers FROM {$this->table}")->getRow();
+        return $this->db->table($this->table)
+                        ->where('is_deleted', 0)
+                        ->countAllResults();
     }
 
+    // Count filtered customers
     public function getFilteredCustomerCount($search = '', $company_id = null)
-{
-     $search = trim($search);
-    $builder = $this->db->table($this->table);
-    $builder->where('is_deleted', 0);
+    {
+        $builder = $this->db->table($this->table . ' AS customers');
+        $builder->where('customers.is_deleted', 0);
 
-    if ($company_id) {
-        $builder->where('company_id', $company_id);
+        if ($company_id) {
+            $builder->where('customers.company_id', $company_id);
+        }
+
+        if (!empty($search)) {
+            $normalizedSearch = str_replace(' ', '', strtolower($search));
+            $builder->groupStart()
+                ->like('customers.name', $search)
+                ->orLike('customers.address', $search)
+                ->orLike('customers.phone', $search)
+                ->orLike('customers.customer_id', $search)
+                ->orWhere("REPLACE(REPLACE(REPLACE(LOWER(customers.name), ' ', ''), '\n', ''), '\r', '') LIKE '%{$normalizedSearch}%'", null, false)
+                ->orWhere("REPLACE(REPLACE(REPLACE(LOWER(customers.address), ' ', ''), '\n', ''), '\r', '') LIKE '%{$normalizedSearch}%'", null, false)
+                ->orWhere("REPLACE(REPLACE(REPLACE(LOWER(customers.phone), ' ', ''), '\n', ''), '\r', '') LIKE '%{$normalizedSearch}%'", null, false)
+                ->groupEnd();
+        }
+
+        return (object)['filCustomers' => $builder->countAllResults()];
     }
 
-   if (!empty($search)) {
-    $normalizedSearch = str_replace(' ', '', strtolower($search)); 
+    // Get filtered records with pagination
+    public function getAllFilteredRecords($search = '', $fromstart = 0, $tolimit = 10, $orderColumn = 'customer_id', $orderDir = 'DESC', $company_id = null)
+    {
+        $allowedColumns = ['customer_id', 'name', 'address', 'phone'];
+        if (!in_array($orderColumn, $allowedColumns)) $orderColumn = 'customer_id';
+        $orderDir = strtoupper($orderDir) === 'ASC' ? 'ASC' : 'DESC';
 
-    $builder->groupStart()
-        ->like('customers.name', $search)
-        ->orLike('customers.address', $search)
-        ->orLike('customers.customer_id', $search)
-        ->orWhere("REPLACE(REPLACE(REPLACE(LOWER(customers.name), ' ', ''), '\n', ''), '\r', '') LIKE '%{$normalizedSearch}%'", null, false)
-        ->orWhere("REPLACE(REPLACE(REPLACE(LOWER(customers.address), ' ', ''), '\n', ''), '\r', '') LIKE '%{$normalizedSearch}%'", null, false)
-        ->groupEnd();
-}
+        $builder = $this->db->table($this->table . ' AS customers');
+        $builder->where('customers.is_deleted', 0);
 
-    $count = $builder->countAllResults();
-    return (object)['filCustomers' => $count];
-}
+        if ($company_id) $builder->where('customers.company_id', $company_id);
 
-public function getAllFilteredRecords($search = '', $fromstart = 0, $tolimit = 10, $orderColumn = 'customer_id', $orderDir = 'DESC', $company_id = null)
-{
-    $search = trim($search);
-    $allowedColumns = ['customer_id', 'name', 'address'];
-    if (!in_array($orderColumn, $allowedColumns)) {
-        $orderColumn = 'customer_id';
+        if (!empty($search)) {
+            $normalizedSearch = str_replace(' ', '', strtolower($search));
+            $builder->groupStart()
+                ->like('customers.name', $search)
+                ->orLike('customers.address', $search)
+                ->orLike('customers.phone', $search)
+                ->orLike('customers.customer_id', $search)
+                ->orWhere("REPLACE(REPLACE(REPLACE(LOWER(customers.name), ' ', ''), '\n', ''), '\r', '') LIKE '%{$normalizedSearch}%'", null, false)
+                ->orWhere("REPLACE(REPLACE(REPLACE(LOWER(customers.address), ' ', ''), '\n', ''), '\r', '') LIKE '%{$normalizedSearch}%'", null, false)
+                ->orWhere("REPLACE(REPLACE(REPLACE(LOWER(customers.phone), ' ', ''), '\n', ''), '\r', '') LIKE '%{$normalizedSearch}%'", null, false)
+                ->groupEnd();
+        }
+
+        $builder->orderBy("customers.$orderColumn", $orderDir)
+                ->limit($tolimit, $fromstart);
+
+        return $builder->get()->getResultArray();
     }
-    $orderDir = strtoupper($orderDir) === 'ASC' ? 'ASC' : 'DESC';
-
-    $builder = $this->db->table($this->table);
-    $builder->where('is_deleted', 0);
-
-    if ($company_id) {
-        $builder->where('company_id', $company_id);
-    }
-
-   if (!empty($search)) {
-    $normalizedSearch = str_replace(' ', '', strtolower($search)); 
-
-    $builder->groupStart()
-        ->like('customers.name', $search)
-        ->orLike('customers.address', $search)
-        ->orLike('customers.customer_id', $search)
-         ->orWhere("REPLACE(REPLACE(REPLACE(LOWER(customers.name), ' ', ''), '\n', ''), '\r', '') LIKE '%{$normalizedSearch}%'", null, false)
-        ->orWhere("REPLACE(REPLACE(REPLACE(LOWER(customers.address), ' ', ''), '\n', ''), '\r', '') LIKE '%{$normalizedSearch}%'", null, false)
-        ->groupEnd();
-}
-
-    $builder->orderBy($orderColumn, $orderDir)
-            ->limit($tolimit, $fromstart);
-
-    return $builder->get()->getResultArray();
-}
-
 }

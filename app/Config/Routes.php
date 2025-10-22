@@ -138,7 +138,8 @@ $routes->get('estimate/generateEstimate/(:segment)', 'Estimate::generateEstimate
 
 
 $routes->get('add_enquiry', 'Supplier::add_enquiry'); 
-$routes->get('supplier/list', 'Supplier::list');
+$routes->get('enquiry/list', 'Supplier::list');
+$routes->post('supplier/saveEnquiry', 'Supplier::saveEnquiry');
 $routes->post('supplier/fetch', 'Supplier::fetch');
 $routes->post('supplier/create', 'Supplier::create');
 $routes->post('supplier/delete', 'Supplier::delete');

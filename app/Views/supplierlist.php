@@ -45,7 +45,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <input type="hidden" name="enquiry_id" id="enquiry_id">
+                    <input type="hidden" name="supplier_id" id="supplier_id">
                     <div class="mb-3">
                         <label>Supplier Name</label>
                         <input type="text" name="name" id="name" class="form-control" required style="text-transform: capitalize;">
@@ -72,7 +72,7 @@
                 <h5 class="modal-title">Confirm Delete</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body">Are You Sure You Want To Delete This Enquiry?</div>
+            <div class="modal-body">Are You Sure You Want To Delete This Supplier?</div>
             <div class="modal-footer">
                 <button type="button" id="confirm-delete-btn" class="btn btn-danger">Delete</button>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -115,7 +115,7 @@ $(document).ready(function () {
                 "<'row'<'col-sm-12'tr>>" +
                 "<'row mt-3'<'col-sm-5'i><'col-sm-7'p>>",
         columns: [
-            { data: "enquiry_id" },
+            { data: "supplier_id" },
             { data: "slno" },
             {
                 data: "name",
@@ -130,7 +130,7 @@ $(document).ready(function () {
                     }
             },
             {
-                data: "enquiry_id",
+                data: "supplier_id",
                 render: data => `
                     <div class="d-flex gap-2">
                         <a href="javascript:void(0);" class="edit-supplier" data-id="${data}" title="Edit" style="color:rgb(13, 162, 199);">
@@ -144,10 +144,10 @@ $(document).ready(function () {
         ]
     });
 
-    // Add Enquiry
+    // Add Supplier
     $('#addSupplierBtn').click(() => {
         $('#supplierForm')[0].reset();
-        $('#enquiry_id').val('');
+        $('#supplier_id').val('');
         $('#supplierModalLabel').text('Add Supplier');
         $('#saveSupplierBtn').prop('disabled', false);
         supplierModal.show();
@@ -157,12 +157,12 @@ $(document).ready(function () {
         originalMaxDiscount = '';
     });
 
-    // Edit Enquiry
+    // Edit Supplier
     $(document).on('click', '.edit-supplier', function () {
         const id = $(this).data('id');
         $.get("<?= base_url('supplier/getSupplier/') ?>" + id, function (data) {
             if (data.status !== 'error') {
-                $('#enquiry_id').val(data.enquiry_id);
+                $('#supplier_id').val(data.supplier_id);
                 $('#name').val(data.name);
                 $('#address').val(data.address);
                 $('#supplierModalLabel').text('Edit Customer');
@@ -181,7 +181,7 @@ $(document).ready(function () {
 
     // Check if input values changed from original (only in Edit)
     $('#name, #address').on('input', function () {
-    const isEdit = $('#enquiry_id').val() !== '';
+    const isEdit = $('#supplier_id').val() !== '';
     if (!isEdit) return;
 
     const currentName = $('#name').val().trim();
@@ -229,8 +229,8 @@ $(document).ready(function () {
 
     // View Estimate
     $(document).on('click', '.view-estimate', function () {
-        const enquiry_id  = $(this).data('id');
-        window.location.href = "<?= base_url('estimate/supplier/') ?>" + enquiry_id ;
+        const supplier_id  = $(this).data('id');
+        window.location.href = "<?= base_url('estimate/supplier/') ?>" + supplier_id ;
     });
 
     // Delete

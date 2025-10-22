@@ -132,7 +132,7 @@ if ($company_id) {
           <?php if (in_array('supplier', $allowedMenus)): ?>
             <li class="nav-item">
               <a class="nav-link <?= strpos($currentPath, 'supplier') !== false ? 'active' : '' ?>"
-                href="<?= base_url('supplier/list') ?>">
+                href="<?= base_url('enquiry/list') ?>">
                 <i class="mdi mdi-file-outline menu-icon"></i>
                 <span class="menu-title">Enquiry List</span>
               </a>

@@ -20,12 +20,13 @@ class Customer extends BaseController
     $name = ucwords(strtolower(trim($this->request->getPost('name'))));
     $address = ucfirst(strtolower(trim($this->request->getPost('address'))));
     $customer_id = $this->request->getPost('customer_id'); 
+    $phone = preg_replace('/[^0-9\+\-\(\)\s]/', '', trim($this->request->getPost('phone')));
     $max_discount = $this->request->getPost('max_discount');
 
     if (empty($name) || empty($address)) {
         return $this->response->setJSON([
             'status' => 'error',
-            'message' => 'Name And Address Are Required'
+            'message' => 'All fields Are Required'
         ]);
     }
 
@@ -33,7 +34,8 @@ class Customer extends BaseController
     $data = [
         'name' => $name,
         'address' => $address,
-         'company_id' => $session->get('company_id'), 
+        'company_id' => $session->get('company_id'), 
+        'phone'=>$phone,
         'max_discount' => round((float)($max_discount ?? 0), 6)
     ];
 
@@ -128,40 +130,42 @@ public function fetch()
 {
     $session = session();
     $request = service('request');
-    $model = new customerModel();
+    $model = new CustomerModel();
     $company_id = $session->get('company_id');
 
-    $draw = $request->getPost('draw') ?? 1;
-    $start = $request->getPost('start') ?? 0;
+    $draw   = $request->getPost('draw') ?? 1;
+    $start  = $request->getPost('start') ?? 0;
     $length = $request->getPost('length') ?? 10;
-    $order = $request->getPost('order');
-    $search= trim($request->getPost('search')['value'] ?? '');
+    $order  = $request->getPost('order');
+    $search = trim($request->getPost('search')['value'] ?? '');
+
+    // Column mapping for sorting
+    $columnMap = [
+        0 => 'customer_id', // hidden
+        1 => 'name',
+        2 => 'address',
+        3 => 'phone'
+    ];
 
     $columnIndex = $order[0]['column'] ?? 0;
     $orderDir = $order[0]['dir'] ?? 'desc';
-
-    $columnMap = [
-        0 => 'customer_id',
-        1 => 'name',
-        2 => 'address'
-    ];
     $orderColumn = $columnMap[$columnIndex] ?? 'customer_id';
 
-    $customers = $model->getAllFilteredRecords($search, $start, $length, $orderColumn, $orderDir,$company_id);
+    $customers = $model->getAllFilteredRecords($search, $start, $length, $orderColumn, $orderDir, $company_id);
 
     $result = [];
     $slno = $start + 1;
 
     foreach ($customers as $row) {
         $result[] = [
-            'slno' => $slno++,
+            'slno'        => $slno++,
             'customer_id' => $row['customer_id'],
-            'name' => ucwords(strtolower($row['name'])),
-            'address' => ucwords(strtolower($row['address'])),
+            'name'        => ucwords(strtolower($row['name'])),
+            'address'     => ucwords(strtolower($row['address'])),
+            'phone'       => $row['phone'] ?? ''
         ];
     }
 
-   $total = $model->getAllCustomerCount()->totcustomers;
     $filteredTotal = $model->getFilteredCustomerCount($search, $company_id)->filCustomers;
 
     return $this->response->setJSON([
@@ -171,6 +175,8 @@ public function fetch()
         'data' => $result
     ]);
 }
+
+
 
 public function getCustomer($id)
 {
