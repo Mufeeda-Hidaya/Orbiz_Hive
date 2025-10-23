@@ -27,6 +27,7 @@
                 <th>Sl No</th>
                 <th>Name</th>
                 <th>Address</th>
+                <th>Phone Number</th>
                 <th style="width: 100px;">Action</th>
             </tr>
         </thead>
@@ -55,9 +56,13 @@
                         <textarea name="address" id="address" class="form-control" required style="text-transform: capitalize;"></textarea>
                     </div>
                     <div class="mb-3">
-                    <label>Maximum Discount (KWD)</label>
-                    <input type="number" name="max_discount" id="max_discount" class="form-control" min="0" step="0.000001" placeholder="Enter maximum discount amount">
-                </div>
+						<label>Phone</label>
+						<input type="text" name="phone" id="phone" class="form-control" required>
+					</div>
+                    <!-- <div class="mb-3">
+						<label>Max Discount</label>
+						<textarea name="discount" id="discount" class="form-control" required style="text-transform: capitalize;"></textarea>
+					</div> -->
 
                 </div>
                 <div class="modal-footer">
@@ -92,11 +97,14 @@
 let table;
 let deleteId = null;
 const alertBox = $('.alert');
-const customerModal = new bootstrap.Modal(document.getElementById('customerModal'));
+// const customerModal = new bootstrap.Modal(document.getElementById('customerModal'));
 const deleteModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
+var customerModal = new bootstrap.Modal(document.getElementById('customerModal'));
+// let originalName = '', originalAddress = '', originalPhone = '';
 
 let originalName = '';
 let originalAddress = '';
+let originalPhone = '';
 
 $(document).ready(function () {
     // Load DataTable
@@ -113,8 +121,9 @@ $(document).ready(function () {
             { targets: 0, visible: false },
             { targets: 1, orderable: false, width: "30px" },
             { targets: 2, width: "150px" },
-            { targets: 3, width: "300px" },
-            { targets: 4, orderable: false, width: "50px" }
+            { targets: 3, width: "150px" },
+            { targets: 4, orderable: false,width: "150px" },
+            { targets: 5, orderable: false }
         ],
         dom: "<'row mb-3'<'col-sm-6'l><'col-sm-6'f>>" +
                 "<'row'<'col-sm-12'tr>>" +
@@ -129,10 +138,14 @@ $(document).ready(function () {
             {
                 data: "address",
                 render: data => {
-                        if (!data) return '';
-                        let formatted = data.replace(/\b\w/g, c => c.toUpperCase());
-                        return formatted.replace(/\n/g, "<br>");
-                    }
+                    if (!data) return '';
+                    let formatted = data.replace(/\b\w/g, c => c.toUpperCase());
+                    return formatted.replace(/\n/g, "<br>");
+                }
+            },
+            {
+                data: "phone",
+                render: data => data ? data : ''
             },
             {
                 data: "customer_id",
@@ -150,6 +163,7 @@ $(document).ready(function () {
                     </div>`
             }
         ]
+
     });
 
     // Add Customer
@@ -162,45 +176,49 @@ $(document).ready(function () {
 
         originalName = '';
         originalAddress = '';
+        originalPhone = '';
         originalMaxDiscount = '';
     });
 
     // Edit Customer
     $(document).on('click', '.edit-customer', function () {
         const id = $(this).data('id');
-        $.get("<?= base_url('customer/getCustomer/') ?>" + id, function (data) {
-            if (data.status !== 'error') {
-                $('#customer_id').val(data.customer_id);
-                $('#name').val(data.name);
-                $('#address').val(data.address);
-                 $('#max_discount').val(data.max_discount || '');
+
+        $.get("<?= base_url('customer/getCustomer/') ?>" + id, function (res) {
+            if (res.status === 'success') {
+                const customer = res.customer;
+
+                $('#customer_id').val(customer.customer_id);
+                $('#name').val(customer.name);
+                $('#address').val(customer.address);
+                $('#phone').val(customer.phone);
+
+                // Store original values to detect changes
+                originalName = customer.name.trim();
+                originalAddress = customer.address.trim();
+                originalPhone = customer.phone ? customer.phone.trim() : '';
+
                 $('#customerModalLabel').text('Edit Customer');
-
-                originalName = data.name.trim();
-                originalAddress = data.address.trim();
-                originalMaxDiscount = data.max_discount ? data.max_discount.toString(6) : '';
-
                 $('#saveCustomerBtn').prop('disabled', true);
                 customerModal.show();
             } else {
-                showAlert('danger', data.message);
+                showAlert('danger', res.message);
             }
         });
     });
 
     // Check if input values changed from original (only in Edit)
-    $('#name, #address, #max_discount').on('input', function () {
+    $('#name, #address, #phone').on('input', function () {
     const isEdit = $('#customer_id').val() !== '';
     if (!isEdit) return;
 
     const currentName = $('#name').val().trim();
     const currentAddress = $('#address').val().trim();
-    const currentMaxDiscount = $('#max_discount').val().trim(6);
+    const currentPhone = $('#phone').val().trim();
 
-    const hasChanged = currentName !== originalName || currentAddress !== originalAddress || currentMaxDiscount !== originalMaxDiscount;
+    const hasChanged = currentName !== originalName || currentAddress !== originalAddress || currentPhone !== originalPhone;
     $('#saveCustomerBtn').prop('disabled', !hasChanged);
 });
-
 
     // Submit Form
     $('#customerForm').submit(function (e) {

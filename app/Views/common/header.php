@@ -1,7 +1,11 @@
 <?php
 $session = session();
-$company_id = $session->get('company_id');
+$company_id = $session->get('company_id') ?? null; 
+$user_id = $session->get('user_id') ?? null;       
 
+if (!$company_id) {
+    $company_id = 1; 
+}
 $company = [];
 if ($company_id) {
     $companyModel = new \App\Models\Managecompany_Model();
@@ -131,10 +135,10 @@ if ($company_id) {
 
           <?php if (in_array('supplier', $allowedMenus)): ?>
             <li class="nav-item">
-              <a class="nav-link <?= strpos($currentPath, 'supplier') !== false ? 'active' : '' ?>"
-                href="<?= base_url('supplier/list') ?>">
-                <i class="mdi mdi-file-outline menu-icon"></i>
-                <span class="menu-title">Enquiry List</span>
+              <a class="nav-link <?= (strpos($currentPath, 'supplier') !== false || strpos(uri_string(), 'enquiry') !== false) ? 'active' : '' ?>"
+                href="<?= base_url('enquiry/list') ?>">
+                  <i class="mdi mdi-file-outline menu-icon"></i>
+                  <span class="menu-title">Enquiry List</span>
               </a>
             </li>
           <?php endif; ?>

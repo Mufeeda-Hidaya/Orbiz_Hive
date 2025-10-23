@@ -58,7 +58,7 @@
                   </div>
                   <div class="d-flex flex-column justify-content-around">
                     <small class="mb-3 text-white"><b>Total Income The Day</b></small>
-                    <h5 id="dailyRevenue" class="me-2 mb-0 text-center">KWD 0.00</h5>
+                    <h5 id="dailyRevenue" class="me-2 mb-0 text-center">AED 0.00</h5>
                   </div>
                   </div>
 
@@ -86,7 +86,7 @@
                       
                       <div class="d-flex flex-column justify-content-around">
                           <small class="mb-3 text-white"><b>Total Income Of The Month</b></small>
-                          <h5 id="monthlyRevenue" class="me-2 mb-0 text-center">KWD 0.00</h5>
+                          <h5 id="monthlyRevenue" class="me-2 mb-0 text-center">AED 0.00</h5>
                       </div>
                   </div>
 
@@ -145,10 +145,10 @@
       type: "POST",
       dataType: "json",
       success: function (res) {
-        $('#dailyExpense').text('KWD ' + parseFloat(res.total).toFixed(6));
+        $('#dailyExpense').text('AED ' + parseFloat(res.total).toFixed(4));
       },
       error: function () {
-        $('#dailyExpense').text('KWD 0.0000000');
+        $('#dailyExpense').text('AED 0.0000');
       }
     });
   }
@@ -159,10 +159,10 @@
       type: "POST",
       dataType: "json",
       success: function (res) {
-        $('#monthlyExpense').text('KWD ' + parseFloat(res.total).toFixed(6));
+        $('#monthlyExpense').text('AED ' + parseFloat(res.total).toFixed(4));
       },
       error: function () {
-        $('#monthlyExpense').text('KWD 0.000000');
+        $('#monthlyExpense').text('AED 0.0000');
       }
     });
   }
@@ -173,10 +173,10 @@
       type: "GET",
       dataType: "json",
       success: function (res) {
-        $('#dailyRevenue').text('KWD ' + parseFloat(res.total).toFixed(6));
+        $('#dailyRevenue').text('AED ' + parseFloat(res.total).toFixed(6));
       },
       error: function () {
-        $('#dailyRevenue').text('KWD 0.000000');
+        $('#dailyRevenue').text('AED 0.0000');
       }
     });
   }
@@ -187,10 +187,10 @@
       type: "GET",
       dataType: "json",
       success: function (res) {
-        $('#monthlyRevenue').text('KWD ' + parseFloat(res.total).toFixed(6));
+        $('#monthlyRevenue').text('AED ' + parseFloat(res.total).toFixed(6));
       },
       error: function () {
-        $('#monthlyRevenue').text('KWD 0.000000');
+        $('#monthlyRevenue').text('AED 0.0000');
       }
     });
   }
@@ -210,8 +210,8 @@
                 <td>${formatDate(est.date)}</td>
                 <td>${capitalizeWords(est.customer_name ?? '-')}</td>
                 <td>${capitalizeWords(est.customer_address ?? '-')}</td>
-                <td>${parseFloat(est.sub_total || 0).toFixed(6)} KWD</td>
-                <td>${parseFloat(est.total_amount || 0).toFixed(6)} KWD</td>
+                <td>${parseFloat(est.sub_total || 0).toFixed(4)} AED</td>
+                <td>${parseFloat(est.total_amount || 0).toFixed(4)} AED</td>
               </tr>
             `;
           });

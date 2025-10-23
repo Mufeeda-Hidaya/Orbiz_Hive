@@ -13,16 +13,16 @@ class Rolemanagement extends Controller
     protected $menus = [
     'dashboard'         => 'Dashboard',
     'adduserlist'       => 'Users',
-    'companylist'       => 'Companies',
+    // 'companylist'       => 'Companies',
     'estimatelist'      => 'Estimates',
     'invoices'          => 'Invoice',
-    'expense'           => 'Expense',
-    'ledger'            => 'Ledger',
-    'reports'           => 'Reports',
+    // 'expense'           => 'Expense',
+    // 'ledger'            => 'Ledger',
+    // 'reports'           => 'Reports',
     'rolemanagement'    => 'Role Management',
     'customer'          => 'Customer List',
-    'supplier'          => 'Supplier List',
-    'transactions'       => 'Transactions'  
+    'enquiry'          => 'Enquiry List',
+    // 'transactions'       => 'Transactions'  
 ];
     
     public function __construct()

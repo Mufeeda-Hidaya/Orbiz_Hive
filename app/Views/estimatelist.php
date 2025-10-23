@@ -36,7 +36,7 @@
                     <th>Address</th>
                     <th>Subtotal</th>
                     <th>Discount</th>
-                    <th>Total (KWD)</th>
+                    <th>Total (AED)</th>
                     <th>Date</th>
                     <th>Action</th>
                     <th class="d-none">ID</th>
@@ -110,21 +110,21 @@
 
                 {
                     data: "subtotal",
-                    render: data => parseFloat(data).toFixed(6) + " KWD"
+                    render: data => parseFloat(data).toFixed(6) + " AED"
                 },
                 {
-    data: 'discount',
-    render: function (data) {
-        if (data === null || data === '' || parseFloat(data) === 0) {
-            return '0.000000 KWD';
-        }
-        return parseFloat(data).toFixed(6) + ' KWD';
-    }
-},
+                    data: 'discount',
+                    render: function (data) {
+                        if (data === null || data === '' || parseFloat(data) === 0) {
+                            return '0.0000 AED';
+                        }
+                        return parseFloat(data).toFixed(6) + 'AED';
+                    }
+                },
 
                 {
                     data: "total_amount",
-                    render: data => parseFloat(data).toFixed(6) + " KWD"
+                    render: data => parseFloat(data).toFixed(6) + "AED"
                 },
                 {
                     data: "date",

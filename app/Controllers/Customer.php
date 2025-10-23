@@ -14,65 +14,73 @@ class Customer extends BaseController
             exit;
         }
     }
-   public function create()
-{
-    $session = session();
-    $name = ucwords(strtolower(trim($this->request->getPost('name'))));
-    $address = ucfirst(strtolower(trim($this->request->getPost('address'))));
-    $customer_id = $this->request->getPost('customer_id'); 
-    $max_discount = $this->request->getPost('max_discount');
+    public function create()
+    {
+        $session = session();
+        $company_id = $this->request->getPost('company_id') ?? $session->get('company_id') ?? 1;
+        $user_id = $session->get('user_id'); 
 
-    if (empty($name) || empty($address)) {
-        return $this->response->setJSON([
-            'status' => 'error',
-            'message' => 'Name And Address Are Required'
-        ]);
-    }
+        $name = ucwords(strtolower(trim($this->request->getPost('name'))));
+        $address = ucfirst(strtolower(trim($this->request->getPost('address'))));
+        $customer_id = $this->request->getPost('customer_id'); 
+        $phone = preg_replace('/[^0-9\+\-\(\)\s]/', '', trim($this->request->getPost('phone')));
+        $max_discount = $this->request->getPost('max_discount');
 
-    $model = new customerModel();
-    $data = [
-        'name' => $name,
-        'address' => $address,
-         'company_id' => $session->get('company_id'), 
-        'max_discount' => round((float)($max_discount ?? 0), 6)
-    ];
-
-    if (!empty($customer_id)) {
-        $updated = $model->update($customer_id, $data);
-
-        if ($updated) {
-            $data['customer_id'] = $customer_id;
-            return $this->response->setJSON([
-                'status' => 'success',
-                'message' => 'Customer Updated Successfully',
-                'customer' => $data
-            ]);
-        } else {
+        // Validate required fields
+        if (empty($name) || empty($address) || empty($user_id)) {
             return $this->response->setJSON([
                 'status' => 'error',
-                'message' => 'Failed To Update Customer.'
+                'message' => 'All fields Are Required'
             ]);
         }
 
-    } else {
-        // Insert new customer
-        $id = $model->insert($data);
+        $model = new customerModel();
+        $data = [
+            'name' => $name,
+            'address' => $address,
+            'phone' => $phone,
+            'company_id' => $company_id,
+            'user_id' => $user_id, // always from session
+            'max_discount' => round((float)($max_discount ?? 0), 6)
+        ];
 
-        if ($id) {
-            $data['customer_id'] = $id;
-            return $this->response->setJSON([
-                'status' => 'success',
-                'message' => 'Customer Created Successfully',
-                'customer' => $data
-            ]);
+        if (!empty($customer_id)) {
+            $updated = $model->update($customer_id, $data);
+
+            if ($updated) {
+                $data['customer_id'] = $customer_id;
+                return $this->response->setJSON([
+                    'status' => 'success',
+                    'message' => 'Customer Updated Successfully',
+                    'customer' => $data
+                ]);
+            } else {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'message' => 'Failed To Update Customer.'
+                ]);
+            }
+
         } else {
-            return $this->response->setJSON([
-                'status' => 'error',
-                'message' => 'Failed To Save Customer.'
-            ]);
+            // Insert new customer
+            $id = $model->insert($data);
+
+            if ($id) {
+                $data['customer_id'] = $id;
+                return $this->response->setJSON([
+                    'status' => 'success',
+                    'message' => 'Customer Created Successfully',
+                    'customer' => $data
+                ]);
+            } else {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'message' => 'Failed To Save Customer.'
+                ]);
+            }
         }
     }
-}
+
 
     public function get_address()
     {
@@ -128,40 +136,42 @@ public function fetch()
 {
     $session = session();
     $request = service('request');
-    $model = new customerModel();
+    $model = new CustomerModel();
     $company_id = $session->get('company_id');
 
-    $draw = $request->getPost('draw') ?? 1;
-    $start = $request->getPost('start') ?? 0;
+    $draw   = $request->getPost('draw') ?? 1;
+    $start  = $request->getPost('start') ?? 0;
     $length = $request->getPost('length') ?? 10;
-    $order = $request->getPost('order');
-    $search= trim($request->getPost('search')['value'] ?? '');
+    $order  = $request->getPost('order');
+    $search = trim($request->getPost('search')['value'] ?? '');
+
+    // Column mapping for sorting
+    $columnMap = [
+        0 => 'customer_id', // hidden
+        1 => 'name',
+        2 => 'address',
+        3 => 'phone'
+    ];
 
     $columnIndex = $order[0]['column'] ?? 0;
     $orderDir = $order[0]['dir'] ?? 'desc';
-
-    $columnMap = [
-        0 => 'customer_id',
-        1 => 'name',
-        2 => 'address'
-    ];
     $orderColumn = $columnMap[$columnIndex] ?? 'customer_id';
 
-    $customers = $model->getAllFilteredRecords($search, $start, $length, $orderColumn, $orderDir,$company_id);
+    $customers = $model->getAllFilteredRecords($search, $start, $length, $orderColumn, $orderDir, $company_id);
 
     $result = [];
     $slno = $start + 1;
 
     foreach ($customers as $row) {
         $result[] = [
-            'slno' => $slno++,
+            'slno'        => $slno++,
             'customer_id' => $row['customer_id'],
-            'name' => ucwords(strtolower($row['name'])),
-            'address' => ucwords(strtolower($row['address'])),
+            'name'        => ucwords(strtolower($row['name'])),
+            'address'     => ucwords(strtolower($row['address'])),
+            'phone'       => $row['phone'] ?? ''
         ];
     }
 
-   $total = $model->getAllCustomerCount()->totcustomers;
     $filteredTotal = $model->getFilteredCustomerCount($search, $company_id)->filCustomers;
 
     return $this->response->setJSON([
@@ -172,19 +182,23 @@ public function fetch()
     ]);
 }
 
+
+
 public function getCustomer($id)
 {
     $model = new customerModel();
     $customer = $model->find($id);
 
     if ($customer) {
-        $customer['max_discount'] = isset($customer['max_discount'])
-            ? round((float)$customer['max_discount'], 6)
-            : 0.000000;
-
-        return $this->response->setJSON($customer);
+        return $this->response->setJSON([
+            'status' => 'success',
+            'customer' => $customer
+        ]);
     } else {
-        return $this->response->setJSON(['status' => 'error', 'message' => 'Customer Not Found']);
+        return $this->response->setJSON([
+            'status' => 'error',
+            'message' => 'Customer not found'
+        ]);
     }
 }
 
