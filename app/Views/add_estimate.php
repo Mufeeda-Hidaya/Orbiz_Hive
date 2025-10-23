@@ -384,13 +384,13 @@
 
         const saveCustomerBtn = $('#saveCustomerBtn');
 
-        // ✅ Disable button when modal opens
+        //  Disable button when modal opens
         $('#customerModal').on('show.bs.modal', function() {
             saveCustomerBtn.prop('disabled', true);
             $('#customerError').addClass('d-none');
         });
 
-        // ✅ Enable Save button only when required fields are filled
+        //  Enable Save button only when required fields are filled
         $('#popup_name, #popup_address, #popup_phone').on('input', function() {
             let name = $('#popup_name').val().trim();
             let address = $('#popup_address').val().trim();
@@ -404,7 +404,7 @@
         });
 
 
-        // ✅ Handle customer form submit
+        //  Handle customer form submit
         $('#customerForm').submit(function(e) {
             e.preventDefault();
 
@@ -421,7 +421,7 @@
                 return;
             }
 
-            // ✅ Disable button after first click to prevent double submission
+            //  Disable button after first click to prevent double submission
             saveCustomerBtn.prop('disabled', true).text('Save');
 
             $.ajax({
