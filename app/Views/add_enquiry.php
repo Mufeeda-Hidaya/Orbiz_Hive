@@ -378,6 +378,12 @@ $('#enquiry-form').submit(function(e) {
         });
     });
 
+    // cancelmodal
+    
+        $('#cancelCustomerBtn, #closeCustomerModalBtn').on('click', function() {
+            $('#customerModal').modal('hide');
+        });
+
         // $('#add-item').click(function() {
         //     const newRow = $(` 
         //         <tr class="item-row">
@@ -409,9 +415,9 @@ $('#enquiry-form').submit(function(e) {
 //         $(document).on('input change', '.price, .quantity, #discount', calculateTotals);
 //         calculateTotals();
 
-//         $('#cancelCustomerBtn, #closeCustomerModalBtn').on('click', function() {
-//             $('#customerModal').modal('hide');
-//         });
+        $('#cancelCustomerBtn, #closeCustomerModalBtn').on('click', function() {
+            $('#customerModal').modal('hide');
+        });
 
 //         $('#customer_id').on('change', function() {
 //             var customerId = $(this).val();
@@ -441,99 +447,102 @@ $('#enquiry-form').submit(function(e) {
 //             });
 //         });
 
-//         const saveCustomerBtn = $('#saveCustomerBtn');
 
-//         // ✅ Disable button when modal opens
-//         $('#customerModal').on('show.bs.modal', function() {
-//             saveCustomerBtn.prop('disabled', true);
-//             $('#customerError').addClass('d-none');
-//         });
+            // customer save 
 
-//         // ✅ Enable Save button only when required fields are filled
-//         $('#popup_name, #popup_address, #popup_phone').on('input', function() {
-//             let name = $('#popup_name').val().trim();
-//             let address = $('#popup_address').val().trim();
-//             let phone = $('#popup_phone').val().trim();
+        const saveCustomerBtn = $('#saveCustomerBtn');
 
-//             if (name !== '' && address !== '' && phone !== '') {
-//                 saveCustomerBtn.prop('disabled', false);
-//             } else {
-//                 saveCustomerBtn.prop('disabled', true);
-//             }
-//         });
+        //  Disable button when modal opens
+        $('#customerModal').on('show.bs.modal', function() {
+            saveCustomerBtn.prop('disabled', true);
+            $('#customerError').addClass('d-none');
+        });
+
+        //  Enable Save button only when required fields are filled
+        $('#popup_name, #popup_address, #popup_phone').on('input', function() {
+            let name = $('#popup_name').val().trim();
+            let address = $('#popup_address').val().trim();
+            let phone = $('#popup_phone').val().trim();
+
+            if (name !== '' && address !== '' && phone !== '') {
+                saveCustomerBtn.prop('disabled', false);
+            } else {
+                saveCustomerBtn.prop('disabled', true);
+            }
+        });
 
 
-//         // ✅ Handle customer form submit
-//         $('#customerForm').submit(function(e) {
-//             e.preventDefault();
+        //  Handle customer form submit
+        $('#customerForm').submit(function(e) {
+            e.preventDefault();
 
-//             let name = $('#popup_name').val().trim();
-//             let address = $('#popup_address').val().trim();
-//             // let max_discount = $('#max_discount').val().trim();
-//             let phone = $('#popup_phone').val().trim();
+            let name = $('#popup_name').val().trim();
+            let address = $('#popup_address').val().trim();
+            // let max_discount = $('#max_discount').val().trim();
+            let phone = $('#popup_phone').val().trim();
 
-//             name = name.replace(/\b\w/g, char => char.toUpperCase());
-//             address = address.replace(/(^\s*\w|[.!?]\s*\w)/g, char => char.toUpperCase());
+            name = name.replace(/\b\w/g, char => char.toUpperCase());
+            address = address.replace(/(^\s*\w|[.!?]\s*\w)/g, char => char.toUpperCase());
 
-//             if (!name || !address) {
-//                 $('#customerError').removeClass('d-none').text('Please Enter Valid Name And Address');
-//                 return;
-//             }
+            if (!name || !address) {
+                $('#customerError').removeClass('d-none').text('Please Enter Valid Name And Address');
+                return;
+            }
 
-//             // ✅ Disable button after first click to prevent double submission
-//             saveCustomerBtn.prop('disabled', true).text('Save');
+            //  Disable button after first click to prevent double submission
+            saveCustomerBtn.prop('disabled', true).text('Save');
 
-//             $.ajax({
-//                 url: "<?= site_url('customer/create') ?>",
-//                 type: "POST",
-//                 data: {
-//                     name,
-//                     address,
-//                     phone,
-//                     // max_discount
-//                 },
-//                 dataType: "json",
-//                 success: function(res) {
-//                     if (res.status === 'success') {
-//                         const newOption = new Option(res.customer.name, res.customer.customer_id, true, true);
-//                         $('#customer_id').append(newOption).trigger('change');
-//                         $('#popup_name').val('');
-//                         $('#popup_address').val('');
-//                         // $('#max_discount').val('');
-//                         $('#popup_phone').val(''); 
-//                         $('#customerModal').modal('hide');
-//                         $('.alert')
-//                             .removeClass('d-none alert-danger')
-//                             .addClass('alert-success')
-//                             .text('Customer Created Successfully.')
-//                             .fadeIn()
-//                             .delay(3000)
-//                             .fadeOut();
-//                     } else {
-//                         $('.alert')
-//                             .removeClass('d-none alert-success')
-//                             .addClass('alert-danger')
-//                             .text(res.message || 'Failed To Create Customer.')
-//                             .fadeIn()
-//                             .delay(3000)
-//                             .fadeOut();
-//                     }
-//                 },
-//                 error: function() {
-//                     $('.alert')
-//                         .removeClass('d-none alert-success')
-//                         .addClass('alert-danger')
-//                         .text('Server Error Occurred While Creating Customer.')
-//                         .fadeIn()
-//                         .delay(3000)
-//                         .fadeOut();
-//                 },
-//                 complete: function() {
-//                     // ✅ Reset button after request is completed
-//                     saveCustomerBtn.prop('disabled', true).text('Save');
-//                 }
-//             });
-//         });
+            $.ajax({
+                url: "<?= site_url('customer/create') ?>",
+                type: "POST",
+                data: {
+                    name,
+                    address,
+                    phone,
+                    // max_discount
+                },
+                dataType: "json",
+                success: function(res) {
+                    if (res.status === 'success') {
+                        const newOption = new Option(res.customer.name, res.customer.customer_id, true, true);
+                        $('#customer_id').append(newOption).trigger('change');
+                        $('#popup_name').val('');
+                        $('#popup_address').val('');
+                        // $('#max_discount').val('');
+                        $('#popup_phone').val(''); 
+                        $('#customerModal').modal('hide');
+                        $('.alert')
+                            .removeClass('d-none alert-danger')
+                            .addClass('alert-success')
+                            .text('Customer Created Successfully.')
+                            .fadeIn()
+                            .delay(3000)
+                            .fadeOut();
+                    } else {
+                        $('.alert')
+                            .removeClass('d-none alert-success')
+                            .addClass('alert-danger')
+                            .text(res.message || 'Failed To Create Customer.')
+                            .fadeIn()
+                            .delay(3000)
+                            .fadeOut();
+                    }
+                },
+                error: function() {
+                    $('.alert')
+                        .removeClass('d-none alert-success')
+                        .addClass('alert-danger')
+                        .text('Server Error Occurred While Creating Customer.')
+                        .fadeIn()
+                        .delay(3000)
+                        .fadeOut();
+                },
+                complete: function() {
+                    //  Reset button after request is completed
+                    saveCustomerBtn.prop('disabled', true).text('Save');
+                }
+            });
+        });
 
 //         let initialEstimateData = $('#estimate-form').serialize();
 //         $('#generate-btn').prop('disabled', true);
