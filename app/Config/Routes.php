@@ -133,20 +133,18 @@ $routes->post('save', 'Estimate::saveEstimate');
 $routes->get('estimate/generateEstimate/(:segment)', 'Estimate::generateEstimate/$1');
 
 
+// enquiry
 
-
-
-
-$routes->get('add_enquiry', 'Supplier::add_enquiry'); 
 $routes->get('enquiry/list', 'Supplier::list');
-$routes->post('supplier/saveEnquiry', 'Supplier::saveEnquiry');
-$routes->post('supplier/fetch', 'Supplier::fetch');
-$routes->post('supplier/create', 'Supplier::create');
-$routes->post('supplier/delete', 'Supplier::delete');
-$routes->post('supplier/get_address', 'Supplier::get_address');
-$routes->get('supplier/edit/(:num)', 'Supplier::edit/$1'); 
-$routes->get('supplier/getSupplier/(:num)', 'Supplier::getSupplier/$1');
-$routes->get('supplier', 'Supplier::index'); 
+$routes->post('enquiry/fetch', 'Supplier::fetch');
+$routes->get('add_enquiry', 'Supplier::add_enquiry'); 
+$routes->post('enquiry/saveEnquiry', 'Supplier::saveEnquiry');
+$routes->post('enquiry/delete', 'Supplier::delete');
+// $routes->post('supplier/get_address', 'Supplier::get_address');
+$routes->get('enquiry/edit/(:num)', 'Supplier::edit/$1');
+
+// $routes->get('supplier/getSupplier/(:num)', 'Supplier::getSupplier/$1');
+// $routes->get('supplier', 'Supplier::index'); 
 
 
 

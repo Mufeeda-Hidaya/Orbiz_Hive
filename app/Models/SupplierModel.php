@@ -14,50 +14,28 @@ class SupplierModel extends Model
     protected $returnType = 'array';
     // protected $defaultCompanyId = 1; 
 
-    public function getAllSupplierCount($company_id = null)
+    public function getFilteredSupplierCount($search = '')
     {
         $builder = $this->db->table($this->table)
             ->where('is_deleted', 0);
-
-        if ($company_id) {
-            $builder->where('company_id', $company_id);
-        }
-
-        $count = $builder->countAllResults();
-        return (object)['totSuppliers' => $count];
-    }
-
-    // Filtered count for DataTables
-    public function getFilteredSupplierCount($search = '', $company_id = null)
-    {
-        $search = trim($search);
-        $builder = $this->db->table($this->table)
-            ->where('is_deleted', 0);
-
-        if ($company_id) {
-            $builder->where('company_id', $company_id);
-        }
 
         if (!empty($search)) {
             $normalizedSearch = str_replace(' ', '', strtolower($search));
-
             $builder->groupStart()
-                ->like('enquiries.name', $search)
-                ->orLike('enquiries.address', $search)
-                ->orLike('enquiries.enquiry_id', $search)
-                ->orWhere("REPLACE(REPLACE(REPLACE(LOWER(enquiries.name), ' ', ''), '\n', ''), '\r', '') LIKE '%{$normalizedSearch}%'", null, false)
-                ->orWhere("REPLACE(REPLACE(REPLACE(LOWER(enquiries.address), ' ', ''), '\n', ''), '\r', '') LIKE '%{$normalizedSearch}%'", null, false)
+                ->like('name', $search)
+                ->orLike('address', $search)
+                ->orLike('enquiry_id', $search)
+                ->orWhere("REPLACE(REPLACE(REPLACE(LOWER(name), ' ', ''), '\n', ''), '\r', '') LIKE '%{$normalizedSearch}%'", null, false)
+                ->orWhere("REPLACE(REPLACE(REPLACE(LOWER(address), ' ', ''), '\n', ''), '\r', '') LIKE '%{$normalizedSearch}%'", null, false)
                 ->groupEnd();
         }
 
-        $count = $builder->countAllResults();
-        return (object)['countSuppliers' => $count];
+        return $builder->countAllResults();
     }
 
-    // Fetch filtered suppliers for DataTables
-    public function getAllFilteredRecords($search = '', $fromstart = 0, $tolimit = 10, $orderColumn = 'enquiry_id', $orderDir = 'DESC', $company_id = null)
+    // Fetch filtered records for DataTables
+    public function getAllFilteredRecords($search = '', $fromstart = 0, $tolimit = 10, $orderColumn = 'enquiry_id', $orderDir = 'DESC')
     {
-        $search = trim($search);
         $allowedColumns = ['enquiry_id', 'name', 'address'];
         if (!in_array($orderColumn, $allowedColumns)) {
             $orderColumn = 'enquiry_id';
@@ -67,19 +45,14 @@ class SupplierModel extends Model
         $builder = $this->db->table($this->table)
             ->where('is_deleted', 0);
 
-        if ($company_id) {
-            $builder->where('company_id', $company_id);
-        }
-
         if (!empty($search)) {
             $normalizedSearch = str_replace(' ', '', strtolower($search));
-
             $builder->groupStart()
-                ->like('enquiries.name', $search)
-                ->orLike('enquiries.address', $search)
-                ->orLike('enquiries.enquiry_id', $search)
-                ->orWhere("REPLACE(REPLACE(REPLACE(LOWER(enquiries.name), ' ', ''), '\n', ''), '\r', '') LIKE '%{$normalizedSearch}%'", null, false)
-                ->orWhere("REPLACE(REPLACE(REPLACE(LOWER(enquiries.address), ' ', ''), '\n', ''), '\r', '') LIKE '%{$normalizedSearch}%'", null, false)
+                ->like('name', $search)
+                ->orLike('address', $search)
+                ->orLike('enquiry_id', $search)
+                ->orWhere("REPLACE(REPLACE(REPLACE(LOWER(name), ' ', ''), '\n', ''), '\r', '') LIKE '%{$normalizedSearch}%'", null, false)
+                ->orWhere("REPLACE(REPLACE(REPLACE(LOWER(address), ' ', ''), '\n', ''), '\r', '') LIKE '%{$normalizedSearch}%'", null, false)
                 ->groupEnd();
         }
 

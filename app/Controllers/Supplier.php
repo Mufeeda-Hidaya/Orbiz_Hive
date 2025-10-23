@@ -20,28 +20,35 @@ class Supplier extends BaseController
 
     // Create or Update 
     public function add_enquiry($id = null)
-    {
-        $estimateModel = new EstimateModel();
-        $estimateItemModel = new EstimateItemModel();
-        $customerModel = new customerModel();
- 
-        $companyId = 1;
-        $data['customers'] = $customerModel
-            ->where('is_deleted', 0)
-            ->where('company_id', $companyId)
-            ->orderBy('customer_id', 'DESC')
-            ->findAll();
- 
-        $data['enquiry'] = null;
-        $data['items'] = [];
- 
-        if ($id) {
-            $data['enquiry'] = $estimateModel->find($id);
-            $data['items'] = $estimateItemModel->where('enquiry_id', $id)->findAll();
-        }
- 
-        return view('add_enquiry', $data);
+{
+    $customerModel = new CustomerModel();
+    $enquiryModel = new SupplierModel();
+    $enquiryItemModel = new EnquiryItemModel();
+
+    $companyId = 1;
+
+    // Load all customers
+    $data['customers'] = $customerModel
+        ->where('is_deleted', 0)
+        ->where('company_id', $companyId)
+        ->orderBy('customer_id', 'DESC')
+        ->findAll();
+
+    $data['enquiry'] = null;
+    $data['items'] = [];
+
+    if ($id) {
+        // Load enquiry
+        $data['enquiry'] = $enquiryModel->where('is_deleted', 0)->find($id);
+
+        // Load items
+        $data['items'] = $enquiryItemModel->where('enquiry_id', $id)->findAll();
     }
+
+    return view('add_enquiry', $data);
+}
+
+
     public function saveEnquiry()
 {
     $enquiryModel     = new SupplierModel();
@@ -54,10 +61,29 @@ class Supplier extends BaseController
     $descriptions = $this->request->getPost('description'); 
     $quantities   = $this->request->getPost('quantity');    
 
-    if (!$customer_id || !$address || empty($descriptions) || empty($quantities)) {
+    // Validate customer and address
+    if (!$customer_id || !$address) {
         return $this->response->setJSON([
             'status' => 'error',
-            'message' => 'Please fill all required fields and add at least one item.'
+            'message' => 'Please fill all required fields.'
+        ]);
+    }
+
+    // Validate at least one valid item
+    $validItemExists = false;
+    foreach ($descriptions as $key => $desc) {
+        $desc = trim($desc);
+        $qty  = floatval($quantities[$key] ?? 0);
+        if ($desc !== '' && $qty > 0) {
+            $validItemExists = true;
+            break;
+        }
+    }
+
+    if (!$validItemExists) {
+        return $this->response->setJSON([
+            'status' => 'error',
+            'message' => 'Please add at least one item with description and quantity.'
         ]);
     }
 
@@ -70,7 +96,6 @@ class Supplier extends BaseController
     $phone = $customer['phone'];
     $user_id = session()->get('user_id') ?? 1;
 
-    // Create enquiry
     $enquiryData = [
         'enquiry_no' => $enquiry_id ? null : 'ENQ-'.strtoupper(uniqid()),
         'customer_id'=> $customer_id,
@@ -88,20 +113,19 @@ class Supplier extends BaseController
         $enquiryData['updated_by'] = $user_id;
         $enquiryData['updated_at'] = date('Y-m-d H:i:s');
         $enquiryModel->update($enquiry_id, $enquiryData);
-        $enquiry_id = $enquiry_id;
-        // Optional: delete old items and re-insert
-        $enquiryItemModel->where('enquiry_id',$enquiry_id)->delete();
+        $enquiryItemModel->where('enquiry_id', $enquiry_id)->delete();
     } else {
         $enquiry_id = $enquiryModel->insert($enquiryData);
     }
 
-    // Insert enquiry items
     foreach ($descriptions as $key => $desc) {
-        if(!empty($desc) && !empty($quantities[$key])){
+        $desc = trim($desc);
+        $qty  = floatval($quantities[$key] ?? 0);
+        if ($desc !== '' && $qty > 0) {
             $enquiryItemModel->insert([
                 'enquiry_id' => $enquiry_id,
                 'description'=> $desc,
-                'quantity'   => $quantities[$key],
+                'quantity'   => $qty,
                 'created_at' => date('Y-m-d H:i:s')
             ]);
         }
@@ -111,64 +135,19 @@ class Supplier extends BaseController
 }
 
 
-    // Get customer Address
-    public function get_address()
-    {
-        $enquiry_id = $this->request->getPost('enquiry_id');
-        $model = new SupplierModel();
-        $supplier = $model->find($enquiry_id);
-
-        if ($supplier) {
-            return $this->response->setJSON(['status' => 'success', 'address' => $supplier['address']]);
-        }
-        return $this->response->setJSON(['status' => 'error', 'message' => 'Supplier Not Found']);
-    }
-
-    // Search 
-    public function search()
-    {
-        $term = $this->request->getGet('term');
-        $model = new SupplierModel();
-        $results = $model
-            ->where('is_deleted', 0)
-            ->like('name', $term)
-            ->select('enquiry_id, name, address')
-            ->orderBy('enquiry_id', 'DESC')
-            ->findAll(10);
-
-        $data = [];
-        foreach ($results as $row) {
-            $data[] = [
-                'id'      => $row['enquiry_id'],
-                'text'    => $row['name'],
-                'address' => $row['address']
-            ];
-        }
-        return $this->response->setJSON($data);
-    }
-
     // List all enquiries (basic)
     public function list()
     {
-        $session = session();
         $SupplierModel = new SupplierModel();
-        $company_id = $session->get('company_id');
-
-        $data['enquiries'] = $SupplierModel
-            ->where('company_id', $company_id)
-            ->where('is_deleted', 0)
-            ->findAll();
-
+        $data['enquiries'] = $SupplierModel->where('is_deleted', 0)->findAll();
         return view('supplierlist', $data);
     }
 
-    // Fetch for DataTables
+    // DataTable AJAX fetch
     public function fetch()
     {
-        $session = session();
         $request = service('request');
         $model = new SupplierModel();
-        $company_id = $session->get('company_id');
 
         $draw = $request->getPost('draw') ?? 1;
         $start = $request->getPost('start') ?? 0;
@@ -186,52 +165,37 @@ class Supplier extends BaseController
         ];
         $orderColumn = $columnMap[$columnIndex] ?? 'enquiry_id';
 
-        $enquiries = $model->getAllFilteredRecords($search, $start, $length, $orderColumn, $orderDir, $company_id);
+        // Fetch filtered data
+        $enquiries = $model->getAllFilteredRecords($search, $start, $length, $orderColumn, $orderDir);
 
         $result = [];
         $slno = $start + 1;
 
         foreach ($enquiries as $row) {
             $result[] = [
-                'slno'        => $slno++,
+                'slno'       => $slno++,
                 'enquiry_id' => $row['enquiry_id'],
-                'name'        => ucwords(strtolower($row['name'])),
-                'address'     => ucwords(strtolower($row['address'])),
+                'name'       => ucwords(strtolower($row['name'] ?? '')),
+                'address'    => ucwords(strtolower($row['address'] ?? '')),
             ];
         }
 
-        $filteredTotal = $model->getFilteredSupplierCount($search, $company_id)->countEnquiries;
+        // Get count
+        $filteredTotal = $model->getFilteredSupplierCount($search);
+        $totalRecords = $model->where('is_deleted', 0)->countAllResults();
 
         return $this->response->setJSON([
             'draw'            => intval($draw),
-            'recordsTotal'    => $filteredTotal,
+            'recordsTotal'    => $totalRecords,
             'recordsFiltered' => $filteredTotal,
             'data'            => $result
         ]);
     }
 
-    // Get single enquiry
-    public function getSupplier($id)
-    {
-        $model = new SupplierModel();
-        $supplier = $model->find($id);
-
-        if ($supplier) {
-            return $this->response->setJSON($supplier);
-        }
-        return $this->response->setJSON(['status' => 'error', 'message' => 'Supplier Not Found']);
-    }
-
     // Edit 
     public function edit($id)
     {
-        $model = new SupplierModel();
-        $data['supplier'] = $model->find($id);
-
-        if (!$data['supplier']) {
-            return redirect()->to(base_url('supplier/list'))->with('error', 'Supplier Not Found');
-        }
-        return view('editsupplier', $data);
+        return $this->add_enquiry($id); // reuse add_enquiry logic
     }
 
     // Soft Delete 
@@ -241,8 +205,8 @@ class Supplier extends BaseController
         $model = new SupplierModel();
 
         if ($model->update($id, ['is_deleted' => 1])) {
-            return $this->response->setJSON(['status' => 'success', 'message' => 'Supplier Deleted Successfully']);
+            return $this->response->setJSON(['status' => 'success', 'message' => 'Enquiry Deleted Successfully']);
         }
-        return $this->response->setJSON(['status' => 'error', 'message' => 'Failed to Delete Supplier']);
+        return $this->response->setJSON(['status' => 'error', 'message' => 'Failed to Delete Enquiry']);
     }
 }
