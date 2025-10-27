@@ -168,7 +168,8 @@
                         </div>
                         <div class="form-group">
                             <label>Customer Phone</label>
-                            <input type="text" class="form-control" id="popup_phone" required>
+                            <input type="text" class="form-control" id="popup_phone" required autocomplete="off" minlength="7" maxlength="15"
+                             pattern="^[0-9+\s]{7,15}$" oninput="this.value = this.value.replace(/[^0-9+\s]/g, '')" onkeypress="return /[0-9+\s]/.test(event.key)">
                         </div>
                         <div class="alert alert-danger d-none" id="customerError"></div>
                     </div>

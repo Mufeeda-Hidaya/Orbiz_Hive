@@ -82,7 +82,9 @@
                         </div>
                     </div>
                     <label class="mt-3"><strong>Customer Address</strong><span class="text-danger">*</span></label>
-                    <textarea name="customer_address" id="customer_address" class="form-control" rows="3"><?= isset($estimate['customer_address']) ? trim($estimate['customer_address']) : '' ?></textarea>
+                    <textarea name="customer_address" id="customer_address" class="form-control" rows="3">
+                        <?= isset($estimate['customer_address']) ? trim($estimate['customer_address']) : '' ?>
+                    </textarea>
                     <div class="phone pt-3">
                         <label class="mt-md-0 mt-3"><strong>Contact Number</strong><span class="text-danger">*</span></label>
                         <input type="text" name="phone_number" id="phone_number" class="form-control"
@@ -104,24 +106,45 @@
                     <thead>
                         <tr>
                             <th>Description Of Goods</th>
-                            <th>Unit Price</th>
+                            <th>Market Price</th>
+                            <th>Selling Price</th>
                             <th>Quantity</th>
-                            <th>Amount</th>
+                            <th>Amount (AED)</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody id="item-container">
-                        <?php if (isset($items) && count($items) > 0): ?>
-                            <?php foreach ($items as $item): ?>
+                        <?php if (!empty($items)): ?>
+                            <?php foreach ($items as $index => $item): ?>
                                 <tr class="item-row">
-                                    <td><input type="text" name="description[]" class="form-control"
-                                            value="<?= $item['description'] ?>"></td>
-                                    <td><input type="number" class="form-control price" step="0.000001" min="0" inputmode="decimal" name="price[]" value="<?= $item['price'] ?>">
-                            </td>
-                                    <td><input type="number" name="quantity[]" class="form-control quantity"
-                                            value="<?= $item['quantity'] ?>"></td>
-                                    <td><input type="number" name="total[]" class="form-control total" value="<?= $item['total'] ?>"
-                                            readonly></td>
+                                    <td>
+                                        <input type="text" name="description[]" class="form-control"
+                                            value="<?= esc($item['description'] ?? '') ?>">
+                                    </td>
+
+                                    <!--  Use market_price instead of price -->
+                                    <td>
+                                        <input type="number" name="market_price[]" class="form-control marketing-price"
+                                            step="0.0001" min="0"
+                                            value="<?= esc($item['market_price'] ?? 0) ?>">
+                                    </td>
+
+                                    <td>
+                                        <input type="number" name="selling_price[]" class="form-control selling-price"
+                                            step="0.0001" min="0"
+                                            value="<?= esc($item['selling_price'] ?? ($item['market_price'] ?? 0)) ?>">
+                                    </td>
+
+                                    <td>
+                                        <input type="number" name="quantity[]" class="form-control quantity"
+                                            value="<?= esc($item['quantity'] ?? 1) ?>">
+                                    </td>
+
+                                    <td>
+                                        <input type="number" name="total[]" class="form-control total"
+                                            step="0.0001" value="<?= esc($item['total'] ?? 0) ?>" readonly>
+                                    </td>
+
                                     <td class="text-center">
                                         <span class="remove-item-btn" title="Remove">
                                             <i class="fas fa-trash text-danger"></i>
@@ -130,15 +153,15 @@
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
+                            <!-- If no items, show one empty row -->
                             <tr class="item-row">
                                 <td><input type="text" name="description[]" class="form-control" placeholder="Description"></td>
-                                <td><input type="number" name="price[]" class="form-control price" step="0.000001" min="0" inputmode="decimal"></td>
+                                <td><input type="number" name="market_price[]" class="form-control marketing-price" step="0.0001" min="0"></td>
+                                <td><input type="number" name="selling_price[]" class="form-control selling-price" step="0.0001" min="0"></td>
                                 <td><input type="number" name="quantity[]" class="form-control quantity"></td>
-                                <td><input type="number" name="total[]" class="form-control total" readonly></td>
+                                <td><input type="number" name="total[]" class="form-control total" step="0.0001" readonly></td>
                                 <td class="text-center">
-                                    <span class="remove-item-btn" title="Remove">
-                                        <i class="fas fa-trash text-danger"></i>
-                                    </span>
+                                    <span class="remove-item-btn" title="Remove"><i class="fas fa-trash text-danger"></i></span>
                                 </td>
                             </tr>
                         <?php endif; ?>
@@ -149,28 +172,20 @@
             <table class="table totals">
                 <tr>
                     <td><strong>Sub Total:</strong></td>
-                    <td><span id="sub_total_display">0.000000</span> KWD</td>
+                    <td><span id="sub_total_display">0.0000</span> AED</td>
                 </tr>
                 <tr>
-                <td><strong>Discount:</strong></td>
-                <td>
-                    <input type="number" name="discount" id="discount" class="form-control col-7 d-inline"
-                        value="<?= isset($estimate['discount']) ? number_format((float)$estimate['discount'], 6, '.', '') : '0.000000' ?>"
-                        min="0" step="0.000001"> KWD
-
-                </td>
-            </tr>
-                <!-- <tr>
                     <td><strong>Discount:</strong></td>
                     <td>
-                        <input type="number" name="discount" id="discount" class="form-control w-50 d-inline"
-                            value="<?= isset($estimate['discount']) ? $estimate['discount'] : '0' ?>" min="0">
-                        %
+                        <input type="number" name="discount" id="discount" class="form-control col-7 d-inline"
+                            value="<?= isset($estimate['discount']) ? number_format($estimate['discount'], 4, '.', '') : '0.0000' ?>"
+                            step="0.0001" min="0">
+                        AED
                     </td>
-                </tr> -->
+                </tr>
                 <tr>
                     <td><strong>Total:</strong></td>
-                    <td><strong><span id="total_display">0.000000</span> KWD</strong></td>
+                    <td><strong><span id="total_display">0.0000</span> AED</strong></td>
                 </tr>
             </table>
             <input type="hidden" id="estimate_id" value="<?= $estimate['estimate_id'] ?? '' ?>">
@@ -207,13 +222,14 @@
                         </div>
                         <div class="form-group">
                             <label>Customer Phone</label>
-                            <input type="text" class="form-control" id="popup_phone" required>
+                            <input type="text" class="form-control" id="popup_phone" required autocomplete="off" minlength="7" maxlength="15"
+                             pattern="^[0-9+\s]{7,15}$" oninput="this.value = this.value.replace(/[^0-9+\s]/g, '')" onkeypress="return /[0-9+\s]/.test(event.key)">
                         </div>
                         <div class="alert alert-danger d-none" id="customerError"></div>
-                        <!-- <div class="mb-3">
+                        <div class="mb-3">
                             <label>Maximum Discount (KWD)</label>
                             <input type="number" name="max_discount" id="max_discount" class="form-control" min="0" step="0.000001" placeholder="Enter maximum discount amount">
-                        </div> -->
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-primary" id="saveCustomerBtn">Save</button>
@@ -289,41 +305,37 @@
         function calculateTotals() {
             let subtotal = 0;
 
-            // Calculate subtotal from all item rows
             $('.item-row').each(function() {
                 let qty = parseFloat($(this).find('.quantity').val()) || 0;
-                let price = parseFloat($(this).find('.price').val()) || 0;
-                let total = qty * price;
-                $(this).find('.total').val(total.toFixed(6));
+                let sPrice = parseFloat($(this).find('.selling-price').val()) || 0;
+                let total = sPrice * qty;
+                $(this).find('.total').val(total.toFixed(4));
                 subtotal += total;
             });
 
-            $('#sub_total_display').text(subtotal.toFixed(6));
+            $('#sub_total_display').text(subtotal.toFixed(4));
 
-            // Get the discount value from the input field
-            let discountFromInput = parseFloat($('#discount').val()) || 0;
+            let discount = parseFloat($('#discount').val()) || 0;
+            let effectiveDiscount = Math.min(discount, subtotal);
 
-            // For calculation, the discount applied cannot be more than the subtotal
-            let effectiveDiscount = Math.min(discountFromInput, subtotal);
-
-            // Calculate the final total using the effective discount
             let finalTotal = subtotal - effectiveDiscount;
+            if (finalTotal < 0) finalTotal = 0;
 
-            // Ensure the total doesn't go below zero
-            if (finalTotal < 0) {
-                finalTotal = 0;
-            }
-
-            $('#total_display').text(finalTotal.toFixed(6));
+            $('#total_display').text(finalTotal.toFixed(4));
         }
 
+        $(document).on('input change', '.selling-price, .quantity, #discount', calculateTotals);
+        calculateTotals();
+
+
         $('#add-item').click(function() {
-            const newRow = $(` 
+            const newRow = $(`
                 <tr class="item-row">
                     <td><input type="text" name="description[]" class="form-control" placeholder="Description"></td>
-                    <td><input type="number" name="price[]" class="form-control price" step="0.000001"></td>
-                    <td><input type="number" name="quantity[]" class="form-control quantity"></td>
-                    <td><input type="number" name="total[]" class="form-control total" step="0.000001" readonly></td>
+                    <td><input type="number" name="price[]" class="form-control marketing-price" step="0.0001" min="0"></td>
+                    <td><input type="number" name="selling_price[]" class="form-control selling-price" step="0.0001" min="0"></td>
+                    <td><input type="number" name="quantity[]" class="form-control quantity" step="0.0001" min="0"></td>
+                    <td><input type="number" name="total[]" class="form-control total" step="0.0001" readonly></td>
                     <td class="text-center">
                         <span class="remove-item-btn" title="Remove">
                             <i class="fas fa-trash text-danger"></i>
@@ -384,13 +396,13 @@
 
         const saveCustomerBtn = $('#saveCustomerBtn');
 
-        // ✅ Disable button when modal opens
+        // Disable button when modal opens
         $('#customerModal').on('show.bs.modal', function() {
             saveCustomerBtn.prop('disabled', true);
             $('#customerError').addClass('d-none');
         });
 
-        // ✅ Enable Save button only when required fields are filled
+        // Enable Save button only when required fields are filled
         $('#popup_name, #popup_address, #popup_phone').on('input', function() {
             let name = $('#popup_name').val().trim();
             let address = $('#popup_address').val().trim();
@@ -404,13 +416,13 @@
         });
 
 
-        // ✅ Handle customer form submit
+        //  Handle customer form submit
         $('#customerForm').submit(function(e) {
             e.preventDefault();
 
             let name = $('#popup_name').val().trim();
             let address = $('#popup_address').val().trim();
-            // let max_discount = $('#max_discount').val().trim();
+            let max_discount = $('#max_discount').val().trim();
             let phone = $('#popup_phone').val().trim();
 
             name = name.replace(/\b\w/g, char => char.toUpperCase());
@@ -421,7 +433,7 @@
                 return;
             }
 
-            // ✅ Disable button after first click to prevent double submission
+            //  Disable button after first click to prevent double submission
             saveCustomerBtn.prop('disabled', true).text('Save');
 
             $.ajax({
@@ -431,7 +443,7 @@
                     name,
                     address,
                     phone,
-                    // max_discount
+                    max_discount
                 },
                 dataType: "json",
                 success: function(res) {
@@ -440,7 +452,7 @@
                         $('#customer_id').append(newOption).trigger('change');
                         $('#popup_name').val('');
                         $('#popup_address').val('');
-                        // $('#max_discount').val('');
+                        $('#max_discount').val('');
                         $('#popup_phone').val(''); 
                         $('#customerModal').modal('hide');
                         $('.alert')
@@ -470,7 +482,7 @@
                         .fadeOut();
                 },
                 complete: function() {
-                    // ✅ Reset button after request is completed
+                    // Reset button after request is completed
                     saveCustomerBtn.prop('disabled', true).text('Save');
                 }
             });

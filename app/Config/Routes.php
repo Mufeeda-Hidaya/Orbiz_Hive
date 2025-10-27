@@ -52,15 +52,15 @@ $routes->post('rolemanagement/delete', 'Rolemanagement::delete');
 
 
 
-$routes->get('add_estimate', 'Estimate::add_estimate'); 
-$routes->post('estimate/save', 'Estimate::save'); 
-$routes->post('estimate/estimatelistajax', 'Estimate::estimatelistajax');
-$routes->post('estimate/delete', 'Estimate::delete');
-$routes->get('estimatelist', 'Estimate::estimatelist');
-$routes->get('estimate/edit/(:num)', 'Estimate::edit/$1');
-$routes->get('estimate/generateEstimate/(:num)', 'Estimate::generateEstimate/$1');
-$routes->post('save', 'Estimate::saveEstimate');
-$routes->get('estimate/generateEstimate/(:segment)', 'Estimate::generateEstimate/$1');
+// $routes->get('add_estimate', 'Estimate::add_estimate'); 
+// $routes->post('estimate/save', 'Estimate::save'); 
+// $routes->post('estimate/estimatelistajax', 'Estimate::estimatelistajax');
+// $routes->post('estimate/delete', 'Estimate::delete');
+// $routes->get('estimatelist', 'Estimate::estimatelist');
+// $routes->get('estimate/edit/(:num)', 'Estimate::edit/$1');
+// $routes->get('estimate/generateEstimate/(:num)', 'Estimate::generateEstimate/$1');
+// $routes->post('save', 'Estimate::saveEstimate');
+// $routes->get('estimate/generateEstimate/(:segment)', 'Estimate::generateEstimate/$1');
 
 
 
@@ -145,6 +145,9 @@ $routes->get('enquiry/edit/(:num)', 'Supplier::edit/$1');
 
 // $routes->get('supplier/getSupplier/(:num)', 'Supplier::getSupplier/$1');
 // $routes->get('supplier', 'Supplier::index'); 
+$routes->post('enquiry/markConverted', 'Supplier::markConverted');
+$routes->get('enquiry/convertToEstimate/(:num)', 'Supplier::convertToEstimate/$1');
+$routes->get('estimate/add_estimate', 'Estimate::add_estimate');
 
 
 
