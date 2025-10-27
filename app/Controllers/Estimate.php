@@ -144,12 +144,10 @@ class Estimate extends BaseController
         'phone_number'     => $phoneNumber,
         'company_id'       => 1
     ];
-
-    // Prepare items
     $itemsArray = [];
     foreach ($description as $key => $desc) {
         $descVal = trim($desc);
-        $mPrice  = floatval($price[$key] ?? 0);
+        $mPrice  = floatval($this->request->getPost('market_price')[$key] ?? 0); 
         $sPrice  = floatval($sellingPrice[$key] ?? 0);
         $qty     = floatval($quantity[$key] ?? 0);
 
@@ -160,17 +158,28 @@ class Estimate extends BaseController
             ]);
         }
 
+        // Calculate total
         $lineTotal = bcmul((string)$sPrice, (string)$qty, 4);
 
+        //  Calculate difference percentage (based on market vs selling)
+        $differencePercentage = 0;
+        if ($mPrice > 0) {
+            $differencePercentage = (($sPrice - $mPrice) / $mPrice) * 100;
+        }
+
+        //  Push item to array
         $itemsArray[] = [
-            'description'     => $descVal,
-            'market_price' => number_format($mPrice, 4, '.', ''),
-            'selling_price'   => number_format($sPrice, 4, '.', ''),
-            'quantity'        => number_format($qty, 4, '.', ''),
-            'total'           => $lineTotal,
-            'item_order'      => $key + 1
+            'description'           => $descVal,
+            'market_price'          => number_format($mPrice, 4, '.', ''),
+            'selling_price'         => number_format($sPrice, 4, '.', ''),
+            'difference_percentage' => number_format($differencePercentage, 2, '.', ''),
+            'quantity'              => number_format($qty, 4, '.', ''),
+            'total'                 => $lineTotal,
+            'item_order'            => $key + 1
         ];
     }
+
+
 
     $estimateModel = new EstimateModel();
 

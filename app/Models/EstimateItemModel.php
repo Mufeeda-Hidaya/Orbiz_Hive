@@ -11,6 +11,7 @@ class EstimateItemModel extends Model
         'description',
         'market_price',
         'selling_price',
+        'difference_percentage',
         'quantity',
         'total',
         'item_order'

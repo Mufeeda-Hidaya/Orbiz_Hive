@@ -82,9 +82,7 @@
                         </div>
                     </div>
                     <label class="mt-3"><strong>Customer Address</strong><span class="text-danger">*</span></label>
-                    <textarea name="customer_address" id="customer_address" class="form-control" rows="3">
-                        <?= isset($estimate['customer_address']) ? trim($estimate['customer_address']) : '' ?>
-                    </textarea>
+                    <textarea name="customer_address" id="customer_address" class="form-control" rows="3"><?= isset($estimate['customer_address']) ? trim($estimate['customer_address']) : '' ?></textarea>
                     <div class="phone pt-3">
                         <label class="mt-md-0 mt-3"><strong>Contact Number</strong><span class="text-danger">*</span></label>
                         <input type="text" name="phone_number" id="phone_number" class="form-control"
@@ -108,6 +106,7 @@
                             <th>Description Of Goods</th>
                             <th>Market Price</th>
                             <th>Selling Price</th>
+                            <th>Difference (%)</th> 
                             <th>Quantity</th>
                             <th>Amount (AED)</th>
                             <th>Action</th>
@@ -124,7 +123,7 @@
 
                                     <!--  Use market_price instead of price -->
                                     <td>
-                                        <input type="number" name="market_price[]" class="form-control marketing-price"
+                                        <input type="number" name="market_price[]" class="form-control market-price"
                                             step="0.0001" min="0"
                                             value="<?= esc($item['market_price'] ?? 0) ?>">
                                     </td>
@@ -134,6 +133,8 @@
                                             step="0.0001" min="0"
                                             value="<?= esc($item['selling_price'] ?? ($item['market_price'] ?? 0)) ?>">
                                     </td>
+
+                                    <td><input type="text" name="difference[]" class="form-control difference" readonly></td>
 
                                     <td>
                                         <input type="number" name="quantity[]" class="form-control quantity"
@@ -156,8 +157,9 @@
                             <!-- If no items, show one empty row -->
                             <tr class="item-row">
                                 <td><input type="text" name="description[]" class="form-control" placeholder="Description"></td>
-                                <td><input type="number" name="market_price[]" class="form-control marketing-price" step="0.0001" min="0"></td>
+                                <td><input type="number" name="market_price[]" class="form-control market-price" step="0.0001" min="0"></td>
                                 <td><input type="number" name="selling_price[]" class="form-control selling-price" step="0.0001" min="0"></td>
+                                <td><input type="text" name="difference[]" class="form-control difference" readonly></td>
                                 <td><input type="number" name="quantity[]" class="form-control quantity"></td>
                                 <td><input type="number" name="total[]" class="form-control total" step="0.0001" readonly></td>
                                 <td class="text-center">
@@ -332,8 +334,9 @@
             const newRow = $(`
                 <tr class="item-row">
                     <td><input type="text" name="description[]" class="form-control" placeholder="Description"></td>
-                    <td><input type="number" name="price[]" class="form-control marketing-price" step="0.0001" min="0"></td>
+                    <td><input type="number" name="market_price[]" class="form-control market-price" step="0.0001" min="0"></td>
                     <td><input type="number" name="selling_price[]" class="form-control selling-price" step="0.0001" min="0"></td>
+                    <td><input type="text" name="difference[]" class="form-control difference" readonly></td> 
                     <td><input type="number" name="quantity[]" class="form-control quantity" step="0.0001" min="0"></td>
                     <td><input type="number" name="total[]" class="form-control total" step="0.0001" readonly></td>
                     <td class="text-center">
@@ -345,7 +348,38 @@
             `);
             $('#item-container').append(newRow);
             newRow.find('input[name="description[]"]').focus();
+            newRow.find('.market-price, .selling-price').trigger('input')
         });
+
+        // Calculate difference between Market Price and Selling Price 
+        $(document).on('input', '.market-price, .selling-price', function() {
+            const row = $(this).closest('tr');
+            const market = parseFloat(row.find('.market-price').val()) || 0;
+            const selling = parseFloat(row.find('.selling-price').val()) || 0;
+
+            if (market > 0) {
+                const diff = ((selling - market) / market) * 100;
+                row.find('.difference').val(diff.toFixed(2) + '%')
+                    .css('color', 'black');
+            } else {
+                row.find('.difference').val('0.00%').css('color', 'black');
+            }
+        });
+
+        //  Prefill difference for existing rows
+        $('.item-row').each(function() {
+            const row = $(this);
+            const market = parseFloat(row.find('.market-price').val()) || 0;
+            const selling = parseFloat(row.find('.selling-price').val()) || 0;
+
+            if (market > 0) {
+                const diff = ((selling - market) / market) * 100;
+                row.find('.difference').val(diff.toFixed(2) + '%').css('color', 'black');
+            } else {
+                row.find('.difference').val('0.00%').css('color', 'black');
+            }
+        });
+
 
 
         $(document).on('click', '.remove-item-btn', function() {
@@ -526,12 +560,12 @@
             let validItemExists = false;
             $('.item-row').each(function() {
                 const desc = $(this).find('input[name="description[]"]').val().trim();
-                const price = parseFloat($(this).find('input[name="price[]"]').val()) || 0;
+                const sPrice = parseFloat($(this).find('input[name="selling_price[]"]').val()) || 0;
                 const qty = parseFloat($(this).find('input[name="quantity[]"]').val()) || 0;
 
-                if (desc && price > 0 && qty > 0) {
+                if (desc && sPrice > 0 && qty > 0) {
                     validItemExists = true;
-                    return false;
+                    return false; 
                 }
             });
 
@@ -539,15 +573,18 @@
                 showAlert('Please Enter At Least One Valid Item With Description, Price, and Quantity.', 'danger');
                 return;
             }
+
+            // Remove completely empty rows before submission
             $('.item-row').each(function() {
                 const desc = $(this).find('input[name="description[]"]').val().trim();
-                const price = parseFloat($(this).find('input[name="price[]"]').val()) || 0;
+                const sPrice = parseFloat($(this).find('input[name="selling_price[]"]').val()) || 0;
                 const qty = parseFloat($(this).find('input[name="quantity[]"]').val()) || 0;
 
-                if (!desc && price === 0 && qty === 0) {
+                if (!desc && sPrice === 0 && qty === 0) {
                     $(this).remove();
                 }
             });
+
 
             $('#generate-btn').prop('disabled', true).text('Generating...');
 
