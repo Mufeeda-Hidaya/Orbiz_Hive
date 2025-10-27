@@ -195,14 +195,10 @@ public function userlistajax()
         5 => 'user_id'
     ];
     $orderColumn = $columnMap[$columnIndex] ?? 'user_id';
-
-  $condition = "1=1";
-if (!empty($companyId)) {
-    $condition .= " AND user.company_id = " . (int)$companyId;
-}
-
-
-    // Search logic
+    $condition = "user.status != 9";
+    if (!empty($companyId)) {
+        $condition .= " AND user.company_id = " . (int)$companyId;
+    }
     $search = trim(preg_replace('/\s+/', ' ', $search));
     if (!empty($search)) {
         $normalizedSearch = str_replace(' ', '', strtolower($search));
@@ -215,29 +211,30 @@ if (!empty($companyId)) {
     }
 
     $userModel = new \App\Models\Manageuser_Model();
-    $users = $userModel->getAllFilteredRecords($condition, $fromstart, $tolimit, $orderColumn, $orderDir,$roleId);
+    $users = $userModel->getAllFilteredRecords($condition, $fromstart, $tolimit, $orderColumn, $orderDir, $roleId);
 
     $result = [];
-    if (!empty($users)){
+    if (!empty($users)) {
         foreach ($users as $user) {
-        $result[] = [
-            'slno'        => $slno++,
-            'user_id'     => $user->user_id,
-            'name'        => $user->name,
-            'role_name'   => $user->role_name ?? '',
-            'email'       => $user->email,
-             'phonenumber' => (isset($user->phonenumber) && trim($user->phonenumber) !== '') 
-                         ? $user->phonenumber 
-                         : 'N/A',
-        ];
+            $result[] = [
+                'slno'        => $slno++,
+                'user_id'     => $user->user_id,
+                'name'        => $user->name,
+                'role_name'   => $user->role_name ?? '',
+                'email'       => $user->email,
+                'phonenumber' => (!empty(trim($user->phonenumber))) ? $user->phonenumber : 'N/A',
+            ];
+        }
     }
 
+    $totalCondition = "user.status != 9";
+    if ($roleId != 1 && !empty($companyId)) {
+        $totalCondition .= " AND user.company_id = " . (int)$companyId;
     }
-    
-    $totalCondition = ($roleId == 1) ? "1=1" : "user.company_id = " . (int)$companyId;
+
     $total = $userModel->getAllUserCount($totalCondition)->totuser ?? 0;
     $filtered = $userModel->getFilterUserCount($condition);
-    $filteredTotal = isset($filtered->totuser) ? (int) $filtered->totuser : 0;
+    $filteredTotal = isset($filtered->totuser) ? (int)$filtered->totuser : 0;
 
     return $this->response->setJSON([
         'draw' => intval($draw),
@@ -246,18 +243,38 @@ if (!empty($companyId)) {
         'data' => $result
     ]);
 }
-   public function delete()
-    {
-        $user_id = $this->request->getPost('user_id');
 
-        if (!$user_id) {
-            return $this->response->setJSON(['status' => 'error', 'message' => 'User ID is missing']);
-        }
+    public function delete()
+{
+    $user_id = $this->request->getPost('user_id');
 
-        $userModel = new Manageuser_Model();
-        $userModel->delete($user_id);
-
-        return $this->response->setJSON(['status' => 'success']);
+    if (!$user_id) {
+        return $this->response->setJSON([
+            'status' => 'error',
+            'message' => 'User ID is missing'
+        ]);
     }
+
+    $userModel = new Manageuser_Model();
+    $updated = $userModel->softDelete($user_id);
+
+    if ($updated) {
+        return $this->response->setJSON([
+            'status' => 'success',
+            'message' => 'user Deleted Successfully'
+        ]);
+    } else {
+        return $this->response->setJSON([
+            'status' => 'error',
+            'message' => 'Failed to perform soft delete'
+        ]);
+    }
+}
+//jwt token
+// public function findUserByToken($token)
+// {
+//     return $this->where('jwt_token', $token)->where('status !=', 9)->first();
+// }
+
 }
 

@@ -189,8 +189,18 @@ $routes->get('paymentvoucher/print/(:num)', 'PaymentVoucher::index/$1');
 
 
 
+// Api
 
 
+// user login
+$routes->post('user/login', 'Api\Login::login');
+$routes->post('user/logout', 'Api\Login::logout');
+
+// Enquiries
+$routes->post('enquiry/save', 'Api\Enquiry::saveEnquiry');
+$routes->get('enquiry/getAll', 'Api\Enquiry::getAllEnquiries');
+$routes->get('enquiry/get/(:num)', 'Api\Enquiry::get/$1');
+$routes->delete('enquiry/delete/(:num)', 'Api\Enquiry::delete/$1');
 
 
 
