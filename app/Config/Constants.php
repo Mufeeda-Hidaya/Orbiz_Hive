@@ -79,3 +79,5 @@ defined('EXIT__AUTO_MIN')      || define('EXIT__AUTO_MIN', 9);      // lowest au
 defined('EXIT__AUTO_MAX')      || define('EXIT__AUTO_MAX', 125);    // highest automatically-assigned error code
 defined('ASSET_PATH')		   || define('ASSET_PATH', "http://" . $_SERVER['SERVER_NAME'] . "/Orbiz_Hive/public/");
 defined('ROUTE_PATH')		   || define('ROUTE_PATH', "http://" . $_SERVER['SERVER_NAME'] . "/Orbiz_Hive/");
+// defined('ASSET_PATH')		   || define('ASSET_PATH', "https://" . $_SERVER['SERVER_NAME'] . "/OrbizHive/public/");
+// defined('ROUTE_PATH')		   || define('ROUTE_PATH', "https://" . $_SERVER['SERVER_NAME'] . "/OrbizHive/");

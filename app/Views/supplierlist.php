@@ -85,16 +85,45 @@ $(document).ready(function () {
             {
                 data: "enquiry_id",
                 orderable: false,
-                render: data => `
-                <div class="d-flex gap-2 justify-content-center">
-                    <a href="<?= base_url('enquiry/edit') ?>/${data}" class="edit-supplier" title="Edit" style="color:rgb(13, 162, 199);">
-                        <i class="bi bi-pencil-fill"></i>
-                    </a>
-                    <a href="javascript:void(0);" class="delete-supplier" data-id="${data}" title="Delete" style="color: #dc3545;">
-                        <i class="bi bi-trash-fill"></i>
-                    </a>
-                </div>`
+                render: function (id, type, row) {
+                    return `
+                        <div class="d-flex align-items-center gap-3 justify-content-center">
+                            <!-- Edit -->
+                            <a href="<?= base_url('enquiry/edit/') ?>${id}" 
+                            title="Edit Enquiry" 
+                            style="color:rgb(13, 162, 199);">
+                            <i class="bi bi-pencil-fill"></i>
+                            </a>
+
+                            <!-- Delete -->
+                            <a href="javascript:void(0);" 
+                            class="delete-supplier" 
+                            data-id="${id}" 
+                            title="Delete" 
+                            style="color:#dc3545;">
+                            <i class="bi bi-trash-fill"></i>
+                            </a>
+
+                            <!-- Convert to Estimate -->
+                            ${row.is_converted == 0 ? `
+                                <a href="<?= base_url('enquiry/convertToEstimate/') ?>${id}" 
+                                title="Convert to Estimate" 
+                                style="color:orange;">
+                                <i class="bi bi-arrow-right-circle"></i>
+                                </a>
+                            ` : `
+                                <a href="#" 
+                                title="Already converted to Estimate" 
+                                style="color:gray; cursor:not-allowed;" 
+                                onclick="event.preventDefault(); showConvertedAlert();">
+                                <i class="bi bi-arrow-right-circle"></i>
+                                </a>
+                            `}
+                        </div>
+                    `;
+                }
             }
+
 
         ]
     });
@@ -140,6 +169,48 @@ $(document).ready(function () {
             .fadeIn();
         setTimeout(() => alertBox.fadeOut(), 2500);
     }
+
+    // $('#customersTable').on('click', '.convert-estimate', function () {
+    // const enquiryId = $(this).data('id');
+
+    // if (!enquiryId) {
+    //     alert('Invalid enquiry ID');
+    //     return;
+    // }
+
+    // Optional: Confirm before converting
+    
+    
+    
+    
+    $(document).on('click', '.convert-to-estimate', function() {
+        const enquiryId = $(this).data('id');
+        
+        if (!confirm('Are you sure you want to convert this Enquiry to an Estimate?')) return;
+
+        $.ajax({
+            url: "<?= site_url('enquiry/markConverted') ?>",
+            type: "POST",
+            data: { enquiry_id: enquiryId },
+            dataType: "json",
+            success: function(res) {
+                if (res.status === 'success') {
+                    // Redirect to convert page
+                    window.location.href = "<?= site_url('enquiry/convertToEstimate/') ?>" + enquiryId;
+                } else {
+                    alert(res.message || 'Failed to convert.');
+                }
+            },
+            error: function() {
+                alert('Server error occurred.');
+            }
+        });
+    });
+
+
+    
+
+
 });
 </script>
 

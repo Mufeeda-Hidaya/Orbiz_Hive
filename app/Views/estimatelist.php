@@ -110,7 +110,7 @@
 
                 {
                     data: "subtotal",
-                    render: data => parseFloat(data).toFixed(6) + " AED"
+                    render: data => parseFloat(data).toFixed(4) + " AED"
                 },
                 {
                     data: 'discount',
@@ -118,13 +118,13 @@
                         if (data === null || data === '' || parseFloat(data) === 0) {
                             return '0.0000 AED';
                         }
-                        return parseFloat(data).toFixed(6) + 'AED';
+                        return parseFloat(data).toFixed(4) + 'AED';
                     }
                 },
 
                 {
                     data: "total_amount",
-                    render: data => parseFloat(data).toFixed(6) + "AED"
+                    render: data => parseFloat(data).toFixed(4) + "AED"
                 },
                 {
                     data: "date",

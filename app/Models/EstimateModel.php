@@ -6,51 +6,51 @@ class EstimateModel extends Model
 {
     protected $table = 'estimates';
     protected $primaryKey = 'estimate_id';
-    protected $allowedFields = ['customer_id','discount', 'total_amount', 'sub_total','date','phone_number', 'is_converted', 'company_id', 'estimate_no' ];
+    protected $allowedFields = [
+        'customer_id','customer_address','discount','total_amount','sub_total',
+        'date','phone_number','is_converted','company_id','estimate_no'
+    ];
 
-   public function insertEstimateWithItems($estimateData, $items)
-{
-    // Auto-generate estimate number if not set
-    if (!isset($estimateData['estimate_no']) && isset($estimateData['company_id'])) {
-        $estimateData['estimate_no'] = $this->getLastEstimateNoByCompany($estimateData['company_id']) + 1;
+    public function getLastEstimateNoByCompany($companyId)
+    {
+        $last = $this->where('company_id', $companyId)
+                     ->orderBy('estimate_no', 'DESC')
+                     ->first();
+        return $last ? intval($last['estimate_no']) : 0;
     }
 
-    $estimateId = $this->insert($estimateData);
-    $itemModel = new \App\Models\EstimateItemModel();
-
-    foreach ($items as $index => $item) {
-        $item['estimate_id'] = $estimateId;
-
-        // Set item_order explicitly
-        if (!isset($item['item_order'])) {
-            $item['item_order'] = $index + 1;
+    public function insertEstimateWithItems($estimateData, $items)
+    {
+        if (!isset($estimateData['estimate_no']) && isset($estimateData['company_id'])) {
+            $estimateData['estimate_no'] = $this->getLastEstimateNoByCompany($estimateData['company_id']) + 1;
         }
 
-        $itemModel->insert($item);
-    }
+        $estimateId = $this->insert($estimateData);
+        $itemModel = new \App\Models\EstimateItemModel();
 
-    return $estimateId;
-}
-
-public function updateEstimateWithItems($estimateId, $estimateData, $items)
-{
-    $this->update($estimateId, $estimateData);
-    $itemModel = new \App\Models\EstimateItemModel();
-
-    // Delete old items
-    $itemModel->where('estimate_id', $estimateId)->delete();
-
-    foreach ($items as $index => $item) {
-        $item['estimate_id'] = $estimateId;
-
-        // Preserve order
-        if (!isset($item['item_order'])) {
-            $item['item_order'] = $index + 1;
+        foreach ($items as $index => $item) {
+            $item['estimate_id'] = $estimateId;
+            if (!isset($item['item_order'])) $item['item_order'] = $index + 1;
+            $itemModel->insert($item);
         }
 
-        $itemModel->insert($item);
+        return $estimateId;
     }
-}
+
+    public function updateEstimateWithItems($estimateId, $estimateData, $items)
+    {
+        $this->update($estimateId, $estimateData);
+        $itemModel = new \App\Models\EstimateItemModel();
+        $itemModel->where('estimate_id', $estimateId)->delete();
+
+        foreach ($items as $index => $item) {
+            $item['estimate_id'] = $estimateId;
+            if (!isset($item['item_order'])) $item['item_order'] = $index + 1;
+            $itemModel->insert($item);
+        }
+    }
+   
+
 
 
     public function getEstimateCount($companyId = 1)

@@ -49,17 +49,25 @@
                     <input type="hidden" name="customer_id" id="customer_id">
                     <div class="mb-3">
                         <label>Customer Name</label>
-                        <input type="text" name="name" id="name" class="form-control" required style="text-transform: capitalize;">
+                        <input type="text" name="name" id="name" class="form-control" required autocomplete="off" style="text-transform: capitalize;">
                     </div>
                     <div class="mb-3">
                         <label>Address</label>
-                        <textarea name="address" id="address" class="form-control" required style="text-transform: capitalize;"></textarea>
+                        <textarea name="address" id="address" class="form-control" required autocomplete="off"style="text-transform: capitalize;"></textarea>
                     </div>
                     <div class="mb-3">
+
+                        <label>Phone</label>
+                        <input type="text" name="phone" id="phone" class="form-control" required autocomplete="off" minlength="7" maxlength="15"
+                             pattern="^[0-9+\s]{7,15}$" oninput="this.value = this.value.replace(/[^0-9+\s]/g, '')" onkeypress="return /[0-9+\s]/.test(event.key)">
+                    </div>        
+
+
 						<label>Phone</label>
 						<input type="text"name="phone"id="phone" class="form-control" required
                             minlength="7"maxlength="25"pattern="^[0-9+\s]{7,25}$"oninput="this.value = this.value.replace(/[^0-9+\s]/g, '')"onkeypress="return /[0-9+\s]/.test(event.key)">
 					</div>
+
                     <!-- <div class="mb-3">
 						<label>Max Discount</label>
 						<textarea name="discount" id="discount" class="form-control" required style="text-transform: capitalize;"></textarea>

@@ -168,7 +168,8 @@
                         </div>
                         <div class="form-group">
                             <label>Customer Phone</label>
-                            <input type="text" class="form-control" id="popup_phone" required>
+                            <input type="text" class="form-control" id="popup_phone" required autocomplete="off" minlength="7" maxlength="15"
+                             pattern="^[0-9+\s]{7,15}$" oninput="this.value = this.value.replace(/[^0-9+\s]/g, '')" onkeypress="return /[0-9+\s]/.test(event.key)">
                         </div>
                         <div class="alert alert-danger d-none" id="customerError"></div>
                     </div>
@@ -378,6 +379,12 @@ $('#enquiry-form').submit(function(e) {
         });
     });
 
+    // cancelmodal
+    
+        $('#cancelCustomerBtn, #closeCustomerModalBtn').on('click', function() {
+            $('#customerModal').modal('hide');
+        });
+
         // $('#add-item').click(function() {
         //     const newRow = $(` 
         //         <tr class="item-row">
@@ -442,6 +449,10 @@ $('#enquiry-form').submit(function(e) {
 //         });
                 // CUSTOMER SAVE
 
+
+
+            // customer save 
+
         const saveCustomerBtn = $('#saveCustomerBtn');
 
         //  Disable button when modal opens
@@ -480,6 +491,46 @@ $('#enquiry-form').submit(function(e) {
                 $('#customerError').removeClass('d-none').text('Please Enter Valid Name And Address');
                 return;
             }
+
+        const saveCustomerBtn = $('#saveCustomerBtn');
+
+        //  Disable button when modal opens
+        $('#customerModal').on('show.bs.modal', function() {
+            saveCustomerBtn.prop('disabled', true);
+            $('#customerError').addClass('d-none');
+        });
+
+        //  Enable Save button only when required fields are filled
+        $('#popup_name, #popup_address, #popup_phone').on('input', function() {
+            let name = $('#popup_name').val().trim();
+            let address = $('#popup_address').val().trim();
+            let phone = $('#popup_phone').val().trim();
+
+            if (name !== '' && address !== '' && phone !== '') {
+                saveCustomerBtn.prop('disabled', false);
+            } else {
+                saveCustomerBtn.prop('disabled', true);
+            }
+        });
+
+
+        //  Handle customer form submit
+        $('#customerForm').submit(function(e) {
+            e.preventDefault();
+
+            let name = $('#popup_name').val().trim();
+            let address = $('#popup_address').val().trim();
+            // let max_discount = $('#max_discount').val().trim();
+            let phone = $('#popup_phone').val().trim();
+
+            name = name.replace(/\b\w/g, char => char.toUpperCase());
+            address = address.replace(/(^\s*\w|[.!?]\s*\w)/g, char => char.toUpperCase());
+
+            if (!name || !address) {
+                $('#customerError').removeClass('d-none').text('Please Enter Valid Name And Address');
+                return;
+            }
+
 
             //  Disable button after first click to prevent double submission
             saveCustomerBtn.prop('disabled', true).text('Save');

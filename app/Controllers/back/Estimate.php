@@ -7,7 +7,6 @@ use App\Models\EstimateModel;
 use App\Models\EstimateItemModel;
 use App\Models\customerModel;
 use App\Models\Manageuser_Model;
-use App\Models\SupplierModel;
  use App\Models\Managecompany_Model;
  use App\Models\RoleModel;
  use Google\Cloud\Translate\V2\TranslateClient;
@@ -20,6 +19,7 @@ class Estimate extends BaseController
         return view('estimatelist');
     }
     public function __construct(){
+       // $this->session = \Session::get('');
        $this->session = \Config\Services::session();
  
        $session = \Config\Services::session();
@@ -29,58 +29,29 @@ class Estimate extends BaseController
         }
     } 
  
-  public function add_estimate()
+   public function add_estimate($id = null)
     {
-        $db = \Config\Database::connect();
-        $enquiry_id = $this->request->getGet('enquiry_id');
-        $data = [];
-
-        if ($enquiry_id) {
-            $enquiry = $db->table('enquiries')
-                          ->where('enquiry_id', $enquiry_id)
-                          ->get()
-                          ->getRowArray();
-
-            if ($enquiry) {
-                $data['estimate'] = [
-                    'customer_id' => $enquiry['customer_id'] ?? '',
-                    'customer_name' => $enquiry['name'] ?? '',
-                    'customer_address' => $enquiry['address'] ?? '',
-                    'phone_number' => $enquiry['phone'] ?? '',
-                    'lpo_no' => '',
-                    'discount' => 0,
-                ];
-
-                $items = $db->table('enquiry_items')
-                            ->where('enquiry_id', $enquiry_id)
-                            ->get()
-                            ->getResultArray();
-
-                $data['items'] = [];
-
-                foreach ($items as $index => $item) {
-                    $data['items'][] = [
-                        'description'   => $item['description'] ?? $item['item_name'] ?? '',
-                        'price'         => $item['price'] ?? $item['unit_price'] ?? 0,
-                        'selling_price' => $item['selling_price'] ?? $item['price'] ?? $item['unit_price'] ?? 0,
-                        'quantity'      => $item['quantity'] ?? 1,
-                        'total'         => $item['total'] ?? 0,
-                        'location'      => $item['location'] ?? '',
-                        'item_order'    => $index + 1,
-                    ];
-                }
-            }
+        $estimateModel = new EstimateModel();
+        $estimateItemModel = new EstimateItemModel();
+        $customerModel = new customerModel();
+ 
+        $companyId = 1;
+        $data['customers'] = $customerModel
+            ->where('is_deleted', 0)
+            ->where('company_id', $companyId)
+            ->orderBy('customer_id', 'DESC')
+            ->findAll();
+ 
+        $data['estimate'] = null;
+        $data['items'] = [];
+ 
+        if ($id) {
+            $data['estimate'] = $estimateModel->find($id);
+            $data['items'] = $estimateItemModel->where('estimate_id', $id)->findAll();
         }
-        $data['customers'] = $db->table('customers')
-                                ->select('customer_id, name')
-                                ->get()
-                                ->getResultArray();
-
+ 
         return view('add_estimate', $data);
     }
-
-
-
 
 
  public function save()
@@ -90,13 +61,12 @@ class Estimate extends BaseController
     $address      = trim($this->request->getPost('customer_address'));
     $discount     = floatval($this->request->getPost('discount') ?? 0);
     $description  = $this->request->getPost('description');
-    $price        = $this->request->getPost('price'); // marketing price
-    $sellingPrice = $this->request->getPost('selling_price'); // selling price
+    $price        = $this->request->getPost('price');
     $quantity     = $this->request->getPost('quantity');
     $total        = $this->request->getPost('total');
     $customerName = trim($this->request->getPost('customer_name'));
     $phoneNumber  = trim($this->request->getPost('phone_number'));
-    $maxDiscount  = floatval($this->request->getPost('max_discount') ?? 0);
+    $maxDiscount  = floatval($this->request->getPost('max_discount') ?? 0); // KWD
 
     if (empty($customerId) || empty($address)) {
         return $this->response->setJSON([
@@ -105,10 +75,14 @@ class Estimate extends BaseController
         ]);
     }
 
-    // Validate items
+    // -------------------------
+    // 2. Validate at least one item
+    // -------------------------
     $validItems = 0;
     foreach ($description as $desc) {
-        if (!empty(trim($desc))) $validItems++;
+        if (!empty(trim($desc))) {
+            $validItems++;
+        }
     }
     if ($validItems === 0) {
         return $this->response->setJSON([
@@ -117,98 +91,161 @@ class Estimate extends BaseController
         ]);
     }
 
-    // Calculate subtotal
-    $subtotal = '0.0000';
+    // -------------------------
+    // 3. Calculate subtotal
+    // -------------------------
+    $subtotal = '0.000000';
     foreach ($total as $t) {
-        $subtotal = bcadd($subtotal, (string)$t, 4);
+        $subtotal = bcadd($subtotal, (string)$t, 6);
     }
 
-    // Validate discount
+    // -------------------------
+    // 4. Validate discount in KWD
+    // -------------------------
     if ($discount > $subtotal || ($maxDiscount > 0 && $discount > $maxDiscount)) {
         $allowedDiscount = $maxDiscount > 0 ? min($subtotal, $maxDiscount) : $subtotal;
         return $this->response->setJSON([
             'status' => 'error',
-            'message' => "Discount cannot exceed maximum allowed: " . number_format($allowedDiscount, 4) . " AED."
+            'message' => "Discount cannot exceed maximum allowed: " . number_format($allowedDiscount, 6) . " KWD."
         ]);
     }
 
-    $grandTotal = bcsub($subtotal, (string)$discount, 4);
+    // -------------------------
+    // 5. Calculate grand total
+    // -------------------------
+    $grandTotal = bcsub($subtotal, (string)$discount, 6);
 
+    // -------------------------
+    // 6. Prepare estimate data
+    // -------------------------
+    $companyId = 1;
     $estimateData = [
         'customer_id'      => $customerId,
         'customer_address' => $address,
         'discount'         => $discount,
-        'sub_total'        => $subtotal,
         'total_amount'     => $grandTotal,
         'date'             => date('Y-m-d'),
         'phone_number'     => $phoneNumber,
-        'company_id'       => 1
+        'company_id'       => $companyId
     ];
+
+    // -------------------------
+    // 7. Prepare items
+    // -------------------------
     $itemsArray = [];
     foreach ($description as $key => $desc) {
-        $descVal = trim($desc);
-        $mPrice  = floatval($this->request->getPost('market_price')[$key] ?? 0); 
-        $sPrice  = floatval($sellingPrice[$key] ?? 0);
-        $qty     = floatval($quantity[$key] ?? 0);
+        $desc      = trim($desc);
+        $unitPrice = floatval($price[$key] ?? 0);
+        $qty       = floatval($quantity[$key] ?? 0);
 
-        if ($descVal === '' || $sPrice <= 0 || $qty <= 0) {
+        if ($desc === '' || $unitPrice <= 0 || $qty <= 0) {
             return $this->response->setJSON([
                 'status' => 'error',
-                'message' => 'Each item must have description, selling price, and quantity.'
+                'message' => 'Each item must have description, unit price, and quantity.'
             ]);
         }
 
-        // Calculate total
-        $lineTotal = bcmul((string)$sPrice, (string)$qty, 4);
-
-        //  Calculate difference percentage (based on market vs selling)
-        $differencePercentage = 0;
-        if ($mPrice > 0) {
-            $differencePercentage = (($sPrice - $mPrice) / $mPrice) * 100;
-        }
-
-        //  Push item to array
+        $lineTotal = bcmul((string)$unitPrice, (string)$qty, 6);
         $itemsArray[] = [
-            'description'           => $descVal,
-            'market_price'          => number_format($mPrice, 4, '.', ''),
-            'selling_price'         => number_format($sPrice, 4, '.', ''),
-            'difference_percentage' => number_format($differencePercentage, 2, '.', ''),
-            'quantity'              => number_format($qty, 4, '.', ''),
-            'total'                 => $lineTotal,
-            'item_order'            => $key + 1
+            'description' => $desc,
+            'price'       => number_format($unitPrice, 6, '.', ''),
+            'quantity'    => number_format($qty, 6, '.', ''),
+            'total'       => $lineTotal,
+            'item_order'  => $itemOrder[$key] ?? ($key + 1)
         ];
     }
 
+    // -------------------------
+    // 8. Update customer info if changed
+    // -------------------------
+    $customerModel = new customerModel();
+    $customer = $customerModel->find($customerId);
+    if ($customer) {
+        if ($customer['name'] !== $customerName || $customer['address'] !== $address) {
+            $customerModel->update($customerId, [
+                'name'    => $customerName,
+                'address' => $address
+            ]);
+        }
+    }
 
-
+    // -------------------------
+    // 9. Insert / Update Estimate
+    // -------------------------
     $estimateModel = new EstimateModel();
+    $estimateItemModel = new EstimateItemModel();
 
     if (!empty($estimateId)) {
-        $estimateModel->updateEstimateWithItems($estimateId, $estimateData, $itemsArray);
-        return $this->response->setJSON([
-            'status' => 'success',
-            'message' => 'Estimate Updated Successfully.',
-            'estimate_id' => $estimateId
-        ]);
+        // Update existing
+        $existing = $estimateModel->find($estimateId);
+        if (!$existing) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Estimate not found.'
+            ]);
+        }
+
+        $hasChanges = (
+            $existing['customer_id'] != $customerId ||
+            $existing['customer_address'] !== $address ||
+            $existing['discount'] != $discount ||
+            $existing['total_amount'] != $grandTotal
+        );
+
+        if ($hasChanges) {
+            $estimateModel->update($estimateId, $estimateData);
+
+            $estimateItemModel->where('estimate_id', $estimateId)->delete();
+            foreach ($itemsArray as &$item) {
+                $item['estimate_id'] = $estimateId;
+            }
+            $estimateItemModel->insertBatch($itemsArray);
+
+            return $this->response->setJSON([
+                'status' => 'success',
+                'message' => 'Estimate Updated Successfully.',
+                'estimate_id' => $estimateId
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'status' => 'nochange',
+                'message' => 'No changes detected.',
+                'estimate_id' => $estimateId
+            ]);
+        }
     } else {
-        $estimateId = $estimateModel->insertEstimateWithItems($estimateData, $itemsArray);
+        // New estimate
+        $lastEstimate = $estimateModel
+            ->where('company_id', $companyId)
+            ->orderBy('estimate_no', 'DESC')
+            ->first();
+        $nextEstimateNo = $lastEstimate ? $lastEstimate['estimate_no'] + 1 : 1;
+        $estimateData['estimate_no'] = $nextEstimateNo;
+
+        $estimateId = $estimateModel->insert($estimateData);
+        foreach ($itemsArray as &$item) {
+            $item['estimate_id'] = $estimateId;
+        }
+        $estimateItemModel->insertBatch($itemsArray);
+
         return $this->response->setJSON([
             'status' => 'success',
             'message' => 'Estimate Generated Successfully.',
-            'estimate_id' => $estimateId
+            'estimate_id' => $estimateId,
+            'estimate_no' => $nextEstimateNo
         ]);
     }
 }
 
-
  public function estimatelistajax()
 {
+    
     $request = service('request');
     $draw = $request->getPost('draw');
     $start = $request->getPost('start');
     $length = $request->getPost('length');
     $searchValue = trim($request->getPost('search')['value'] ?? '');
-
+ 
     $orderColumnIndex = $request->getPost('order')[0]['column'] ?? 8;
     $orderDir = $request->getPost('order')[0]['dir'] ?? 'desc';
 
@@ -224,48 +261,44 @@ class Estimate extends BaseController
         8 => 'estimates.estimate_id'
     ];
     $orderByColumn = $columns[$orderColumnIndex] ?? 'estimates.estimate_id';
-
+ 
     $companyId = 1;
 
     $estimateModel = new EstimateModel();
     $itemModel = new EstimateItemModel();
-
+ 
     $totalRecords = $estimateModel->getEstimateCount($companyId);
     $filteredRecords = $estimateModel->getFilteredCount($searchValue, $companyId);
-    $records = $estimateModel->getFilteredEstimates($searchValue, $start, $length, $orderByColumn, $orderDir, $companyId);
-
+    $records = $estimateModel->getFilteredEstimates($searchValue, $start, $length, $orderByColumn, $orderDir,  $companyId);
+ 
     $data = [];
     $slno = $start + 1;
-
+ 
     foreach ($records as $row) {
         $items = $itemModel->where('estimate_id', $row['estimate_id'])->findAll();
         $descList = array_column($items, 'description');
-
-        $subtotal = '0.0000';
+ 
+        $subtotal = '0.000000';
         foreach ($items as $item) {
-            $subtotal = bcadd((string)$subtotal, (string)$item['total'], 4);
+            $subtotal = bcadd((string)$subtotal, (string)$item['total'], 6);
         }
-
-        //  Format values to 4 decimals
-        $formattedSubtotal = number_format((float)$subtotal, 4, '.', '');
-        $formattedTotal = number_format((float)$row['total_amount'], 4, '.', '');
-        $formattedDiscount = number_format((float)($row['discount'] ?? 0), 4, '.', '');
-
+ 
         $data[] = [
             'slno'              => $slno++,
             'estimate_id'       => $row['estimate_id'],
             'estimate_no'       => $row['estimate_no'],
             'customer_name'     => $row['customer_name'],
             'customer_address'  => $row['customer_address'],
-            'subtotal'          => $formattedSubtotal,
-            'discount'          => $formattedDiscount,
-            'total_amount'      => $formattedTotal,
+            'subtotal'         => $subtotal,
+            'discount'          => $row['discount'],
+            'total_amount'     => bcadd((string)$row['total_amount'], '0', 6), // 6 decimals
             'date'              => $row['date'],
             'description'       => implode(', ', $descList),
-            'is_converted'      => $row['is_converted'],
+            'is_converted'  => $row['is_converted'],
+        
         ];
     }
-
+ 
     return $this->response->setJSON([
         'draw' => intval($draw),
         'recordsTotal' => $totalRecords,
@@ -273,7 +306,6 @@ class Estimate extends BaseController
         'data' => $data,
     ]);
 }
-
  
     public function delete()
     {
@@ -291,45 +323,36 @@ class Estimate extends BaseController
         return $this->response->setJSON(['status' => 'success']);
     }
  
-  public function edit($id)
+   public function edit($id)
 {
     $estimateModel = new EstimateModel();
     $estimateItemModel = new EstimateItemModel();
-    $customerModel = new CustomerModel();
+    $customerModel = new customerModel();
 
-    // Get the estimate + customer info
+    // Get estimate
     $estimate = $estimateModel
         ->select('estimates.*, customers.address AS customer_address, customers.name AS customer_name')
         ->join('customers', 'customers.customer_id = estimates.customer_id', 'left')
-        ->where('estimates.estimate_id', $id)
+        ->where('estimate_id', $id)
         ->first();
 
     if (!$estimate) {
         return redirect()->to('estimatelist')->with('error', 'Estimate not found.');
     }
-
-    // Get all items including market_price
-    $items = $estimateItemModel
-        ->select('item_id, estimate_id, description, market_price, selling_price, quantity, total, item_order')
-        ->where('estimate_id', $id)
-        ->orderBy('item_order', 'ASC')
-        ->findAll();
-
-    // Optional debugging (use once)
-    // echo '<pre>'; print_r($items); exit;
-
     $customer = $customerModel->find($estimate['customer_id']);
+    $companyId = session()->get('company_id'); 
 
     $data = [
-        'estimate'   => $estimate,
-        'items'      => $items,
-        'customers'  => $customerModel->where('is_deleted', 0)->orderBy('customer_id', 'DESC')->findAll(),
-        'customer'   => $customer
+        'estimate' => $estimate,
+        // 'items' => $estimateItemModel->where('estimate_id', $id)->findAll(),
+        'items' => $estimateItemModel->where('estimate_id', $id)->orderBy('item_order', 'ASC')->findAll(),
+
+        'customers' => $customerModel->where('is_deleted', 0)->orderBy('customer_id', 'DESC')->findAll(),
+        'customer' => $customer
     ];
 
     return view('add_estimate', $data);
 }
-
 private function translateToArabic($text)
 {
     if (empty($text)) {
@@ -476,9 +499,9 @@ private function translateToArabic($text)
 
 
         // Calculate subtotal with 6 decimals
-        $subtotal = '0.0000';
+        $subtotal = '0.000000';
         foreach ($items as $item) {
-            $subtotal = bcadd((string)$subtotal, (string)$item['total'], 4);
+            $subtotal = bcadd((string)$subtotal, (string)$item['total'], 6);
         }
 
         $est['items'] = $items;
@@ -493,31 +516,4 @@ private function translateToArabic($text)
     ]);
 }
 
-    // public function convertFromEnquiry($enquiryId)
-    // {
-    //     $enquiryModel = new SupplierModel();
-    //     $customerModel = new customerModel();
-
-    //     $enquiry = $enquiryModel->find($enquiryId);
-    //     if (!$enquiry) {
-    //         return redirect()->back()->with('error', 'Enquiry not found.');
-    //     }
-
-    //     // Fetch customer details (if linked)
-    //     $customer = $customerModel->where('customer_id', $enquiry['customer_id'] ?? null)->first();
-
-    //     $companyId = session()->get('company_id');
-    //     $customers = $customerModel
-    //         ->where('is_deleted', 0)
-    //         ->where('company_id', $companyId)
-    //         ->findAll();
-
-    //     // Pass enquiry details to estimate creation view
-    //     return view('estimate_form', [
-    //         'enquiry' => $enquiry,
-    //         'customers' => $customers,
-    //         'customer' => $customer,
-    //         'is_converted' => true,
-    //     ]);
-    // }
 }
