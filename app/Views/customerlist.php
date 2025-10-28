@@ -56,10 +56,17 @@
                         <textarea name="address" id="address" class="form-control" required autocomplete="off"style="text-transform: capitalize;"></textarea>
                     </div>
                     <div class="mb-3">
+
                         <label>Phone</label>
                         <input type="text" name="phone" id="phone" class="form-control" required autocomplete="off" minlength="7" maxlength="15"
                              pattern="^[0-9+\s]{7,15}$" oninput="this.value = this.value.replace(/[^0-9+\s]/g, '')" onkeypress="return /[0-9+\s]/.test(event.key)">
                     </div>        
+
+
+						<label>Phone</label>
+						<input type="text"name="phone"id="phone" class="form-control" required
+                            minlength="7"maxlength="25"pattern="^[0-9+\s]{7,25}$"oninput="this.value = this.value.replace(/[^0-9+\s]/g, '')"onkeypress="return /[0-9+\s]/.test(event.key)">
+					</div>
 
                     <!-- <div class="mb-3">
 						<label>Max Discount</label>

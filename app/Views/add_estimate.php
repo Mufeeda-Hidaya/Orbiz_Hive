@@ -430,13 +430,21 @@
 
         const saveCustomerBtn = $('#saveCustomerBtn');
 
+
         // Disable button when modal opens
+
+        //  Disable button when modal opens
+
         $('#customerModal').on('show.bs.modal', function() {
             saveCustomerBtn.prop('disabled', true);
             $('#customerError').addClass('d-none');
         });
 
+
         // Enable Save button only when required fields are filled
+
+        //  Enable Save button only when required fields are filled
+
         $('#popup_name, #popup_address, #popup_phone').on('input', function() {
             let name = $('#popup_name').val().trim();
             let address = $('#popup_address').val().trim();

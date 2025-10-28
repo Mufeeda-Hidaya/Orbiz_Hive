@@ -447,6 +447,8 @@ $('#enquiry-form').submit(function(e) {
 //                 }
 //             });
 //         });
+                // CUSTOMER SAVE
+
 
 
             // customer save 
@@ -489,6 +491,46 @@ $('#enquiry-form').submit(function(e) {
                 $('#customerError').removeClass('d-none').text('Please Enter Valid Name And Address');
                 return;
             }
+
+        const saveCustomerBtn = $('#saveCustomerBtn');
+
+        //  Disable button when modal opens
+        $('#customerModal').on('show.bs.modal', function() {
+            saveCustomerBtn.prop('disabled', true);
+            $('#customerError').addClass('d-none');
+        });
+
+        //  Enable Save button only when required fields are filled
+        $('#popup_name, #popup_address, #popup_phone').on('input', function() {
+            let name = $('#popup_name').val().trim();
+            let address = $('#popup_address').val().trim();
+            let phone = $('#popup_phone').val().trim();
+
+            if (name !== '' && address !== '' && phone !== '') {
+                saveCustomerBtn.prop('disabled', false);
+            } else {
+                saveCustomerBtn.prop('disabled', true);
+            }
+        });
+
+
+        //  Handle customer form submit
+        $('#customerForm').submit(function(e) {
+            e.preventDefault();
+
+            let name = $('#popup_name').val().trim();
+            let address = $('#popup_address').val().trim();
+            // let max_discount = $('#max_discount').val().trim();
+            let phone = $('#popup_phone').val().trim();
+
+            name = name.replace(/\b\w/g, char => char.toUpperCase());
+            address = address.replace(/(^\s*\w|[.!?]\s*\w)/g, char => char.toUpperCase());
+
+            if (!name || !address) {
+                $('#customerError').removeClass('d-none').text('Please Enter Valid Name And Address');
+                return;
+            }
+
 
             //  Disable button after first click to prevent double submission
             saveCustomerBtn.prop('disabled', true).text('Save');
