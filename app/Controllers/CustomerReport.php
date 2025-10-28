@@ -28,12 +28,12 @@ class CustomerReport extends Controller
 
         $data = [];
 
-        if ($type == 'invoice') {
-            $builder = $db->table('invoices i')
+        if ($type == 'joborder') {
+            $builder = $db->table('joborder i')
                 ->select('i.*, c.name as customer_name')
                 ->join('customers c', 'c.customer_id = i.customer_id AND c.company_id = '.$companyId.' AND c.is_deleted = 0', 'left')
                 ->where('i.company_id', $companyId)
-                ->orderBy('i.invoice_id', 'DESC');
+                ->orderBy('i.joborder_id', 'DESC');
 
             if(!empty($customer_id)){
                 $builder->where('i.customer_id', $customer_id);
@@ -42,11 +42,11 @@ class CustomerReport extends Controller
             $invoices = $builder->get()->getResultArray();
 
             foreach ($invoices as $inv) {
-                $items = $db->table('invoice_items')->where('invoice_id', $inv['invoice_id'])->get()->getResultArray();
+                $items = $db->table('invoice_items')->where('joborder_id', $inv['joborder_id'])->get()->getResultArray();
                 $subtotal = array_sum(array_map(fn($item) => $item['quantity'] * $item['price'], $items));
 
                 $data[] = [
-                    'id' => $inv['invoice_id'],
+                    'id' => $inv['joborder_id'],
                     'no' => $inv['invoice_no'],
                     'customer' => $inv['customer_name'],
                     'subtotal' => $subtotal,

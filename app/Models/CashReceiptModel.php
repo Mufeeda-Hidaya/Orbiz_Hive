@@ -4,17 +4,17 @@ use CodeIgniter\Model;
 
 class CashReceiptModel extends Model
 {
-    protected $table = 'invoices';
-    protected $primaryKey = 'invoice_id';
+    protected $table = 'joborder';
+    protected $primaryKey = 'joborder_id';
     protected $allowedFields = [
         'estimate_id','company_id','customer_id','customer_address','customer_phone','customer_email',
         'total_amount','status','user_id','discount','invoice_date','billing_address',
         'shipping_address','lpo_no','phone_number','delivery_date','paid_amount','balance_amount','payment_mode'
     ];
 
-    public function getAllFilteredCashReceipts($company_id, $search = '', $start = 0, $length = 10, $orderColumn = 'invoice_id', $orderDir = 'DESC')
+    public function getAllFilteredCashReceipts($company_id, $search = '', $start = 0, $length = 10, $orderColumn = 'joborder_id', $orderDir = 'DESC')
     {
-        $builder = $this->db->table('invoices i')
+        $builder = $this->db->table('joborder i')
             ->select('i.*, c.name AS customer_name')
             ->join('customers c', 'c.customer_id = i.customer_id', 'left')
             ->where('i.status !=', 'unpaid')
@@ -44,14 +44,14 @@ class CashReceiptModel extends Model
 
     public function getAllCashReceiptsCount($company_id)
     {
-        return $this->db->table('invoices')
+        return $this->db->table('joborder')
             ->where('company_id', $company_id)
             ->countAllResults();
     }
 
     public function getFilteredCashReceiptsCount($company_id, $search = '')
     {
-        $builder = $this->db->table('invoices i')
+        $builder = $this->db->table('joborder i')
             ->join('customers c', 'c.customer_id = i.customer_id', 'left')
             ->where('i.status !=', 'unpaid')
             ->where('i.company_id', $company_id);

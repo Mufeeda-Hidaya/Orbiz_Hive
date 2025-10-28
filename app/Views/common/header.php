@@ -166,7 +166,7 @@ if ($company_id) {
             <a class="nav-link <?= strpos($currentPath, 'invoice') !== false ? 'active' : '' ?>"
               href="<?= base_url('invoicelist') ?>">
               <i class="mdi mdi-receipt menu-icon"></i>
-              <span class="menu-title">Invoice List</span>
+              <span class="menu-title">Job Order</span>
             </a>
           </li>
         <?php endif; ?>

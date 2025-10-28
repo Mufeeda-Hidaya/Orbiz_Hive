@@ -1,32 +1,26 @@
 <?php include "common/header.php"; ?>
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-
-<div class="alert d-none text-center position-fixed" role="alert"></div>
-
+<div class="alert d-none text-center position-fixed" role=alert></div>
+<!DOCTYPE html>
+<html>
 
 <head>
-    <title>Estimate</title>
+    <title>JOB ORDER</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
-        .estimate-box {
+        .order-box {
             border: 1px solid #000;
             padding: 20px;
         }
 
-        .estimate-title {
+        .order-title {
             text-align: right;
             font-weight: bold;
             font-size: 24px;
         }
 
-        .location {
-            text-transform: capitalize;
-        }
-
-        .estimate-details {
+        .order-details {
             text-align: right;
-            position: absolute;
-            right: 15px;
         }
 
         .table-bordered td,
@@ -59,336 +53,235 @@
         .select2-selection__arrow {
             height: 36px;
         }
-
-        textarea[readonly] {
-            background-color: #fff !important;
-            border-color: #ced4da;
-            /* Optional: match normal border */
-            box-shadow: none !important;
-            /* Remove blue focus glow */
-            color: #212529;
-            /* Default text color */
-        }
     </style>
 </head>
-
-<div class="mt-1 estimate-box right_container">
-    <div class="row mb-3">
-        <div class="col-md-6">
-            <h3><?= isset($invoice['invoice_id']) ? 'Edit Invoice' : 'Create Invoice' ?></h3>
-        </div>
-
-        <div class="col-md-6 text-end">
-            <div class="estimate-title">INVOICE</div>
-            <div class="estimate-details">
-                <p class="mb-1">Invoice No:
-                    <?= isset($invoice['invoice_no']) ? $invoice['invoice_no'] : '' ?>
-                </p>
-                <p>Date: <?= date('d-m-Y') ?></p>
-            </div>
-        </div>
-    </div>
-
-    <form id="invoice-form">
-        <div class="row">
+<body>
+    <div class="mt-1 order-box right_container">
+        <div class="row mb-3">
             <div class="col-md-6">
-                <label><strong>Customer Name</strong><span class="text-danger">*</span></label>
-                <div class="input-group mb-2 d-flex">
-                    <select name="customer_id" id="customer_id" class="form-control select2">
-                        <option value="" disabled <?= !isset($invoice['customer_id']) ? 'selected' : '' ?>>Select
-                            Customer</option>
-                        <?php foreach ($customers as $customer): ?>
-                            <option value="<?= $customer['customer_id'] ?>" <?= (isset($invoice['customer_id']) && $invoice['customer_id'] == $customer['customer_id']) ? 'selected' : '' ?>>
-                                <?= esc($customer['name']) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                    <div class="input-group-append">
-                        <button type="button" class="btn btn-outline-primary" id="addCustomerBtn">+</button>
+                <h3><?= isset($estimate['joborder_id']) ? 'Edit Order' : 'Job Order Generation' ?></h3>
+            </div>
+        </div>
+        <form id="order-form">
+             <input type="hidden" name="joborder_id" id="joborder_id" value="<?= isset($estimate['joborder_id']) ? $estimate['joborder_id'] : '' ?>">
+            <div class="row">
+                <div class="col-md-6">
+                    <label><strong> Customer</strong><span class="text-danger">*</span></label>
+                    <div class="input-group mb-2 d-flex">
+                        <select name="customer_id" id="customer_id" class="form-control select2">
+                            <option value="" disabled <?= !isset($estimate['customer_id']) ? 'selected' : '' ?>>Select Customer</option>
+                            <?php foreach ($customers ?? []  as $customer): ?>
+                                <option value="<?= $customer['customer_id'] ?>"
+                                    <?= (isset($estimate['customer_id']) && $estimate['customer_id'] == $customer['customer_id']) ? 'selected' : '' ?>>
+                                    <?= esc($customer['name']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <div class="input-group-append">
+                            <button type="button" class="btn btn-outline-primary" id="addCustomerBtn">+</button>
+                        </div>
+                    </div>
+                    <label class="mt-3"><strong>Customer Address</strong><span class="text-danger">*</span></label>
+                    <textarea name="customer_address" id="customer_address" class="form-control" rows="3"><?= isset($estimate['customer_address']) ? trim($estimate['customer_address']) : '' ?></textarea>
+                    <div class="phone pt-3">
+                        <label class="mt-md-0 mt-3"><strong>Contact Number</strong><span class="text-danger">*</span></label>
+                        <input type="text" name="phone_number" id="phone_number" class="form-control"
+                        value="<?= isset($estimate['phone_number']) ? esc($estimate['phone_number']) : '' ?>"
+                        minlength="7" maxlength="25" pattern="^[\+0-9\s\-\(\)]{7,25}$" />
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="order-title">JOB ORDER</div>
+                    <div class="order-details">
+                        <p class="mb-1" id="order-id-display">Order No :
+                            <?= isset($estimate['joborder_no']) ? $estimate['joborder_no'] : '' ?></p>
+                        <p>Date : <?= date('d-m-Y') ?></p>
                     </div>
                 </div>
             </div>
-            <div class="row">
-                <!-- Billing Address -->
-                <div class="col-md-6">
-                    <label for="customer_address" class="form-label">
-                        <strong>Customer Address</strong> <span class="text-danger">*</span>
-                    </label>
-                    <textarea name="customer_address" id="customer_address" class="form-control capitalize"
-                        maxlength="150" style="resize: vertical;"
-                        rows="3"><?= isset($invoice['customer_address']) ? trim($invoice['customer_address']) : '' ?></textarea>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <label class="mt-3"><strong>LPO No</strong></label>
-                    <input type="text" name="lpo_no" id="lpo_no" class="form-control"
-                        value="<?= isset($invoice['lpo_no']) ? esc($invoice['lpo_no']) : '' ?>">
-                </div>
-                <div class="col-md-6">
-                    <label class="mt-3"><strong>Phone Number</strong><span class="text-danger">*</span></label>
-                    <input type="text" name="phone_number" id="phone_number" class="form-control"
-                        value=" <?= esc($invoice['phone_number'] ?? '') ?>" minlength="7" maxlength="15"
-                        pattern="^[\+0-9\s\-\(\)]{7,25}$"
-                        title="Phone number must be 7 to 15 digits and can start with +" />
-                </div>
-            </div>
-        </div>
-
-        <table class="table table-bordered mt-4">
-            <thead>
-                <tr>
-                    <th>Description</th>
-                    <th>Unit Price</th>
-                    <th>Quantity</th>
-                    <th>Amount</th>
-                    <th>Location</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody id="item-container">
-                <?php if (!empty($invoiceformitems)): ?>
-                    <?php foreach ($invoiceformitems as $index => $item): ?>
-                        <tr class="item-row">
-                            <td><input type="text" name="description[]" class="form-control"
-                                    value="<?= esc($item['description'] ?? $item['item_name'] ?? '') ?>"></td>
-                            <td><input type="number" class="form-control price" step="0.000001" min="0" inputmode="decimal"
-                                    name="price[]" value="<?= $item['price'] ?>">
-                            </td>
-                            <td><input type="number" class="form-control quantity" name="quantity[]"
-                                    value="<?= $item['quantity'] ?>"></td>
-                            <td><input type="number" class="form-control total" name="total[]" step="0.000001"
-                                    value="<?= $item['total'] ?>" readonly></td>
-                            <td>
-                                <input type="text" class="form-control location" name="location[]"
-                                    value="<?= esc(ucfirst($item['location'] ?? '')) ?>" placeholder="Enter Delivery Location">
-                            </td>
-                            <td class="text-center">
-                                <span class="remove-item-btn" title="Remove"><i class="fas fa-trash text-danger"></i></span>
-                            </td>
-                            <input type="hidden" name="item_order[]" class="item-order" value="<?= $index + 1 ?>">
+            <div class="table-responsive">
+                <table class="table table-bordered mt-4">
+                    <thead>
+                        <tr>
+                            <th>Description Of Goods</th>
+                            <th>Market Price</th>
+                            <th>Selling Price</th>
+                            <th>Difference (%)</th> 
+                            <th>Quantity</th>
+                            <th>Amount (AED)</th>
+                            <th>Action</th>
                         </tr>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <tr class="item-row">
-                        <td><input type="text" name="description[]" class="form-control" placeholder="Description"></td>
-                        <td><input type="number" name="price[]" class="form-control price" step="0.000001" min="0"
-                                inputmode="decimal"></td>
-                        <td><input type="number" name="quantity[]" class="form-control quantity"></td>
-                        <td><input type="number" name="total[]" class="form-control total" readonly></td>
-                        <td>
-                            <input type="text" class="form-control location" name="location[]"
-                                value="<?= esc(ucfirst($item['location'] ?? '')) ?>" placeholder="Enter Delivery Location">
-                        </td>
-                        <td class="text-center">
-                            <span class="remove-item-btn" title="Remove"><i class="fas fa-trash text-danger"></i></span>
-                        </td>
-                    </tr>
-                <?php endif; ?>
+                    </thead>
+                    <tbody id="item-container">
+                        <?php if (!empty($items)): ?>
+                            <?php foreach ($items as $index => $item): ?>
+                                <tr class="item-row">
+                                    <td>
+                                        <input type="text" name="description[]" class="form-control"
+                                            value="<?= esc($item['description'] ?? '') ?>">
+                                    </td>
 
-            </tbody>
-        </table>
+                                    <!--  Use market_price instead of price -->
+                                    <td>
+                                        <input type="number" name="market_price[]" class="form-control market-price"
+                                            step="0.0001" min="0"
+                                            value="<?= esc($item['market_price'] ?? 0) ?>">
+                                    </td>
 
-        <button type="button" class="btn btn-outline-secondary mb-3" id="add-item">Add More Item</button>
+                                    <td>
+                                        <input type="number" name="selling_price[]" class="form-control selling-price"
+                                            step="0.0001" min="0"
+                                            value="<?= esc($item['selling_price'] ?? ($item['market_price'] ?? 0)) ?>">
+                                    </td>
 
-        <table class="table totals">
-            <tr>
-                <td><strong>Sub Total:</strong></td>
-                <td><span id="sub_total_display">0.000000</span> KWD</td>
-            </tr>
-            <tr>
-                <td><strong>Discount:</strong></td>
-                <td>
-                    <input type="number" name="discount" id="discount" class="form-control w-50 d-inline"
-                        value="<?= isset($invoice['discount']) ? number_format((float) $invoice['discount'], 6, '.', '') : '0.000000' ?>"
-                        min="0" step="0.000001"> KWD
+                                    <td><input type="text" name="difference[]" class="form-control difference" readonly></td>
 
-                </td>
-            </tr>
+                                    <td>
+                                        <input type="number" name="quantity[]" class="form-control quantity"
+                                            value="<?= esc($item['quantity'] ?? 1) ?>">
+                                    </td>
 
-            <!-- <tr>
-                <td><strong>Discount:</strong></td>
-                <td>
-                    <input type="number" name="discount" id="discount" class="form-control w-50 d-inline"
-                        value="<?= esc($invoice['discount'] ?? 0) ?>" min="0"> %
-                </td>
-            </tr> -->
-            <tr>
-                <td><strong>Total:</strong></td>
-                <td><strong><span id="total_display">0.000000</span> KWD</strong></td>
-            </tr>
-        </table>
-        <input type="hidden" name="estimate_id" value="<?= $invoice['estimate_id'] ?? '' ?>">
-        <input type="hidden" name="invoice_id"
-            value="<?= isset($invoice['invoice_id']) ? $invoice['invoice_id'] : '' ?>">
-        <input type="hidden" name="original_status"
-            value="<?= isset($invoice['status']) ? esc($invoice['status']) : 'unpaid' ?>">
-        <input type="hidden" id="is_converted" value="<?= !empty($is_converted) ? 1 : 0 ?>">
-        <div class="text-end">
-            <a href="<?= base_url('invoicelist') ?>" class="btn btn-secondary">Discard</a>
-            <!-- <button type="submit" id="save-invoice-btn" class="btn btn-primary" -->
-            <button type="submit" id="save-invoice-btn" class="btn btn-primary" <?= (!empty($invoice) && empty($is_converted)) ? 'disabled' : '' ?>>
-                Generate Invoice
-            </button>
-        </div>
-    </form>
-</div>
-<!-- Customer Modal -->
-<div class="modal fade" id="customerModal" tabindex="-1" aria-labelledby="customerModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <form id="customerForm">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Add Customer</h5>
-                    <button type="button" class="close" data-bs-dismiss="modal"><span>&times;</span></button>
-                </div>
-                <div class="modal-body">
-                    <label>Name</label>
-                    <input type="text" id="popup_name" class="form-control mb-2" required>
-                    <label>Address</label>
-                    <textarea id="popup_address" class="form-control" rows="3" required></textarea>
-                    <div class="alert alert-danger d-none mt-2" id="customerError"></div>
-                    <div class="mb-3">
-                        <label>Maximum Discount (KWD)</label>
-                        <input type="number" name="max_discount" id="max_discount" class="form-control" min="0"
-                            step="0.000001" placeholder="Enter maximum discount amount">
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" id="saveCustomerBtn" class="btn btn-primary" disabled>Save</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                </div>
+                                    <td>
+                                        <input type="number" name="total[]" class="form-control total"
+                                            step="0.0001" value="<?= esc($item['total'] ?? 0) ?>" readonly>
+                                    </td>
+
+                                    <td class="text-center">
+                                        <span class="remove-item-btn" title="Remove">
+                                            <i class="fas fa-trash text-danger"></i>
+                                        </span>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <!-- If no items, show one empty row -->
+                            <tr class="item-row">
+                                <td><input type="text" name="description[]" class="form-control" placeholder="Description"></td>
+                                <td><input type="number" name="market_price[]" class="form-control market-price" step="0.0001" min="0"></td>
+                                <td><input type="number" name="selling_price[]" class="form-control selling-price" step="0.0001" min="0"></td>
+                                <td><input type="text" name="difference[]" class="form-control difference" readonly></td>
+                                <td><input type="number" name="quantity[]" class="form-control quantity"></td>
+                                <td><input type="number" name="total[]" class="form-control total" step="0.0001" readonly></td>
+                                <td class="text-center">
+                                    <span class="remove-item-btn" title="Remove"><i class="fas fa-trash text-danger"></i></span>
+                                </td>
+                            </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+            <button type="button" class="btn btn-outline-secondary mb-34" id="add-item">Add More Item</button>
+            <table class="table totals">
+                <tr>
+                    <td><strong>Sub Total:</strong></td>
+                    <td><span id="sub_total_display">0.0000</span> AED</td>
+                </tr>
+                <tr>
+                    <td><strong>Discount:</strong></td>
+                    <td>
+                        <input type="number" name="discount" id="discount" class="form-control col-7 d-inline"
+                            value="<?= isset($estimate['discount']) ? number_format($estimate['discount'], 4, '.', '') : '0.0000' ?>"
+                            step="0.0001" min="0">
+                        AED
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Total:</strong></td>
+                    <td><strong><span id="total_display">0.0000</span> AED</strong></td>
+                </tr>
+            </table>
+            <input type="hidden" id="joborder_id" value="<?= $estimate['joborder_id'] ?? '' ?>">
+
+            <div class="text-right">
+                <a href="<?= base_url('estimatelist') ?>" class="btn btn-secondary">Discard</a>
+                <button type="submit" id="generate-btn" class="btn btn-primary">Generate Order</button>
             </div>
         </form>
     </div>
-</div>
-</div>
-<?php include "common/footer.php"; ?>
+    </div>
 
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <div class="modal fade" id="customerModal" tabindex="-1" role="dialog" aria-labelledby="customerModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <form id="customerForm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Add New Customer</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                            id="closeCustomerModalBtn"><span>&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Customer Name</label>
+                            <input type="text" class="form-control" id="popup_name" required>
+                            <!-- <textarea class="form-control" id="popup_address" rows="3" required></textarea> -->
+
+                        </div>
+                        <div class="form-group">
+                            <label>Customer Address</label>
+                            <!-- <input type="text" name="description[]" class="form-control description" required> -->
+                            <textarea class="form-control" id="popup_address" rows="3" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Customer Phone</label>
+                            <input type="text" class="form-control" id="popup_phone" required autocomplete="off" minlength="7" maxlength="15"
+                             pattern="^[0-9+\s]{7,15}$" oninput="this.value = this.value.replace(/[^0-9+\s]/g, '')" onkeypress="return /[0-9+\s]/.test(event.key)">
+                        </div>
+                        <div class="alert alert-danger d-none" id="customerError"></div>
+                        <div class="mb-3">
+                            <label>Maximum Discount (KWD)</label>
+                            <input type="number" name="max_discount" id="max_discount" class="form-control" min="0" step="0.000001" placeholder="Enter maximum discount amount">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary" id="saveCustomerBtn">Save</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal"
+                            id="cancelCustomerBtn">Cancel</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <?php include "common/footer.php"; ?>
 <script>
-    let initialFormData;
-
-    let maxCustomerDiscount = 0;
-
-    $(document).ready(function () {
+    $(document).ready(function() {
         $('#customer_id').select2({
             placeholder: "Select Customer",
-            width: 'resolve'
+            width: 'calc(100% - 40px)',
+            minimumResultsForSearch: 0
         });
 
-        initialFormData = $('#invoice-form').serialize();
-        if ($('#is_converted').val() === "1") {
-            $('#save-invoice-btn').prop('disabled', false);
-        } else {
-            $('#save-invoice-btn').prop('disabled', true);
-        }
+        $('#popup_name').on('input', function() {
+            let value = $(this).val();
+            let capitalized = value.replace(/\b\w/g, function(char) {
+                return char.toUpperCase();
+            });
+            $(this).val(capitalized);
+        });
 
-        function calculateTotals() {
-            let subtotal = 0;
-
-            // Calculate subtotal from all item rows
-            $('.item-row').each(function () {
-                let qty = parseFloat($(this).find('.quantity').val()) || 0;
-                let price = parseFloat($(this).find('.price').val()) || 0;
-                let total = qty * price;
-                $(this).find('.total').val(total.toFixed(6));
-                subtotal += total;
+        $('#popup_address').on('input', function() {
+            let value = $(this).val();
+            let capitalized = value.replace(/\b\w/g, function(char) {
+                return char.toUpperCase();
             });
 
-            $('#sub_total_display').text(subtotal.toFixed(6));
-
-            // Get the discount value from the input field
-            let discountFromInput = parseFloat($('#discount').val()) || 0;
-
-            // For calculation, the discount applied cannot be more than the subtotal
-            let effectiveDiscount = Math.min(discountFromInput, subtotal);
-
-            // Calculate the final total using the effective discount
-            let finalTotal = subtotal - effectiveDiscount;
-
-            // Ensure the total doesn't go below zero
-            if (finalTotal < 0) {
-                finalTotal = 0;
-            }
-
-            $('#total_display').text(finalTotal.toFixed(6));
-        }
-
-        function updateSaveButtonState() {
-            if ($('#is_converted').val() === "1") {
-                $('#save-invoice-btn').prop('disabled', false);
-                return;
-            }
-            const currentFormData = $('#invoice-form').serialize();
-            const hasChanged = currentFormData !== initialFormData;
-            $('#save-invoice-btn').prop('disabled', !hasChanged);
-        }
-        updateSaveButtonState();
-        $('#invoice-form input, #invoice-form select, #invoice-form textarea').on('input change', updateSaveButtonState);
-        $(document).on('click', '.remove-item-btn', function () {
-            $(this).closest('tr').remove();
-            calculateTotals();
-            updateSaveButtonState();
-            const currentData = $('#invoice-form').serialize();
-            const hasChanged = currentData !== initialFormData;
-            $('#save-invoice-btn').prop('disabled', !hasChanged);
-        });
-
-
-
-        $('#add-item').click(function () {
-            const row = `
-            <tr class="item-row">
-                <td><input type="text" name="description[]" class="form-control" placeholder="Description"></td>
-                <td><input type="text" name="price[]" class="form-control price" step="0.000001"></td>
-                <td><input type="number" name="quantity[]" class="form-control quantity" step="0.01"></td>
-                <td><input type="number" name="total[]" class="form-control total" step="0.000001" readonly></td>
-                <td><input type="text" name="location[]" class="form-control location" placeholder="Enter Delivery Location">
-                <td class="text-center"><span class="remove-item-btn" title="Remove"><i class="fas fa-trash text-danger"></i></span></td>
-            </tr>`;
-            $('#item-container').append(row);
-            calculateTotals();
-
-
-            const currentFormData = $('#invoice-form').serialize();
-            const hasChanged = currentFormData !== initialFormData;
-            $('#save-invoice-btn').prop('disabled', !hasChanged);
-        });
-
-        $('#popup_name').on('input', function () {
-            let value = $(this).val();
-            let capitalized = value.replace(/\b\w/g, char => char.toUpperCase());
             $(this).val(capitalized);
         });
 
-        $('#popup_address').on('input', function () {
-            let value = $(this).val();
-            let capitalized = value.replace(/\b\w/g, char => char.toUpperCase());
-            $(this).val(capitalized);
-        });
-
-        document.getElementById('phone_number').addEventListener('input', function () {
+        document.getElementById('phone_number').addEventListener('input', function() {
             let val = this.value;
             this.value = val.replace(/(?!^)\+/g, '').replace(/[^0-9\s\-\(\)\+]/g, '');
         });
 
-        $(document).on('input', 'input[name="description[]"]', function () {
+        $(document).on('input', 'input[name="description[]"]', function() {
             let value = $(this).val();
-            let capitalized = value.replace(/\b\w/g, char => char.toUpperCase());
+            let capitalized = value.replace(/\b\w/g, function(char) {
+                return char.toUpperCase();
+            });
             $(this).val(capitalized);
         });
 
-        // $(document).on('click', '.remove-item-btn', function () {
-        //     $(this).closest('tr').remove();
-        //     calculateTotals();
-
-        //     const currentFormData = $('#invoice-form').serialize();
-        //     const hasChanged = currentFormData !== initialFormData;
-        //     $('#save-invoice-btn').prop('disabled', !hasChanged);
-        // });
-
-        $(document).on('input', '.price', function () {
+        $(document).on('input', '.price', function() {
             let input = this;
             let val = input.value;
             if (val === '' || val === '.') return;
@@ -406,213 +299,204 @@
             }
         });
 
-        $(document).on('input', '.price, .quantity, #discount', calculateTotals);
-        calculateTotals();
-
-        $('#addCustomerBtn').click(function () {
-            $('#popup_name').val('');
-            $('#popup_address').val('');
+        $('#addCustomerBtn').on('click', function() {
             $('#customerModal').modal('show');
         });
 
-        $('#customer_id').on('change', function () {
-            let customerId = $(this).val();
 
-            if (customerId) {
-                // Fetch customer address
-                $.post("<?= site_url('customer/get_address') ?>", {
+        function calculateTotals() {
+            let subtotal = 0;
+
+            $('.item-row').each(function() {
+                let qty = parseFloat($(this).find('.quantity').val()) || 0;
+                let sPrice = parseFloat($(this).find('.selling-price').val()) || 0;
+                let total = sPrice * qty;
+                $(this).find('.total').val(total.toFixed(4));
+                subtotal += total;
+            });
+
+            $('#sub_total_display').text(subtotal.toFixed(4));
+
+            let discount = parseFloat($('#discount').val()) || 0;
+            let effectiveDiscount = Math.min(discount, subtotal);
+
+            let finalTotal = subtotal - effectiveDiscount;
+            if (finalTotal < 0) finalTotal = 0;
+
+            $('#total_display').text(finalTotal.toFixed(4));
+        }
+
+        $(document).on('input change', '.selling-price, .quantity, #discount', calculateTotals);
+        calculateTotals();
+
+
+        $('#add-item').click(function() {
+            const newRow = $(`
+                <tr class="item-row">
+                    <td><input type="text" name="description[]" class="form-control" placeholder="Description"></td>
+                    <td><input type="number" name="market_price[]" class="form-control market-price" step="0.0001" min="0"></td>
+                    <td><input type="number" name="selling_price[]" class="form-control selling-price" step="0.0001" min="0"></td>
+                    <td><input type="text" name="difference[]" class="form-control difference" readonly></td> 
+                    <td><input type="number" name="quantity[]" class="form-control quantity" step="0.0001" min="0"></td>
+                    <td><input type="number" name="total[]" class="form-control total" step="0.0001" readonly></td>
+                    <td class="text-center">
+                        <span class="remove-item-btn" title="Remove">
+                            <i class="fas fa-trash text-danger"></i>
+                        </span>
+                    </td>
+                </tr>
+            `);
+            $('#item-container').append(newRow);
+            newRow.find('input[name="description[]"]').focus();
+            newRow.find('.market-price, .selling-price').trigger('input')
+        });
+
+        // Calculate difference between Market Price and Selling Price 
+        $(document).on('input', '.market-price, .selling-price', function() {
+            const row = $(this).closest('tr');
+            const market = parseFloat(row.find('.market-price').val()) || 0;
+            const selling = parseFloat(row.find('.selling-price').val()) || 0;
+
+            if (market > 0) {
+                const diff = ((selling - market) / market) * 100;
+                row.find('.difference').val(diff.toFixed(2) + '%')
+                    .css('color', 'black');
+            } else {
+                row.find('.difference').val('0.00%').css('color', 'black');
+            }
+        });
+
+        //  Prefill difference for existing rows
+        $('.item-row').each(function() {
+            const row = $(this);
+            const market = parseFloat(row.find('.market-price').val()) || 0;
+            const selling = parseFloat(row.find('.selling-price').val()) || 0;
+
+            if (market > 0) {
+                const diff = ((selling - market) / market) * 100;
+                row.find('.difference').val(diff.toFixed(2) + '%').css('color', 'black');
+            } else {
+                row.find('.difference').val('0.00%').css('color', 'black');
+            }
+        });
+
+
+
+        $(document).on('click', '.remove-item-btn', function() {
+            $(this).closest('tr').remove();
+            calculateTotals();
+
+            const currentData = $('#order-form').serialize();
+            const hasChanged = currentData !== initialEstimateData;
+
+
+            $('#generate-btn').prop('disabled', !hasChanged);
+        });
+
+        $(document).on('input change', '.price, .quantity, #discount', calculateTotals);
+        calculateTotals();
+
+        $('#cancelCustomerBtn, #closeCustomerModalBtn').on('click', function() {
+            $('#customerModal').modal('hide');
+        });
+
+        $('#customer_id').on('change', function() {
+            var customerId = $(this).val();
+            if (customerId === '') {
+                $('#customer_address').val('');
+                return;
+            }
+
+            $.ajax({
+                url: '<?= site_url('
+                customer / get-address ') ?>',
+                type: 'POST',
+                data: {
                     customer_id: customerId
-                }, function (res) {
-                    if (res.status === 'success') {
-                        $('#customer_address').val(res.address);
+                },
+                dataType: 'json',
+                success: function(response) {
+                    if (response.status === 'success') {
+                        $('#customer_address').val(response.address);
                     } else {
                         $('#customer_address').val('');
                     }
-                }, 'json');
-
-                // Fetch customer-specific discount
-                $.ajax({
-                    url: '<?= base_url("customer/get_discount") ?>/' + customerId,
-                    type: 'GET',
-                    dataType: 'json',
-                    success: function (res) {
-                        if (res.discount !== undefined) {
-                            maxCustomerDiscount = parseFloat(res.discount) || 0;
-                            // Set the discount input to the fetched value
-                            $('#discount').val(maxCustomerDiscount.toFixed(6));
-                        } else {
-                            // If customer has no discount, reset to 0
-                            maxCustomerDiscount = 0;
-                            $('#discount').val('0.000000');
-                        }
-                        // Recalculate totals immediately after setting the discount
-                        calculateTotals();
-                    }
-                });
-            } else {
-                // If no customer is selected, reset everything
-                maxCustomerDiscount = 0;
-                $('#discount').val('0.000000');
-                $('#customer_address').val('');
-                calculateTotals();
-            }
-        });
-
-        let existingCustomerId = $('#customer_id').val();
-        if (existingCustomerId) {
-            $.ajax({
-                url: '<?= base_url("customer/get_discount") ?>/' + existingCustomerId,
-                type: 'GET',
-                dataType: 'json',
-                success: function (res) {
-                    if (res.discount !== undefined) {
-                        maxCustomerDiscount = parseFloat(res.discount) || 0;
-
-                    }
-                }
-            });
-        }
-        $('#invoice-form').submit(function (e) {
-            e.preventDefault();
-            // const currentFormData = $('#invoice-form').serialize();
-            // if (currentFormData === initialFormData) {
-            //     showAlert('No Changes Made.', 'info');
-            //     return;
-            // }
-            const $submitBtn = $('#save-invoice-btn');
-            $submitBtn.prop('disabled', true).text('Generating...');
-            const customerId = $('#customer_id').val();
-            const customerAddress = $('#customer_address').val()?.trim();
-            const phoneNumber = $('#phone_number').val()?.trim();
-
-            if (!customerId || !customerAddress || !phoneNumber) {
-                showAlert('Please Fill All Mandatory Fields.', 'danger');
-                $submitBtn.prop('disabled', false).text('Generate Invoice');
-                return;
-            }
-
-            let validItemExists = false;
-            $('.item-row').each(function () {
-                const desc = $(this).find('input[name="description[]"]').val().trim();
-                const price = parseFloat($(this).find('input[name="price[]"]').val()) || 0;
-                const qty = parseFloat($(this).find('input[name="quantity[]"]').val()) || 0;
-                if (desc && price > 0 && qty > 0) {
-                    validItemExists = true;
-                    return false;
-                }
-            });
-
-            if (!validItemExists) {
-                showAlert('Please Enter At Least One Valid Item With Description, Price, and Quantity.', 'danger');
-                $submitBtn.prop('disabled', false).text('Generate Invoice');
-                return;
-            }
-
-            $('.item-row').each(function () {
-                const desc = $(this).find('input[name="description[]"]').val().trim();
-                const price = parseFloat($(this).find('input[name="price[]"]').val()) || 0;
-                const qty = parseFloat($(this).find('input[name="quantity[]"]').val()) || 0;
-                if (!desc && price === 0 && qty === 0) {
-                    $(this).remove();
-                }
-            });
-
-            const formData = new FormData(this);
-            $.ajax({
-                url: "<?= site_url('invoice/save') ?>",
-                type: "POST",
-                data: formData,
-                contentType: false,
-                processData: false,
-                dataType: "json",
-                success: function (res) {
-                    if (res.status === 'success') {
-                        showAlert(res.message, 'success');
-                        setTimeout(() => window.location.href = res.redirect, 1000);
-                    } else {
-                        showAlert(res.message || 'Failed to save invoice.', 'danger');
-                        $submitBtn.prop('disabled', false).text('Generate Invoice');
-                    }
                 },
-                error: function () {
-                    showAlert('Server error while saving.', 'danger');
-                    $submitBtn.prop('disabled', false).text('Generate Invoice');
+                error: function() {
+                    $('#customer_address').val('');
                 }
             });
         });
-        $('#discount').tooltip({
-            trigger: 'manual',
-            placement: 'top'
+
+        const saveCustomerBtn = $('#saveCustomerBtn');
+
+
+        // Disable button when modal opens
+
+        //  Disable button when modal opens
+
+        $('#customerModal').on('show.bs.modal', function() {
+            saveCustomerBtn.prop('disabled', true);
+            $('#customerError').addClass('d-none');
         });
 
-        $('#discount').on('input', function () {
-            let val = parseFloat($(this).val()) || 0;
 
-            if (maxCustomerDiscount === 0) {
-                $(this).val(0);
-                $(this).attr('data-bs-original-title', 'No discount is Set for The Selected Customer').tooltip('show');
-                setTimeout(() => {
-                    $('#discount').tooltip('hide');
-                }, 2000);
-            } else if (val > maxCustomerDiscount) {
-                $(this).val(maxCustomerDiscount);
-                $(this).attr('data-bs-original-title', 'Unable to increase beyond max discount for this customer').tooltip('show');
-                setTimeout(() => {
-                    $('#discount').tooltip('hide');
-                }, 2000);
+        // Enable Save button only when required fields are filled
+
+        //  Enable Save button only when required fields are filled
+
+        $('#popup_name, #popup_address, #popup_phone').on('input', function() {
+            let name = $('#popup_name').val().trim();
+            let address = $('#popup_address').val().trim();
+            let phone = $('#popup_phone').val().trim();
+
+            if (name !== '' && address !== '' && phone !== '') {
+                saveCustomerBtn.prop('disabled', false);
             } else {
-                $(this).tooltip('hide');
+                saveCustomerBtn.prop('disabled', true);
             }
         });
 
-        function toggleCustomerSaveButton() {
-            const name = $('#popup_name').val().trim();
-            const address = $('#popup_address').val().trim();
 
-
-            if (name && address) {
-                $('#saveCustomerBtn').prop('disabled', false).removeClass('btn-secondary').addClass('btn-primary');
-            } else {
-                $('#saveCustomerBtn').prop('disabled', true).removeClass('btn-primary').addClass('btn-primary');
-            }
-        }
-        $('#popup_name, #popup_address').on('input', toggleCustomerSaveButton);
-        $('#customerForm').submit(function (e) {
+        //  Handle customer form submit
+        $('#customerForm').submit(function(e) {
             e.preventDefault();
 
-            const $submitBtn = $('#saveCustomerBtn');
-            $submitBtn.prop('disabled', true).text();
+            let name = $('#popup_name').val().trim();
+            let address = $('#popup_address').val().trim();
+            let max_discount = $('#max_discount').val().trim();
+            let phone = $('#popup_phone').val().trim();
 
-            const name = $('#popup_name').val().trim();
-            const address = $('#popup_address').val().trim();
-            const max_discount = $('#max_discount').val().trim();
+            name = name.replace(/\b\w/g, char => char.toUpperCase());
+            address = address.replace(/(^\s*\w|[.!?]\s*\w)/g, char => char.toUpperCase());
 
             if (!name || !address) {
-                $('#customerError').removeClass('d-none').text('Name and address are required.');
-                $submitBtn.prop('disabled', false).text('Save');
+                $('#customerError').removeClass('d-none').text('Please Enter Valid Name And Address');
                 return;
             }
 
+            //  Disable button after first click to prevent double submission
+            saveCustomerBtn.prop('disabled', true).text('Save');
+
             $.ajax({
-                url: "<?= base_url('customer/create') ?>",
+                url: "<?= site_url('customer/create') ?>",
                 type: "POST",
                 data: {
                     name,
                     address,
+                    phone,
                     max_discount
                 },
                 dataType: "json",
-                success: function (res) {
+                success: function(res) {
                     if (res.status === 'success') {
                         const newOption = new Option(res.customer.name, res.customer.customer_id, true, true);
                         $('#customer_id').append(newOption).trigger('change');
-
                         $('#popup_name').val('');
                         $('#popup_address').val('');
                         $('#max_discount').val('');
+                        $('#popup_phone').val(''); 
                         $('#customerModal').modal('hide');
-                        toggleCustomerSaveButton(); // Reset button state
-
                         $('.alert')
                             .removeClass('d-none alert-danger')
                             .addClass('alert-success')
@@ -628,10 +512,9 @@
                             .fadeIn()
                             .delay(3000)
                             .fadeOut();
-                        $submitBtn.prop('disabled', false).text('Save');
                     }
                 },
-                error: function () {
+                error: function() {
                     $('.alert')
                         .removeClass('d-none alert-success')
                         .addClass('alert-danger')
@@ -639,58 +522,236 @@
                         .fadeIn()
                         .delay(3000)
                         .fadeOut();
-                    $submitBtn.prop('disabled', false).text('Save');
+                },
+                complete: function() {
+                    // Reset button after request is completed
+                    saveCustomerBtn.prop('disabled', true).text('Save');
                 }
             });
         });
 
-        function showAlert(message, type) {
+        let initialEstimateData = $('#estimate-form').serialize();
+        $('#generate-btn').prop('disabled', true);
+        $('#estimate-form').on('input change', 'input, select, textarea', function() {
+            const currentData = $('#estimate-form').serialize();
+            const hasChanged = currentData !== initialEstimateData;
+            $('#generate-btn').prop('disabled', !hasChanged);
+        });
+
+        function updateInitialFormState() {
+            initialEstimateData = $('#estimate-form').serialize();
+            $('#generate-btn').prop('disabled', true);
+        }
+
+
+        $('#estimate-form').submit(function(e) {
+            e.preventDefault();
+
+            const customerId = $('#customer_id').val();
+            const customerAddress = $('#customer_address').val().trim();
+            const customerName = $('#customer_id option:selected').text().trim();
+            const phoneNumber = $('#phone_number').val()?.trim();
+
+            if (!customerId) {
+                showAlert('Please Select A Customer.', 'danger');
+                return;
+            }
+
+            if (!customerAddress) {
+                showAlert('Please Enter The Customer Address.', 'danger');
+                return;
+            }
+            if (!phoneNumber) {
+                showAlert('Please Enter The Customer Number.', 'danger');
+                return;
+            }
+            let validItemExists = false;
+            $('.item-row').each(function() {
+                const desc = $(this).find('input[name="description[]"]').val().trim();
+                const sPrice = parseFloat($(this).find('input[name="selling_price[]"]').val()) || 0;
+                const qty = parseFloat($(this).find('input[name="quantity[]"]').val()) || 0;
+
+                if (desc && sPrice > 0 && qty > 0) {
+                    validItemExists = true;
+                    return false; 
+                }
+            });
+
+            if (!validItemExists) {
+                showAlert('Please Enter At Least One Valid Item With Description, Price, and Quantity.', 'danger');
+                return;
+            }
+
+            // Remove completely empty rows before submission
+            $('.item-row').each(function() {
+                const desc = $(this).find('input[name="description[]"]').val().trim();
+                const sPrice = parseFloat($(this).find('input[name="selling_price[]"]').val()) || 0;
+                const qty = parseFloat($(this).find('input[name="quantity[]"]').val()) || 0;
+
+                if (!desc && sPrice === 0 && qty === 0) {
+                    $(this).remove();
+                }
+            });
+
+
+            $('#generate-btn').prop('disabled', true).text('Generating...');
+
+            const formData = new FormData(this);
+            formData.append('customer_name', customerName);
+
+            $('#item-container tr.item-row').each(function(index) {
+                formData.append('item_order[]', index + 1); // Save order starting from 1
+            });
+
+            $.ajax({
+                url: "<?= site_url('estimate/save') ?>",
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                dataType: "json",
+                success: function(res) {
+                    if (res.status === 'success') {
+                        showAlert(res.message, 'success');
+
+                        updateInitialFormState();
+
+                        setTimeout(function() {
+                            window.location.href = "<?= site_url('estimate/generateEstimate/') ?>" + res.estimate_id;
+                        }, 1500);
+                    } else if (res.status === 'nochange') {
+                        showAlert(res.message, 'warning');
+                        $('#generate-btn').prop('disabled', true).text('Generate Estimate');
+                    } else {
+                        showAlert(res.message || 'Failed To Save Estimate.', 'danger');
+                        $('#generate-btn').prop('disabled', false).text('Generate Estimate');
+                    }
+                },
+
+                error: function() {
+                    showAlert('Something Went Wrong While Saving The Estimate.', 'danger');
+                    $('#generate-btn').prop('disabled', false).text('Generate Estimate');
+                }
+            });
+
+        });
+
+        $('#discount').on('input', function() {
+            var max = parseFloat($(this).attr('max'));
+            var val = parseFloat($(this).val());
+            if (val > max) {
+                alert('Cannot exceed maximum discount set for this customer.');
+                $(this).val(max);
+            }
+        });
+
+        let maxCustomerDiscount = 0;
+        
+        $('#customer_id').on('change', function() {
+            let customerId = $(this).val();
+
+            if (customerId) {
+                // Fetch customer address
+                $.post("<?= site_url('customer/get_address') ?>", {
+                    customer_id: customerId
+                }, function(res) {
+                    if (res.status === 'success') {
+                        $('#customer_address').val(res.address);
+                    } else {
+                        $('#customer_address').val('');
+                    }
+                }, 'json');
+
+                // Fetch customer-specific discount
+                $.ajax({
+                    url: '<?= base_url("customer/get_discount") ?>/' + customerId,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(res) {
+                        if (res.discount !== undefined) {
+                            maxCustomerDiscount = parseFloat(res.discount) || 0;
+                            // Set the discount input to the fetched value
+                            $('#discount').val(maxCustomerDiscount.toFixed(6));
+                        } else {
+                            // If customer has no discount, reset to 0
+                            maxCustomerDiscount = 0;
+                            $('#discount').val('0.0000');
+                        }
+                        // Recalculate totals immediately after setting the discount
+                        calculateTotals();
+                    }
+                });
+            } else {
+                // If no customer is selected, reset everything
+                maxCustomerDiscount = 0;
+                $('#discount').val('0.0000');
+                $('#customer_address').val('');
+                calculateTotals();
+            }
+        });
+
+        // Tooltip setup
+        $('#discount').tooltip({
+            trigger: 'manual',
+            placement: 'top'
+        });
+
+        // Restrict discount to max but allow lower values
+        $('#discount').on('input', function() {
+            let val = parseFloat($(this).val()) || 0;
+
+            if (maxCustomerDiscount === 0) {
+                // Customer has no discount
+                $(this).val(0);
+                $(this).attr('data-bs-original-title', 'No discount is set for the selected customer').tooltip('show');
+                setTimeout(() => $(this).tooltip('hide'), 2000);
+            } else if (val > maxCustomerDiscount) {
+                // Exceeds max discount
+                $(this).val(maxCustomerDiscount);
+                $(this).attr('data-bs-original-title', 'Cannot exceed max discount for this customer').tooltip('show');
+                setTimeout(() => $(this).tooltip('hide'), 2000);
+            } else {
+                $(this).tooltip('hide');
+            }
+        });
+
+
+        // When editing existing invoice: just fetch max discount, do not overwrite field
+        let existingCustomerId = $('#customer_id').val();
+        if (existingCustomerId) {
+            $.ajax({
+                url: '<?= base_url("customer/get_discount") ?>/' + existingCustomerId,
+                type: 'GET',
+                dataType: 'json',
+                success: function(res) {
+                    maxCustomerDiscount = parseFloat(res.discount) || 0;
+                    //  Do not auto-fill #discount here to preserve user's entered value
+                }
+            });
+        }
+
+        function showAlert(message, type = 'success') {
             $('.alert')
-                .removeClass('d-none alert-success alert-danger')
+                .removeClass('d-none alert-success alert-danger alert-warning')
                 .addClass('alert-' + type)
                 .text(message)
-                .fadeIn().delay(3000).fadeOut();
+                .fadeIn()
+                .delay(3000)
+                .fadeOut();
         }
-        $(window).on('keydown', function (e) {
-            if (e.ctrlKey && e.key === 'Enter') {
-                e.preventDefault();
-                $('#save-invoice-btn').trigger('click');
-            }
-
-            if (e.ctrlKey && e.key.toLowerCase() === 'f') {
-                e.preventDefault();
-                $('#add-item').trigger('click');
-            }
-        });
     });
 
-    function updateItemOrders() {
-        $('#item-container tr.item-row').each(function (index) {
-            $(this).find('.item-order').val(index + 1);
-        });
+$(window).on('keydown', function(e) {
+    if (e.ctrlKey && e.key === 'Enter') {
+        e.preventDefault();
+        $('#generate-btn').trigger('click');
     }
 
-    // // Call this after adding or removing an item
-    // $('#add-item').click(function () {
-    //     const row = `
-    //     <tr class="item-row">
-    //         <td><input type="text" name="description[]" class="form-control" placeholder="Description"></td>
-    //         <td><input type="text" name="price[]" class="form-control price" step="0.001"></td>
-    //         <td><input type="number" name="quantity[]" class="form-control quantity" step="0.01"></td>
-    //         <td><input type="number" name="total[]" class="form-control total" step="0.001" readonly></td>
-    //         <td><input type="text" name="location[]" class="form-control location" placeholder="Enter Delivery Location"></td>
-    //         <td class="text-center"><span class="remove-item-btn" title="Remove"><i class="fas fa-trash text-danger"></i></span></td>
-    //         <input type="hidden" name="item_order[]" class="item-order" value="0">
-    //     </tr>`;
-    //     $('#item-container').append(row);
-    //     updateItemOrders();
-    //     calculateTotals();
-    // });
-
-    // $(document).on('click', '.remove-item-btn', function () {
-    //     $(this).closest('tr').remove();
-    //     updateItemOrders();
-    //     calculateTotals();
-    // });
-
+    if (e.ctrlKey && e.key.toLowerCase() === 'f') {
+        e.preventDefault();
+        $('#add-item').trigger('click');
+    }
+}); 
 </script>
+
+

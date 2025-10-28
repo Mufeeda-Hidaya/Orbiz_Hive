@@ -91,9 +91,9 @@
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <div class="estimate-title">ESTIMATE</div>
+                    <div class="estimate-title">JOBORDER</div>
                     <div class="estimate-details">
-                        <p class="mb-1" id="estimate-id-display">Estimate No :
+                        <p class="mb-1" id="estimate-id-display">Job Order No :
                             <?= isset($estimate['estimate_no']) ? $estimate['estimate_no'] : '' ?></p>
                         <p>Date : <?= date('d-m-Y') ?></p>
                     </div>
