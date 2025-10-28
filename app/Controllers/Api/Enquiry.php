@@ -2,18 +2,19 @@
 
 namespace App\Controllers\Api;
 
+use CodeIgniter\RESTful\ResourceController;
 use App\Models\Api\EnquiryModel;
 use App\Controllers\BaseController;
 use App\Models\Api\LoginModel;  
 use App\Models\Manageuser_Model;
 use App\Models\customerModel;
 use App\Models\EnquiryItemModel;
-// use App\Models\RoleModel;
-// use App\Libraries\Jwt;
-// use App\Libraries\AuthService;
-// use App\Helpers\AuthHelper;
+use App\Models\RoleModel;
+use App\Libraries\Jwt;
+use App\Libraries\AuthService;
+use App\Helpers\AuthHelper;
 
-class Enquiry extends BaseController
+class Enquiry extends ResourceController
 {
     protected $loginModel;
 
@@ -25,10 +26,15 @@ class Enquiry extends BaseController
         $this->customerModel = new CustomerModel();
         $this->enquiryModel = new EnquiryModel();
         $this->enquiryItemModel = new EnquiryItemModel();
-        // $this->authService = new AuthService();
+        $this->authService = new AuthService();
     }
     public function saveEnquiry()
     {
+        $authHeader = AuthHelper::getAuthorizationToken($this->request);
+        $user = $this->authService->getAuthenticatedUser($authHeader);
+        if(!$user){
+            return $this->failUnauthorized('Invalid or missing token.');
+        }
         $enquiryModel     = new EnquiryModel();
         $enquiryItemModel = new EnquiryItemModel();
         $customerModel    = new CustomerModel();
@@ -173,86 +179,41 @@ class Enquiry extends BaseController
     }
     public function getAllEnquiries()
     {
+        $authHeader = AuthHelper::getAuthorizationToken($this->request);
+        $user = $this->authService->getAuthenticatedUser($authHeader);
+        if (!$user) {
+            return $this->failUnauthorized('Invalid or missing token.');
+        }
         $pageIndex = (int) $this->request->getGet('pageIndex');
         $pageSize  = (int) $this->request->getGet('pageSize');
         $search    = $this->request->getGet('search');
 
-        if ($pageSize <= 0) {
-            $pageSize = 10;
-        }
-
+        if ($pageSize <= 0) $pageSize = 10;
         $offset = $pageIndex * $pageSize;
-
-        $builder = $this->enquiryModel
-            ->select('enquiries.*, customers.name AS customer_name, customers.address AS customer_address')
-            ->join('customers', 'customers.customer_id = enquiries.customer_id', 'left')
-            ->where('enquiries.is_deleted', 0);
-
-        if (!empty($search)) {
-            $builder->groupStart()
-                    ->like('enquiries.name', $search)
-                    ->orLike('customers.name', $search)
-                    ->orLike('customers.address', $search)
-                    ->groupEnd();
-        }
-
-        $total = $builder->countAllResults(false);
-
-        $enquiries = $builder
-            ->orderBy('enquiries.created_at', 'DESC')
-            ->findAll($pageSize, $offset);
-
-        foreach ($enquiries as &$enquiry) {
-            // Fetch related items from the EnquiryModel
-            $items = $this->enquiryModel->getItemsByEnquiryId($enquiry['enquiry_id']);
-
-            // 🧹 Clean item fields (remove timestamps, etc.)
-            foreach ($items as &$item) {
-                unset(
-                    $item['created_at'],
-                    $item['updated_at'],
-                    $item['created_on'],
-                    $item['updated_on'],
-                    $item['name'],
-                    $item['address']
-                );
-            }
-
-            $enquiry['items'] = $items;
-
-            // 🧹 Remove unwanted fields from enquiry
-            unset(
-                $enquiry['company_id'],
-                $enquiry['created_on'],
-                $enquiry['updated_on'],
-                $enquiry['created_at'],
-                $enquiry['updated_at'],
-                $enquiry['customer_name'],
-                $enquiry['customer_address'],
-                $enquiry['name'],
-                $enquiry['address']
-            );
+        $result = $this->enquiryModel->getAllEnquiries($pageSize, $offset, $search);
+        foreach ($result['data'] as &$enquiry) {
+            $enquiry['items'] = $this->enquiryItemModel
+                ->select('description, quantity')
+                ->where('enquiry_id', $enquiry['enquiry_id'])
+                ->findAll();
         }
 
         return $this->response->setJSON([
             'success' => true,
             'message' => 'Enquiries fetched successfully.',
-            'data'    => $enquiries,
-            'total'   => $total
+            'total'   => $result['total'],
+            'data'    => $result['data']
         ]);
     }
 
-
-
-    // ✅ Get single enquiry by ID
     public function getEnquiryById($id)
     {
-        $enquiry = $this->enquiryModel
-            ->select('enquiries.*, customers.name AS customer_name, customers.address AS customer_address')
-            ->join('customers', 'customers.customer_id = enquiries.customer_id', 'left')
-            ->where('enquiries.enquiry_id', $id)
-            ->where('enquiries.is_deleted', 0)
-            ->first();
+        $authHeader = AuthHelper::getAuthorizationToken($this->request);
+        $user = $this->authService->getAuthenticatedUser($authHeader);
+        if (!$user) {
+            return $this->failUnauthorized('Invalid or missing token.');
+        }
+        $enquiry = $this->enquiryModel->getEnquiryWithCustomer($id);
 
         if (!$enquiry) {
             return $this->response->setJSON([
@@ -262,16 +223,11 @@ class Enquiry extends BaseController
         }
 
         $items = $this->enquiryItemModel
-            ->select('description, quantity, created_at')
+            ->select('description, quantity')
             ->where('enquiry_id', $id)
             ->findAll();
 
-        foreach ($items as &$item) {
-            unset($item['created_on'], $item['updated_on']);
-        }
-
         $enquiry['items'] = $items;
-        unset($enquiry['company_id'], $enquiry['created_on'], $enquiry['updated_on']);
 
         return $this->response->setJSON([
             'success' => true,
@@ -279,10 +235,13 @@ class Enquiry extends BaseController
             'data'    => $enquiry
         ]);
     }
-
-    // ✅ Soft delete
     public function deleteEnquiry($id)
     {
+        $authHeader = AuthHelper::getAuthorizationToken($this->request);
+        $user = $this->authService->getAuthenticatedUser($authHeader);
+        if (!$user) {
+            return $this->failUnauthorized('Invalid or missing token.');
+        }
         $enquiry = $this->enquiryModel->find($id);
         if (!$enquiry) {
             return $this->response->setJSON([

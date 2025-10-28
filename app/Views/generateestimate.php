@@ -141,10 +141,9 @@
           </span>
 
 
-          <?php if (!empty($company['company_logo'])): ?>
-            <img src="<?= base_url('public/uploads/' . $company['company_logo']) ?>" alt="Company Logo"
-              style="max-height: 50px; width: 30%;">
-          <?php endif; ?>
+          <a class="navbar-brand brand-logo" href="#">
+          <img src="<?= ASSET_PATH; ?>assets/images/logo-new1.png"  alt="logo" /></a>
+        </a>
 
           <span style="font-size: 15px; font-weight: bold; direction: rtl;">
             <?= esc($company['company_name_ar'] ?? '') ?>
@@ -207,7 +206,7 @@
               <tr>
                 <td><?= $si++ ?></td>
                 <td><?= esc($item['description']) ?></td>
-                <td><?= bcadd($item['price'], '0', 6) ?></td>
+                <td><?= number_format((float)($item['selling_price'] ?? 0), 4, '.', '') ?></td>
                 <td><?= $item['quantity'] ?></td>
                 <td><?= number_format($item['total'], 6, '.', '') ?></td>
               </tr>

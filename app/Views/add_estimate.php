@@ -667,7 +667,7 @@
                         } else {
                             // If customer has no discount, reset to 0
                             maxCustomerDiscount = 0;
-                            $('#discount').val('0.000000');
+                            $('#discount').val('0.0000');
                         }
                         // Recalculate totals immediately after setting the discount
                         calculateTotals();
@@ -676,7 +676,7 @@
             } else {
                 // If no customer is selected, reset everything
                 maxCustomerDiscount = 0;
-                $('#discount').val('0.000000');
+                $('#discount').val('0.0000');
                 $('#customer_address').val('');
                 calculateTotals();
             }

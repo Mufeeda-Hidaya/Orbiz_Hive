@@ -12,20 +12,46 @@ class EnquiryModel extends Model
     'created_by','created_at','company_id','is_deleted', 'is_converted','updated_by','updated_at'
     ];
 
-    public function getItemsByEnquiryId($enquiryId)
+    public function getAllEnquiries($pageSize = 10, $offset = 0, $search = '')
     {
-        $db = \Config\Database::connect();
-        $builder = $db->table('enquiry_items');
+        $builder = $this->select('
+                enquiries.enquiry_id,
+                enquiries.enquiry_no,
+                customers.name AS customer_name,
+                customers.address AS customer_address
+            ')
+            ->join('customers', 'customers.customer_id = enquiries.customer_id', 'left')
+            ->where('enquiries.is_deleted', 0);
 
-        $items = $builder
-            ->select('description, quantity, created_at')
-            ->where('enquiry_id', $enquiryId)
-            ->get()
-            ->getResultArray();
-        foreach ($items as &$item) {
-            unset($item['created_on'], $item['updated_on'], $item['name'], $item['address']);
+        if (!empty($search)) {
+            $builder->groupStart()
+                ->like('enquiries.enquiry_no', $search)
+                ->orLike('customers.name', $search)
+                ->orLike('customers.address', $search)
+                ->groupEnd();
         }
+        $total = $builder->countAllResults(false);
+        $data = $builder
+            ->orderBy('enquiries.enquiry_id', 'DESC')
+            ->findAll($pageSize, $offset);
 
-        return $items;
+        return [
+            'total' => $total,
+            'data'  => $data
+        ];
+    }
+
+    public function getEnquiryWithCustomer($id)
+    {
+        return $this->select('
+                enquiries.enquiry_id,
+                enquiries.enquiry_no,
+                customers.name AS customer_name,
+                customers.address AS customer_address
+            ')
+            ->join('customers', 'customers.customer_id = enquiries.customer_id', 'left')
+            ->where('enquiries.enquiry_id', $id)
+            ->where('enquiries.is_deleted', 0)
+            ->first();
     }
 }
