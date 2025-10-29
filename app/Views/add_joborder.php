@@ -5,21 +5,21 @@
 <html>
 
 <head>
-    <title>Estimate</title>
+    <title>JOB ORDER</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
-        .estimate-box {
+        .order-box {
             border: 1px solid #000;
             padding: 20px;
         }
 
-        .estimate-title {
+        .order-title {
             text-align: right;
             font-weight: bold;
             font-size: 24px;
         }
 
-        .estimate-details {
+        .order-details {
             text-align: right;
         }
 
@@ -56,15 +56,14 @@
     </style>
 </head>
 <body>
-    <div class="mt-1 estimate-box right_container">
+    <div class="mt-1 order-box right_container">
         <div class="row mb-3">
             <div class="col-md-6">
-                <h3><?= isset($estimate['estimate_id']) ? 'Edit Estimate' : 'Estimate Generation' ?></h3>
+                <h3><?= isset($estimate['joborder_id']) ? 'Edit Order' : 'Job Order Generation' ?></h3>
             </div>
         </div>
-        <form id="estimate-form">
-                <input type="hidden" name="enquiry_id" id="enquiry_id" value="<?= isset($estimate['enquiry_id']) ? $estimate['enquiry_id'] : '' ?>">
-             <input type="hidden" name="estimate_id" id="estimate_id" value="<?= isset($estimate['estimate_id']) ? $estimate['estimate_id'] : '' ?>">
+        <form id="order-form">
+             <input type="hidden" name="joborder_id" id="joborder_id" value="<?= isset($estimate['joborder_id']) ? $estimate['joborder_id'] : '' ?>">
             <div class="row">
                 <div class="col-md-6">
                     <label><strong> Customer</strong><span class="text-danger">*</span></label>
@@ -92,10 +91,10 @@
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <div class="estimate-title">JOBORDER</div>
-                    <div class="estimate-details">
-                        <p class="mb-1" id="estimate-id-display">Job Order No :
-                            <?= isset($estimate['estimate_no']) ? $estimate['estimate_no'] : '' ?></p>
+                    <div class="order-title">JOB ORDER</div>
+                    <div class="order-details">
+                        <p class="mb-1" id="order-id-display">Order No :
+                            <?= isset($estimate['joborder_no']) ? $estimate['joborder_no'] : '' ?></p>
                         <p>Date : <?= date('d-m-Y') ?></p>
                     </div>
                 </div>
@@ -107,7 +106,6 @@
                             <th>Description Of Goods</th>
                             <th>Market Price</th>
                             <th>Selling Price</th>
-                            <th>Difference (%)</th> 
                             <th>Quantity</th>
                             <th>Amount (AED)</th>
                             <th>Action</th>
@@ -134,9 +132,6 @@
                                             step="0.0001" min="0"
                                             value="<?= esc($item['selling_price'] ?? ($item['market_price'] ?? 0)) ?>">
                                     </td>
-
-                                    <td><input type="text" name="difference[]" class="form-control difference" readonly></td>
-
                                     <td>
                                         <input type="number" name="quantity[]" class="form-control quantity"
                                             value="<?= esc($item['quantity'] ?? 1) ?>">
@@ -160,7 +155,6 @@
                                 <td><input type="text" name="description[]" class="form-control" placeholder="Description"></td>
                                 <td><input type="number" name="market_price[]" class="form-control market-price" step="0.0001" min="0"></td>
                                 <td><input type="number" name="selling_price[]" class="form-control selling-price" step="0.0001" min="0"></td>
-                                <td><input type="text" name="difference[]" class="form-control difference" readonly></td>
                                 <td><input type="number" name="quantity[]" class="form-control quantity"></td>
                                 <td><input type="number" name="total[]" class="form-control total" step="0.0001" readonly></td>
                                 <td class="text-center">
@@ -191,11 +185,11 @@
                     <td><strong><span id="total_display">0.0000</span> AED</strong></td>
                 </tr>
             </table>
-            <input type="hidden" id="estimate_id" value="<?= $estimate['estimate_id'] ?? '' ?>">
+            <input type="hidden" id="joborder_id" value="<?= $estimate['joborder_id'] ?? '' ?>">
 
             <div class="text-right">
-                <a href="<?= base_url('estimatelist') ?>" class="btn btn-secondary">Discard</a>
-                <button type="submit" id="generate-btn" class="btn btn-primary">Generate Estimate</button>
+                <a href="<?= base_url('orderist') ?>" class="btn btn-secondary">Discard</a>
+                <button type="submit" id="generate-btn" class="btn btn-primary">Generate Order</button>
             </div>
         </form>
     </div>
@@ -337,7 +331,6 @@
                     <td><input type="text" name="description[]" class="form-control" placeholder="Description"></td>
                     <td><input type="number" name="market_price[]" class="form-control market-price" step="0.0001" min="0"></td>
                     <td><input type="number" name="selling_price[]" class="form-control selling-price" step="0.0001" min="0"></td>
-                    <td><input type="text" name="difference[]" class="form-control difference" readonly></td> 
                     <td><input type="number" name="quantity[]" class="form-control quantity" step="0.0001" min="0"></td>
                     <td><input type="number" name="total[]" class="form-control total" step="0.0001" readonly></td>
                     <td class="text-center">
@@ -352,42 +345,11 @@
             newRow.find('.market-price, .selling-price').trigger('input')
         });
 
-        // Calculate difference between Market Price and Selling Price 
-        $(document).on('input', '.market-price, .selling-price', function() {
-            const row = $(this).closest('tr');
-            const market = parseFloat(row.find('.market-price').val()) || 0;
-            const selling = parseFloat(row.find('.selling-price').val()) || 0;
-
-            if (market > 0) {
-                const diff = ((selling - market) / market) * 100;
-                row.find('.difference').val(diff.toFixed(2) + '%')
-                    .css('color', 'black');
-            } else {
-                row.find('.difference').val('0.00%').css('color', 'black');
-            }
-        });
-
-        //  Prefill difference for existing rows
-        $('.item-row').each(function() {
-            const row = $(this);
-            const market = parseFloat(row.find('.market-price').val()) || 0;
-            const selling = parseFloat(row.find('.selling-price').val()) || 0;
-
-            if (market > 0) {
-                const diff = ((selling - market) / market) * 100;
-                row.find('.difference').val(diff.toFixed(2) + '%').css('color', 'black');
-            } else {
-                row.find('.difference').val('0.00%').css('color', 'black');
-            }
-        });
-
-
-
         $(document).on('click', '.remove-item-btn', function() {
             $(this).closest('tr').remove();
             calculateTotals();
 
-            const currentData = $('#estimate-form').serialize();
+            const currentData = $('#order-form').serialize();
             const hasChanged = currentData !== initialEstimateData;
 
 
@@ -431,18 +393,12 @@
 
         const saveCustomerBtn = $('#saveCustomerBtn');
 
-
-        // Disable button when modal opens
-
         //  Disable button when modal opens
 
         $('#customerModal').on('show.bs.modal', function() {
             saveCustomerBtn.prop('disabled', true);
             $('#customerError').addClass('d-none');
         });
-
-
-        // Enable Save button only when required fields are filled
 
         //  Enable Save button only when required fields are filled
 

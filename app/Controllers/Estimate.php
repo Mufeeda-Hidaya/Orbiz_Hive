@@ -90,8 +90,8 @@ class Estimate extends BaseController
     $address      = trim($this->request->getPost('customer_address'));
     $discount     = floatval($this->request->getPost('discount') ?? 0);
     $description  = $this->request->getPost('description');
-    $price        = $this->request->getPost('price'); // marketing price
-    $sellingPrice = $this->request->getPost('selling_price'); // selling price
+    $price        = $this->request->getPost('price'); 
+    $sellingPrice = $this->request->getPost('selling_price'); 
     $quantity     = $this->request->getPost('quantity');
     $total        = $this->request->getPost('total');
     $customerName = trim($this->request->getPost('customer_name'));

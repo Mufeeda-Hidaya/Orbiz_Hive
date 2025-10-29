@@ -122,11 +122,11 @@
             Converted
           </button>
         <?php else: ?>
-          <button
+          <!-- <button
             onclick="window.location.href='<?= base_url('invoice/convertFromEstimate/' . $estimate['estimate_id']) ?>'"
             style="background-color:#991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
             Convert Invoice
-          </button>
+          </button> -->
           <button onclick="window.location.href='<?= base_url('estimate/edit/' . $estimate['estimate_id']) ?>'"
             style="background-color:#991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
             Edit Estimate

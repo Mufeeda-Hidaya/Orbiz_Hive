@@ -163,8 +163,8 @@ if ($company_id) {
         <?php endif; ?>
         <?php if (in_array('invoices', $allowedMenus)): ?>
           <li class="nav-item">
-            <a class="nav-link <?= strpos($currentPath, 'invoice') !== false ? 'active' : '' ?>"
-              href="<?= base_url('invoicelist') ?>">
+            <a class="nav-link <?= strpos(uri_string(), 'orderlist') !== false ? 'active' : '' ?>"
+              href="<?= base_url('orderlist') ?>">
               <i class="mdi mdi-receipt menu-icon"></i>
               <span class="menu-title">Job Order</span>
             </a>

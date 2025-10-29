@@ -20,10 +20,10 @@
     <div class="alert d-none text-center position-fixed" role="alert"></div>
     <div class="row align-items-center">
         <div class="col-md-6">
-            <h3 class="mb-0">Estimate List</h3>
+            <h3 class="mb-0">Job Order List</h3>
         </div>
         <div class="col-md-6 text-end">
-            <a href="<?= base_url('add_estimate') ?>" class="btn btn-secondary">Add New Estimate</a>
+            <a href="<?= base_url('order/add') ?>" class="btn btn-secondary">Add New Order</a>
         </div>
     </div>
     <hr>
@@ -101,9 +101,7 @@
                     data: "customer_address",
                     render: data => {
                         if (!data) return '';
-                        // Convert first letter of each word to uppercase
                         let formatted = data.replace(/\b\w/g, c => c.toUpperCase());
-                        // Replace newline characters with <br>
                         return formatted.replace(/\n/g, "<br>");
                     }
                 },
@@ -174,11 +172,11 @@
                     `;
                     }
                 },
-                { data: "estimate_id", visible: false } // index 8
+                { data: "estimate_id", visible: false } 
             ],
             columnDefs: [
                 { targets: 2, width: '350px' },
-                { searchable: false, orderable: false, targets: [0, 7] } // DO NOT block column 8!
+                { searchable: false, orderable: false, targets: [0, 7] } 
             ]
         });
 

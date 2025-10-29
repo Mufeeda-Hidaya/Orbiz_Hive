@@ -15,7 +15,7 @@ class Rolemanagement extends Controller
     'adduserlist'       => 'Users',
     // 'companylist'       => 'Companies',
     'estimatelist'      => 'Estimates',
-    'joborder'          => 'Job Order',
+    'invoice'          => 'Job Order',
     // 'expense'           => 'Expense',
     // 'ledger'            => 'Ledger',
     // 'reports'           => 'Reports',

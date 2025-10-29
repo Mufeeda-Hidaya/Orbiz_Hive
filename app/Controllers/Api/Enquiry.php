@@ -6,9 +6,9 @@ use CodeIgniter\RESTful\ResourceController;
 use App\Models\Api\EnquiryModel;
 use App\Controllers\BaseController;
 use App\Models\Api\LoginModel;  
+use App\Models\EnquiryItemModel;
 use App\Models\Manageuser_Model;
 use App\Models\customerModel;
-use App\Models\EnquiryItemModel;
 use App\Models\RoleModel;
 use App\Libraries\Jwt;
 use App\Libraries\AuthService;
@@ -93,6 +93,7 @@ class Enquiry extends ResourceController
             $customerModel->insert([
                 'name'       => $name,
                 'address'    => $address,
+                'company_id'  => $companyId,
                 'created_by' => $userId,
                 'created_at' => date('Y-m-d H:i:s'),
                 'is_deleted' => 0
@@ -121,6 +122,7 @@ class Enquiry extends ResourceController
                     'enquiry_id'  => $enquiryId,
                     'description' => $item['description'],
                     'quantity'    => $item['quantity'],
+                    'status'      => 1,
                     'created_at'  => date('Y-m-d H:i:s')
                 ]);
             }
@@ -162,6 +164,7 @@ class Enquiry extends ResourceController
                 'enquiry_id'  => $newEnquiryId,
                 'description' => $item['description'],
                 'quantity'    => $item['quantity'],
+                'status'      => 1,
                 'created_at'  => date('Y-m-d H:i:s')
             ]);
         }
@@ -195,6 +198,7 @@ class Enquiry extends ResourceController
             $enquiry['items'] = $this->enquiryItemModel
                 ->select('description, quantity')
                 ->where('enquiry_id', $enquiry['enquiry_id'])
+                ->where('status !=', 9)
                 ->findAll();
         }
 
@@ -225,6 +229,7 @@ class Enquiry extends ResourceController
         $items = $this->enquiryItemModel
             ->select('description, quantity')
             ->where('enquiry_id', $id)
+            ->where('status !=', 9)
             ->findAll();
 
         $enquiry['items'] = $items;
@@ -260,4 +265,98 @@ class Enquiry extends ResourceController
             'message' => 'Enquiry deleted successfully.'
         ]);
     }
+    public function deleteItem($itemId = null)
+    {
+        if (empty($itemId) || !is_numeric($itemId)) {
+            return $this->respond([
+                'status'  => false,
+                'message' => 'Invalid or missing item ID.'
+            ]);
+        }
+
+        $enquiryItemModel = new EnquiryItemModel();
+        $item = $enquiryItemModel->find($itemId);
+
+        if (!$item) {
+            return $this->respond([
+                'status'  => false,
+                'message' => 'Item not found.'
+            ]);
+        }
+
+        if ($item['status'] == 9) {
+            return $this->respond([
+                'status'  => false,
+                'message' => "Item {$itemId} is already deleted."
+            ]);
+        }
+
+        $updateData = [
+            'status'     => 9,
+            'updated_at' => date('Y-m-d H:i:s')
+        ];
+
+        $enquiryItemModel->update($itemId, $updateData);
+
+        return $this->respond([
+            'status'  => 'success',
+            'message' => "Item {$itemId} deleted successfully."
+        ]);
+    }
+    public function convertToEstimate($enquiryId = null)
+    {
+        if (empty($enquiryId) || !is_numeric($enquiryId)) {
+            return $this->respond([
+                'status'  => false,
+                'message' => 'Invalid or missing enquiry ID.'
+            ]);
+        }
+
+        $enquiry = $this->enquiryModel->getEnquiryDetails($enquiryId);
+        if (!$enquiry) {
+            return $this->respond([
+                'status'  => false,
+                'message' => 'Enquiry not found.'
+            ]);
+        }
+
+        if ($enquiry['is_deleted'] == 1) {
+            return $this->respond([
+                'status'  => false,
+                'message' => "Enquiry ID {$enquiryId} is deleted and cannot be converted into an estimate."
+            ]);
+        }
+
+        if ($enquiry['is_converted'] == 1) {
+            return $this->respond([
+                'status'  => false,
+                'message' => "Enquiry ID {$enquiryId} is already converted to an estimate."
+            ]);
+        }
+
+        $converted = $this->enquiryModel->convertEnquiry($enquiryId);
+        if (!$converted) {
+            return $this->respond([
+                'status'  => false,
+                'message' => 'Failed to convert enquiry.'
+            ]);
+        }
+        $items = $this->enquiryItemModel->getItemsByEnquiryId($enquiryId);
+
+        $response = [
+            'enquiry_id'       => $enquiry['enquiry_id'],
+            'enquiry_no'       => $enquiry['enquiry_no'],
+            'customer_name'    => $enquiry['customer_name'],
+            'customer_address' => $enquiry['customer_address'],
+            'is_converted'     => 1,
+            'items'            => $items
+        ];
+
+        return $this->respond([
+            'status'  => true,
+            'message' => "Enquiry ID {$enquiryId} successfully converted into an estimate.",
+            'data'    => $response
+        ]);
+    }
+
 }
