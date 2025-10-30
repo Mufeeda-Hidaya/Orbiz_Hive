@@ -11,7 +11,7 @@ class EnquiryItemModel extends Model
 
     public function getItemsByEnquiryId($enquiryId)
     {
-        return $this->select('description, quantity')
+        return $this->select('item_id,description, quantity')
             ->where('enquiry_id', $enquiryId)
             ->where('status !=', 9)  
             ->findAll();

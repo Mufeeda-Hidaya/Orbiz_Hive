@@ -196,7 +196,7 @@ class Enquiry extends ResourceController
         $result = $this->enquiryModel->getAllEnquiries($pageSize, $offset, $search);
         foreach ($result['data'] as &$enquiry) {
             $enquiry['items'] = $this->enquiryItemModel
-                ->select('description, quantity')
+                ->select('item_id,description, quantity')
                 ->where('enquiry_id', $enquiry['enquiry_id'])
                 ->where('status !=', 9)
                 ->findAll();
@@ -227,7 +227,7 @@ class Enquiry extends ResourceController
         }
 
         $items = $this->enquiryItemModel
-            ->select('description, quantity')
+            ->select('item_id,description, quantity')
             ->where('enquiry_id', $id)
             ->where('status !=', 9)
             ->findAll();
@@ -247,6 +247,7 @@ class Enquiry extends ResourceController
         if (!$user) {
             return $this->failUnauthorized('Invalid or missing token.');
         }
+
         $enquiry = $this->enquiryModel->find($id);
         if (!$enquiry) {
             return $this->response->setJSON([
@@ -254,7 +255,12 @@ class Enquiry extends ResourceController
                 'message' => 'Enquiry not found.'
             ]);
         }
-
+        if ($enquiry['is_deleted'] == 1) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Enquiry already deleted.'
+            ]);
+        }
         $this->enquiryModel->update($id, [
             'is_deleted' => 1,
             'updated_at' => date('Y-m-d H:i:s')
@@ -267,6 +273,11 @@ class Enquiry extends ResourceController
     }
     public function deleteItem($itemId = null)
     {
+        $authHeader = AuthHelper::getAuthorizationToken($this->request);
+        $user = $this->authService->getAuthenticatedUser($authHeader);
+        if (!$user) {
+            return $this->failUnauthorized('Invalid or missing token.');
+        }
         if (empty($itemId) || !is_numeric($itemId)) {
             return $this->respond([
                 'status'  => false,
@@ -303,60 +314,65 @@ class Enquiry extends ResourceController
             'message' => "Item {$itemId} deleted successfully."
         ]);
     }
-    public function convertToEstimate($enquiryId = null)
-    {
-        if (empty($enquiryId) || !is_numeric($enquiryId)) {
-            return $this->respond([
-                'status'  => false,
-                'message' => 'Invalid or missing enquiry ID.'
-            ]);
-        }
+    // public function convertToEstimate($enquiryId = null)
+    // {
+    //     $authHeader = AuthHelper::getAuthorizationToken($this->request);
+    //     $user = $this->authService->getAuthenticatedUser($authHeader);
+    //     if (!$user) {
+    //         return $this->failUnauthorized('Invalid or missing token.');
+    //     }
+    //     if (empty($enquiryId) || !is_numeric($enquiryId)) {
+    //         return $this->respond([
+    //             'status'  => false,
+    //             'message' => 'Invalid or missing enquiry ID.'
+    //         ]);
+    //     }
 
-        $enquiry = $this->enquiryModel->getEnquiryDetails($enquiryId);
-        if (!$enquiry) {
-            return $this->respond([
-                'status'  => false,
-                'message' => 'Enquiry not found.'
-            ]);
-        }
+    //     $enquiry = $this->enquiryModel->getEnquiryDetails($enquiryId);
+    //     if (!$enquiry) {
+    //         return $this->respond([
+    //             'status'  => false,
+    //             'message' => 'Enquiry not found.'
+    //         ]);
+    //     }
 
-        if ($enquiry['is_deleted'] == 1) {
-            return $this->respond([
-                'status'  => false,
-                'message' => "Enquiry ID {$enquiryId} is deleted and cannot be converted into an estimate."
-            ]);
-        }
+    //     if ($enquiry['is_deleted'] == 1) {
+    //         return $this->respond([
+    //             'status'  => false,
+    //             'message' => "Enquiry ID {$enquiryId} is deleted and cannot be converted into an estimate."
+    //         ]);
+    //     }
 
-        if ($enquiry['is_converted'] == 1) {
-            return $this->respond([
-                'status'  => false,
-                'message' => "Enquiry ID {$enquiryId} is already converted to an estimate."
-            ]);
-        }
+    //     if ($enquiry['is_converted'] == 1) {
+    //         return $this->respond([
+    //             'status'  => false,
+    //             'message' => "Enquiry ID {$enquiryId} is already converted to an estimate."
+    //         ]);
+    //     }
 
-        $converted = $this->enquiryModel->convertEnquiry($enquiryId);
-        if (!$converted) {
-            return $this->respond([
-                'status'  => false,
-                'message' => 'Failed to convert enquiry.'
-            ]);
-        }
-        $items = $this->enquiryItemModel->getItemsByEnquiryId($enquiryId);
+    //     $converted = $this->enquiryModel->convertEnquiry($enquiryId);
+    //     if (!$converted) {
+    //         return $this->respond([
+    //             'status'  => false,
+    //             'message' => 'Failed to convert enquiry.'
+    //         ]);
+    //     }
+    //     $items = $this->enquiryItemModel->getItemsByEnquiryId($enquiryId);
 
-        $response = [
-            'enquiry_id'       => $enquiry['enquiry_id'],
-            'enquiry_no'       => $enquiry['enquiry_no'],
-            'customer_name'    => $enquiry['customer_name'],
-            'customer_address' => $enquiry['customer_address'],
-            'is_converted'     => 1,
-            'items'            => $items
-        ];
+    //     $response = [
+    //         'enquiry_id'       => $enquiry['enquiry_id'],
+    //         'enquiry_no'       => $enquiry['enquiry_no'],
+    //         'customer_name'    => $enquiry['customer_name'],
+    //         'customer_address' => $enquiry['customer_address'],
+    //         'is_converted'     => 1,
+    //         'items'            => $items
+    //     ];
 
-        return $this->respond([
-            'status'  => true,
-            'message' => "Enquiry ID {$enquiryId} successfully converted into an estimate.",
-            'data'    => $response
-        ]);
-    }
+    //     return $this->respond([
+    //         'status'  => true,
+    //         'message' => "Enquiry ID {$enquiryId} successfully converted into an estimate.",
+    //         'data'    => $response
+    //     ]);
+    // }
 
 }

@@ -173,7 +173,7 @@
       type: "GET",
       dataType: "json",
       success: function (res) {
-        $('#dailyRevenue').text('AED ' + parseFloat(res.total).toFixed(6));
+        $('#dailyRevenue').text('AED ' + parseFloat(res.total).toFixed(4));
       },
       error: function () {
         $('#dailyRevenue').text('AED 0.0000');
@@ -187,7 +187,7 @@
       type: "GET",
       dataType: "json",
       success: function (res) {
-        $('#monthlyRevenue').text('AED ' + parseFloat(res.total).toFixed(6));
+        $('#monthlyRevenue').text('AED ' + parseFloat(res.total).toFixed(4));
       },
       error: function () {
         $('#monthlyRevenue').text('AED 0.0000');
