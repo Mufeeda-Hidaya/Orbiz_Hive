@@ -54,4 +54,26 @@ class EnquiryModel extends Model
             ->where('enquiries.is_deleted', 0)
             ->first();
     }
+    public function getEnquiryDetails($enquiryId)
+    {
+        return $this->select('
+                enquiries.enquiry_id,
+                enquiries.enquiry_no,
+                enquiries.is_deleted,
+                enquiries.is_converted,
+                customers.name AS customer_name,
+                customers.address AS customer_address
+            ')
+            ->join('customers', 'customers.customer_id = enquiries.customer_id', 'left')
+            ->where('enquiries.enquiry_id', $enquiryId)
+            ->first();
+    }
+
+    public function convertEnquiry($enquiryId)
+    {
+        return $this->update($enquiryId, [
+            'is_converted' => 1,
+            'updated_at'   => date('Y-m-d H:i:s')
+        ]);
+    }
 }

@@ -106,7 +106,6 @@
                             <th>Description Of Goods</th>
                             <th>Market Price</th>
                             <th>Selling Price</th>
-                            <th>Difference (%)</th> 
                             <th>Quantity</th>
                             <th>Amount (AED)</th>
                             <th>Action</th>
@@ -133,9 +132,6 @@
                                             step="0.0001" min="0"
                                             value="<?= esc($item['selling_price'] ?? ($item['market_price'] ?? 0)) ?>">
                                     </td>
-
-                                    <td><input type="text" name="difference[]" class="form-control difference" readonly></td>
-
                                     <td>
                                         <input type="number" name="quantity[]" class="form-control quantity"
                                             value="<?= esc($item['quantity'] ?? 1) ?>">
@@ -159,7 +155,6 @@
                                 <td><input type="text" name="description[]" class="form-control" placeholder="Description"></td>
                                 <td><input type="number" name="market_price[]" class="form-control market-price" step="0.0001" min="0"></td>
                                 <td><input type="number" name="selling_price[]" class="form-control selling-price" step="0.0001" min="0"></td>
-                                <td><input type="text" name="difference[]" class="form-control difference" readonly></td>
                                 <td><input type="number" name="quantity[]" class="form-control quantity"></td>
                                 <td><input type="number" name="total[]" class="form-control total" step="0.0001" readonly></td>
                                 <td class="text-center">
@@ -193,7 +188,7 @@
             <input type="hidden" id="joborder_id" value="<?= $estimate['joborder_id'] ?? '' ?>">
 
             <div class="text-right">
-                <a href="<?= base_url('estimatelist') ?>" class="btn btn-secondary">Discard</a>
+                <a href="<?= base_url('orderist') ?>" class="btn btn-secondary">Discard</a>
                 <button type="submit" id="generate-btn" class="btn btn-primary">Generate Order</button>
             </div>
         </form>
@@ -336,7 +331,6 @@
                     <td><input type="text" name="description[]" class="form-control" placeholder="Description"></td>
                     <td><input type="number" name="market_price[]" class="form-control market-price" step="0.0001" min="0"></td>
                     <td><input type="number" name="selling_price[]" class="form-control selling-price" step="0.0001" min="0"></td>
-                    <td><input type="text" name="difference[]" class="form-control difference" readonly></td> 
                     <td><input type="number" name="quantity[]" class="form-control quantity" step="0.0001" min="0"></td>
                     <td><input type="number" name="total[]" class="form-control total" step="0.0001" readonly></td>
                     <td class="text-center">
@@ -350,37 +344,6 @@
             newRow.find('input[name="description[]"]').focus();
             newRow.find('.market-price, .selling-price').trigger('input')
         });
-
-        // Calculate difference between Market Price and Selling Price 
-        $(document).on('input', '.market-price, .selling-price', function() {
-            const row = $(this).closest('tr');
-            const market = parseFloat(row.find('.market-price').val()) || 0;
-            const selling = parseFloat(row.find('.selling-price').val()) || 0;
-
-            if (market > 0) {
-                const diff = ((selling - market) / market) * 100;
-                row.find('.difference').val(diff.toFixed(2) + '%')
-                    .css('color', 'black');
-            } else {
-                row.find('.difference').val('0.00%').css('color', 'black');
-            }
-        });
-
-        //  Prefill difference for existing rows
-        $('.item-row').each(function() {
-            const row = $(this);
-            const market = parseFloat(row.find('.market-price').val()) || 0;
-            const selling = parseFloat(row.find('.selling-price').val()) || 0;
-
-            if (market > 0) {
-                const diff = ((selling - market) / market) * 100;
-                row.find('.difference').val(diff.toFixed(2) + '%').css('color', 'black');
-            } else {
-                row.find('.difference').val('0.00%').css('color', 'black');
-            }
-        });
-
-
 
         $(document).on('click', '.remove-item-btn', function() {
             $(this).closest('tr').remove();
@@ -430,18 +393,12 @@
 
         const saveCustomerBtn = $('#saveCustomerBtn');
 
-
-        // Disable button when modal opens
-
         //  Disable button when modal opens
 
         $('#customerModal').on('show.bs.modal', function() {
             saveCustomerBtn.prop('disabled', true);
             $('#customerError').addClass('d-none');
         });
-
-
-        // Enable Save button only when required fields are filled
 
         //  Enable Save button only when required fields are filled
 

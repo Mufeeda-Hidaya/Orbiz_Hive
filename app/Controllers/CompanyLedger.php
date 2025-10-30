@@ -35,7 +35,7 @@ class CompanyLedger extends BaseController
 
         $ledgerModel->insert([
             'company_id'     => $companyId,
-            'invoice_id'     => 0, // placeholder
+            'joborder_id'     => 0, // placeholder
             'customer_id'    => 0, // placeholder
             'invoice_amount' => 0  // placeholder
         ]);
@@ -63,33 +63,33 @@ public function getPaidInvoices()
 
     $builder = $invoiceModel->builder()
         ->select('
-            invoices.invoice_id,
-            invoices.invoice_date,
-            invoices.status,
-            invoices.total_amount,
-            invoices.paid_amount,
-            invoices.balance_amount,
-            invoices.payment_mode,
+            joborder.joborder_id,
+            joborder_id.invoice_date,
+            joborder.status,
+            joborder.total_amount,
+            joborder.paid_amount,
+            joborder.balance_amount,
+            joborder.payment_mode,
             customers.name AS customer_name
         ')
-        ->join('customers', 'customers.customer_id = invoices.customer_id', 'left')
-        ->where('invoices.company_id', $companyId)
+        ->join('customers', 'customers.customer_id = joborder.customer_id', 'left')
+        ->where('joborder.company_id', $companyId)
         ->groupStart()
-            ->where('LOWER(TRIM(invoices.status))', 'paid')
-            ->orWhere('LOWER(TRIM(invoices.status))', 'partial paid')
+            ->where('LOWER(TRIM(joborder.status))', 'paid')
+            ->orWhere('LOWER(TRIM(joborder.status))', 'partial paid')
         ->groupEnd();
 
     if (!empty($from) && !empty($to)) {
-        $builder->where('invoices.invoice_date >=', $from)
-                ->where('invoices.invoice_date <=', $to);
+        $builder->where('joborder.invoice_date >=', $from)
+                ->where('joborder.invoice_date <=', $to);
     }
 
     if (!empty($month) && !empty($year)) {
-        $builder->where('MONTH(invoices.invoice_date)', $month)
-                ->where('YEAR(invoices.invoice_date)', $year);
+        $builder->where('MONTH(joborder.invoice_date)', $month)
+                ->where('YEAR(joborder.invoice_date)', $year);
     }
 
-    $builder->orderBy('invoices.invoice_date', 'DESC');
+    $builder->orderBy('joborder.invoice_date', 'DESC');
     $results = $builder->get()->getResultArray();
 
     return $this->response->setJSON([

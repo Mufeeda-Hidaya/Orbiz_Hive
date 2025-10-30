@@ -63,6 +63,7 @@
             </div>
         </div>
         <form id="estimate-form">
+                <input type="hidden" name="enquiry_id" id="enquiry_id" value="<?= isset($estimate['enquiry_id']) ? $estimate['enquiry_id'] : '' ?>">
              <input type="hidden" name="estimate_id" id="estimate_id" value="<?= isset($estimate['estimate_id']) ? $estimate['estimate_id'] : '' ?>">
             <div class="row">
                 <div class="col-md-6">
@@ -91,9 +92,9 @@
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <div class="estimate-title">ESTIMATE</div>
+                    <div class="estimate-title">JOBORDER</div>
                     <div class="estimate-details">
-                        <p class="mb-1" id="estimate-id-display">Estimate No :
+                        <p class="mb-1" id="estimate-id-display">Job Order No :
                             <?= isset($estimate['estimate_no']) ? $estimate['estimate_no'] : '' ?></p>
                         <p>Date : <?= date('d-m-Y') ?></p>
                     </div>

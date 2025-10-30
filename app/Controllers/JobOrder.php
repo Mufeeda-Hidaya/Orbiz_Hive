@@ -14,20 +14,19 @@ use App\Models\TransactionModel;
 
 use Google\Cloud\Translate\V2\TranslateClient;
 
-class Invoice extends BaseController
+class JobOrder extends BaseController
 {
     public function add()
 {
     $customerModel = new customerModel();
     $companyId = session()->get('company_id');
 
-    // Only fetch active (not deleted) customers
     $customers = $customerModel
         ->where('is_deleted', 0)
         ->where('company_id', $companyId)
         ->findAll();
 
-    return view('invoice_form', [
+    return view('add_joborder', [
         'customers' => $customers,
         'invoice' => []
     ]);
@@ -36,7 +35,7 @@ class Invoice extends BaseController
 
     public function list()
     {
-        return view('invoicelist');
+        return view('orderlist');
     }
 
 
@@ -151,7 +150,7 @@ class Invoice extends BaseController
         $invoice = $invoiceModel->getInvoiceWithItems($id);
 
         if (!$invoice) {
-            return redirect()->to('/invoicelist')->with('error', 'Invoice not found.');
+            return redirect()->to('/orderlist')->with('error', 'Invoice not found.');
         }
 
         $customer = $customerModel->find($invoice['customer_id']);
@@ -178,127 +177,123 @@ class Invoice extends BaseController
         }
     }
 
+    public function save()
+    {
+        $request = $this->request;
+        $jobOrderModel = new JobOrder_Model();
+        $jobOrderItemModel = new JobOrderItem_Model();
+        $customerModel = new CustomerModel();
 
-  public function save()
-{
-    $request = $this->request;
-    $invoiceModel = new InvoiceModel();
-    $itemModel = new InvoiceItemModel();
-    $customerModel = new CustomerModel();
-    $transactionModel = new TransactionModel();
+        $customerId = $request->getPost('customer_id');
+        $estimateId = $request->getPost('estimate_id');
+        $discount = (float) $request->getPost('discount');
+        $customer = $customerModel->find($customerId);
 
-    $discount = (float) $request->getPost('discount');
-    $customerId = $request->getPost('customer_id');
-    $customer = $customerModel->find($customerId);
-    $estimateId = $this->request->getPost('estimate_id');
-
-    if (!$customer) {
-        return $this->response->setJSON([
-            'status' => 'error',
-            'message' => 'Invalid customer selected.'
-        ]);
-    }
-
-    // ✅ Validation for discount
-    if (!empty($customer['max_discount']) && $discount > (float) $customer['max_discount']) {
-        return $this->response->setJSON([
-            'status' => 'error',
-            'message' => 'Discount cannot exceed maximum allowed discount (' . $customer['max_discount'] . 'KWD)'
-        ]);
-    }
-
-    $invoiceId = $request->getPost('invoice_id');
-    $originalStatus = $request->getPost('original_status');
-    $companyId = session()->get('company_id');
-
-    $totalAmount = $this->calculateTotal($request);
-
-    $invoiceData = [
-    'customer_id' => $customerId,
-    'customer_address' => $customer['address'] ?? $request->getPost('customer_address') ?? '',
-    'phone_number' => $customer['phone_number'] ?? $request->getPost('phone_number') ?? '',
-    'lpo_no' => $request->getPost('lpo_no'),
-    'total_amount' => $totalAmount,
-    'discount' => $discount,
-    'invoice_date' => date('Y-m-d'),
-    'user_id' => session()->get('user_id') ?? 1,
-    'status' => ($invoiceId && $originalStatus) ? $originalStatus : 'unpaid',
-    'company_id' => $companyId,
-    // ✅ Add these two lines to fix balance calculation
-    'paid_amount' => 0,
-    'balance_amount' => $totalAmount
-];
-
-    if ($invoiceId) {
-        $invoiceModel->update($invoiceId, $invoiceData);
-        $itemModel->where('invoice_id', $invoiceId)->delete();
-        $message = 'Invoice Updated Successfully';
-    } else {
-        //  Generate company-specific invoice_no
-        $lastInvoice = $invoiceModel
-            ->where('company_id', $companyId)
-            ->orderBy('invoice_no', 'DESC')
-            ->first();
-
-        $nextInvoiceNo = $lastInvoice ? $lastInvoice['invoice_no'] + 1 : 1;
-        $invoiceData['invoice_no'] = $nextInvoiceNo;
-
-        // Mark estimate as converted if applicable
-        if (!empty($estimateId)) {
-            $db = \Config\Database::connect();
-            $db->table('estimates')->where('estimate_id', $estimateId)->update(['is_converted' => 1]);
-        }
-
-        $invoiceModel->insert($invoiceData);
-        $invoiceId = $invoiceModel->getInsertID();
-        $message = 'Generating Invoice';
-
-        // ✅ Insert into transactions only if invoice is already "paid"
-        if ($invoiceData['status'] === 'paid') {
-            $transactionModel->insert([
-                'customer_id' => $customerId,
-                'invoice_id'  => $invoiceId,
-                'user_id'     => session()->get('user_id') ?? 1,
-                'company_id'  => $companyId,
-                'invoice_amount' => $totalAmount,
-                'paid_amount' => $totalAmount,   // full payment
-                'partial_paid_amount' => $totalAmount,
-                'payment_mode' => $request->getPost('payment_mode') ?? 'cash',
-                'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s'),
+        if (!$customer) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Invalid customer selected.'
             ]);
         }
-    }
+        if (!empty($customer['max_discount']) && $discount > (float) $customer['max_discount']) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Discount cannot exceed maximum allowed discount (' . $customer['max_discount'] . ' KWD)'
+            ]);
+        }
+        $subTotal = 0;
+        $sellingPrices = $request->getPost('selling_price');
+        $quantities = $request->getPost('quantity');
 
-    // Save items
-    $descriptions = $request->getPost('description');
-    $quantities = $request->getPost('quantity');
-    $prices = $request->getPost('price');
-    $locations = $request->getPost('location'); 
-
-    if ($descriptions && $quantities && $prices) {
-        foreach ($descriptions as $i => $desc) {
-            if (!empty($desc) && $quantities[$i] > 0 && $prices[$i] > 0) {
-                $itemModel->insert([
-                    'invoice_id' => $invoiceId,
-                    'item_name' => ucfirst(trim($desc)),
-                    'quantity' => $quantities[$i],
-                    'price' => $prices[$i],
-                    'location'   => $locations[$i] ?? null,
-                    'item_order' => $i + 1 
-                ]);
+        if (is_array($sellingPrices) && is_array($quantities)) {
+            foreach ($sellingPrices as $i => $price) {
+                $price = (float) $price;
+                $qty = (float) ($quantities[$i] ?? 0);
+                $subTotal += ($price * $qty);
             }
         }
-    }
 
-    return $this->response->setJSON([
-        'status' => 'success',
-        'message' => $message,
-        'invoice_id'  => $invoiceId,
-        'invoice_no'  => $invoiceData['invoice_no'] ?? null,
-        'redirect' => site_url('invoice/print/' . $invoiceId)
-    ]);
-}
+        $totalAmount = $subTotal - $discount;
+        if ($totalAmount < 0) $totalAmount = 0;
+
+        $joborderId = $request->getPost('joborder_id');
+        $companyId = session()->get('company_id');
+        $userId = session()->get('user_id') ?? 1;
+
+        $jobOrderData = [
+            'customer_id'      => $customerId,
+            'estimate_id'      => $estimateId,
+            'company_id'       => $companyId,
+            'customer_name'    => $request->getPost('customer_name'),
+            'customer_address' => $request->getPost('customer_address'),
+            'phone_number'     => $request->getPost('phone_number'),
+            'sub_total'        => $subTotal,
+            'total_amount'     => $totalAmount,
+            'user_id'          => $userId,
+            'date'             => date('Y-m-d'),
+            'is_convereted'    => 0 
+        ];
+
+        // === Generate or update job order ===
+        if ($joborderId) {
+            $jobOrderModel->update($joborderId, $jobOrderData);
+            $jobOrderItemModel->where('joborder_id', $joborderId)->delete();
+            $message = 'Job Order Updated Successfully';
+        } else {
+            // Generate next job order number (company-specific)
+            $lastOrder = $jobOrderModel
+                ->where('company_id', $companyId)
+                ->orderBy('joborder_no', 'DESC')
+                ->first();
+
+            $nextOrderNo = $lastOrder ? $lastOrder['joborder_no'] + 1 : 1;
+            $jobOrderData['joborder_no'] = $nextOrderNo;
+
+            $jobOrderModel->insert($jobOrderData);
+            $joborderId = $jobOrderModel->getInsertID();
+
+            $message = 'Job Order Created Successfully';
+        }
+
+        // === Save items ===
+        $descriptions = $request->getPost('description');
+        $marketPrices = $request->getPost('market_price');
+        $sellingPrices = $request->getPost('selling_price');
+        $quantities = $request->getPost('quantity');
+        $totals = $request->getPost('total');
+
+        if (is_array($descriptions)) {
+            foreach ($descriptions as $i => $desc) {
+                $desc = trim($desc);
+                $mPrice = (float) ($marketPrices[$i] ?? 0);
+                $sPrice = (float) ($sellingPrices[$i] ?? 0);
+                $qty = (float) ($quantities[$i] ?? 0);
+                $total = (float) ($totals[$i] ?? 0);
+
+                if (!empty($desc) && $sPrice > 0 && $qty > 0) {
+                    $diffPercent = $mPrice > 0 ? (($sPrice - $mPrice) / $mPrice) * 100 : 0;
+
+                    $jobOrderItemModel->insert([
+                        'joborder_id' => $joborderId,
+                        'customer_id' => $customerId,
+                        'description' => ucfirst($desc),
+                        'market_price' => $mPrice,
+                        'selling_price' => $sPrice,
+                        'difference_percentage' => number_format($diffPercent, 2),
+                        'quantity' => $qty,
+                        'total' => $total,
+                        'discount' => $discount
+                    ]);
+                }
+            }
+        }
+        return $this->response->setJSON([
+            'status' => 'success',
+            'message' => $message,
+            'joborder_id' => $joborderId,
+            'estimate_id' => $estimateId
+        ]);
+    }
 
 
     private function calculateTotal($request)
@@ -332,7 +327,7 @@ class Invoice extends BaseController
 
     $invoice = $invoiceModel->find($id);
     if (!$invoice) {
-        return redirect()->to(base_url('invoicelist'))->with('error', 'Invoice not found.');
+        return redirect()->to(base_url('orderlist'))->with('error', 'Invoice not found.');
     }
 
     // ✅ Fetch customer details
@@ -364,7 +359,7 @@ class Invoice extends BaseController
         'customers' => $customers,
     ];
 
-    return view('invoice_form', $data);
+    return view('add_joborder', $data);
 }
 
 
@@ -489,7 +484,7 @@ public function convertFromEstimate($estimateId)
         $item['product_id'] = $item['product_id'] ?? '';
     }
 
-    return view('invoice_form', [
+    return view('add_joborder', [
         'invoice' => $estimate,
         'invoiceformitems' => $items,
         'customers' => $customers,

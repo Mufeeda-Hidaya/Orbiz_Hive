@@ -151,9 +151,12 @@ $routes->get('estimate/add_estimate', 'Estimate::add_estimate');
 
 
 
-
-$routes->get('invoicelist', 'Invoice::list');
-$routes->get('invoice/add', 'Invoice::add');
+// job order
+$routes->get('orderlist', 'JobOrder::list');
+$routes->get('order/add', 'JobOrder::add');
+$routes->get('order/add/(:num)', 'JobOrder::add/$1');
+// $routes->get('orderlist', 'Invoice::list');
+// $routes->get('invoice/add', 'Invoice::add');
 $routes->post('invoice/save', 'Invoice::save');
 $routes->get('invoice/print/(:segment)', 'Invoice::print/$1');
 $routes->post('invoice/invoicelistajax', 'Invoice::invoicelistajax');
@@ -161,7 +164,7 @@ $routes->get('invoice/edit/(:segment)', 'Invoice::edit/$1');
 $routes->post('invoice/delete/(:segment)', 'Invoice::delete/$1');
 $routes->get('invoice/edit/(:num)', 'Invoice::edit/$1');
 $routes->post('invoice/save', 'Invoice::save'); 
-$routes->get('invoice/add/(:num)', 'Invoice::add/$1');
+// $routes->get('invoice/add/(:num)', 'Invoice::add/$1');
 $routes->get('invoice/convertFromEstimate/(:num)', 'Invoice::convertFromEstimate/$1');
 $routes->get('invoice/delivery_note/(:num)', 'Invoice::delivery_note/$1');
 $routes->post('invoice/update_status', 'Invoice::update_status');
@@ -201,7 +204,8 @@ $routes->post('enquiry/save', 'Api\Enquiry::saveEnquiry');
 $routes->get('enquiry/getAll', 'Api\Enquiry::getAllEnquiries');
 $routes->get('enquiry/get/(:num)', 'Api\Enquiry::getEnquiryById/$1');
 $routes->delete('enquiry/delete/(:num)', 'Api\Enquiry::deleteEnquiry/$1');
-
+$routes->delete('enquiry/deleteItem/(:num)', 'Api\Enquiry::deleteItem/$1');
+$routes->post('enquiry/convertToEstimate/(:num)', 'Api\Enquiry::convertToEstimate/$1');
 
 
 

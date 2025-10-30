@@ -151,7 +151,7 @@ class Invoice extends BaseController
         $invoice = $invoiceModel->getInvoiceWithItems($id);
 
         if (!$invoice) {
-            return redirect()->to('/invoicelist')->with('error', 'Invoice not found.');
+            return redirect()->to('/orderlist')->with('error', 'Invoice not found.');
         }
 
         $customer = $customerModel->find($invoice['customer_id']);
@@ -332,7 +332,7 @@ class Invoice extends BaseController
 
     $invoice = $invoiceModel->find($id);
     if (!$invoice) {
-        return redirect()->to(base_url('invoicelist'))->with('error', 'Invoice not found.');
+        return redirect()->to(base_url('orderlist'))->with('error', 'Invoice not found.');
     }
 
     // ✅ Fetch customer details

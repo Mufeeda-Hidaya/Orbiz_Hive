@@ -33,8 +33,8 @@ public function ajaxListJson()
     $search = $request->getPost('search')['value'] ?? '';
 
     $columnMap = [
-        0 => 'invoice_id',
-        1 => 'invoice_id', // Sl No
+        0 => 'joborder_id',
+        1 => 'joborder_id', // Sl No
         2 => 'customer_id',
         3 => 'invoice_date',
         4 => 'total_amount',
@@ -44,7 +44,7 @@ public function ajaxListJson()
         8 => 'payment_mode'
     ];
 
-    $orderColumn = $columnMap[$columnIndex] ?? 'invoice_id';
+    $orderColumn = $columnMap[$columnIndex] ?? 'joborder_id';
     $receipts = $this->cashModel->getAllFilteredCashReceipts(
         $company_id,
         $search,
@@ -60,7 +60,7 @@ public function ajaxListJson()
     foreach ($receipts as $row) {
         $data[] = [
             'slno' => $slno++,
-            'payment_id' => $row['invoice_id'],
+            'payment_id' => $row['joborder_id'],
             'customer_name' => $row['customer_name'],
             'payment_date' => date('d-m-Y', strtotime($row['invoice_date'])),
             'amount' => $row['total_amount'],
