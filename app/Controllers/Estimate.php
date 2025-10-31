@@ -164,7 +164,7 @@ class Estimate extends BaseController
         //  Calculate difference percentage (based on market vs selling)
         $differencePercentage = 0;
         if ($mPrice > 0) {
-            $differencePercentage = (($sPrice - $mPrice) / $mPrice) * 100;
+            $differencePercentage = (($mPrice - $sPrice) / $mPrice) * 100;
         }
 
         //  Push item to array

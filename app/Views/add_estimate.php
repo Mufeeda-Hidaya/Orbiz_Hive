@@ -359,7 +359,7 @@
             const selling = parseFloat(row.find('.selling-price').val()) || 0;
 
             if (market > 0) {
-                const diff = ((selling - market) / market) * 100;
+                const diff = ((market - selling) / market) * 100;
                 row.find('.difference').val(diff.toFixed(2) + '%')
                     .css('color', 'black');
             } else {
@@ -374,7 +374,7 @@
             const selling = parseFloat(row.find('.selling-price').val()) || 0;
 
             if (market > 0) {
-                const diff = ((selling - market) / market) * 100;
+                const diff = ((market - selling) / market) * 100;
                 row.find('.difference').val(diff.toFixed(2) + '%').css('color', 'black');
             } else {
                 row.find('.difference').val('0.00%').css('color', 'black');
@@ -431,18 +431,12 @@
 
         const saveCustomerBtn = $('#saveCustomerBtn');
 
-
-        // Disable button when modal opens
-
         //  Disable button when modal opens
 
         $('#customerModal').on('show.bs.modal', function() {
             saveCustomerBtn.prop('disabled', true);
             $('#customerError').addClass('d-none');
         });
-
-
-        // Enable Save button only when required fields are filled
 
         //  Enable Save button only when required fields are filled
 
