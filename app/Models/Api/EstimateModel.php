@@ -49,6 +49,16 @@ class EstimateModel extends Model
                         ->get()
                         ->getRowArray();
     }
-    
+    // estimate to job order conversion
+    public function getDetails($estimateId)
+    {
+        return $this->db->table('estimates e')
+            ->select('e.*, c.name, c.address as customer_address')
+            ->join('customers c', 'c.customer_id = e.customer_id', 'left')
+            ->where('e.estimate_id', $estimateId)
+            ->get()
+            ->getRowArray();
+    }
+
 
 }

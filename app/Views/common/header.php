@@ -170,7 +170,7 @@ if ($company_id) {
             </a>
           </li>
         <?php endif; ?>
-        <?php if (in_array('customer', $allowedMenus)): ?>
+        <!-- <?php if (in_array('customer', $allowedMenus)): ?>
           <li class="nav-item">
             <a class="nav-link <?= strpos($currentPath, 'cashlist') !== false ? 'active' : '' ?>" 
               href="<?= base_url('cashlist') ?>">
@@ -178,8 +178,8 @@ if ($company_id) {
               <span class="menu-title">Transactions</span>
             </a>
           </li>
-        <?php endif; ?>
-        <?php if (in_array('expense', $allowedMenus)): ?>
+        <?php endif; ?> -->
+        <!-- <?php if (in_array('expense', $allowedMenus)): ?>
           <li class="nav-item">
             <a class="nav-link <?= strpos($currentPath, 'expense') !== false ? 'active' : '' ?>"
               href="<?= base_url('expense') ?>">
@@ -188,9 +188,9 @@ if ($company_id) {
             </a>
 
           </li>
-        <?php endif; ?>
+        <?php endif; ?> -->
 
-        <?php if (in_array('reports', $allowedMenus)): ?>
+        <!-- <?php if (in_array('reports', $allowedMenus)): ?>
   <li class="nav-item">
     <a class="nav-link" data-bs-toggle="collapse" href="#auth" aria-expanded="false" aria-controls="auth">
       <i class="mdi mdi-clipboard menu-icon"></i>
@@ -205,7 +205,7 @@ if ($company_id) {
       </ul>
     </div>
   </li>
-<?php endif; ?>
+<?php endif; ?> -->
 
 
         <li class="nav-item">

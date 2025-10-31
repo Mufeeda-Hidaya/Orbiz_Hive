@@ -211,3 +211,6 @@ $routes->post('enquiry/convertToEstimate/(:num)', 'Api\Estimate::convertToEstima
 $routes->get('estimate/getAll', 'Api\Estimate::getAllEstimates');
 $routes->get('estimate/get/(:num)', 'Api\Estimate::getEstimateById/$1');
 $routes->delete('estimate/delete/(:num)', 'Api\Estimate::deleteEstimate/$1');
+
+// Job Orders
+$routes->post('estimate/convertToOrder/(:num)', 'Api\JobOrder::convertToJobOrder/$1');
