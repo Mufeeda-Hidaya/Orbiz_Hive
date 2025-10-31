@@ -68,12 +68,13 @@ class EnquiryModel extends Model
             ->where('enquiries.enquiry_id', $enquiryId)
             ->first();
     }
-
-    public function convertEnquiry($enquiryId)
+    // for estimate save data fetching
+    public function getDetails($enquiryId)
     {
-        return $this->update($enquiryId, [
-            'is_converted' => 1,
-            'updated_at'   => date('Y-m-d H:i:s')
-        ]);
+        return $this->select('enquiries.*, customers.customer_id, customers.name AS customer_name, customers.address AS customer_address, customers.phone AS customer_phone')
+                    ->join('customers', 'customers.customer_id = enquiries.customer_id', 'left')
+                    ->where('enquiries.enquiry_id', $enquiryId)
+                    ->first();
     }
+
 }

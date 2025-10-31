@@ -205,9 +205,9 @@ $routes->get('enquiry/getAll', 'Api\Enquiry::getAllEnquiries');
 $routes->get('enquiry/get/(:num)', 'Api\Enquiry::getEnquiryById/$1');
 $routes->delete('enquiry/delete/(:num)', 'Api\Enquiry::deleteEnquiry/$1');
 $routes->delete('enquiry/deleteItem/(:num)', 'Api\Enquiry::deleteItem/$1');
-$routes->post('enquiry/convertToEstimate/(:num)', 'Api\Enquiry::convertToEstimate/$1');
 
-
-
-
-
+// Estimates
+$routes->post('enquiry/convertToEstimate/(:num)', 'Api\Estimate::convertToEstimate/$1');
+$routes->get('estimate/getAll', 'Api\Estimate::getAllEstimates');
+$routes->get('estimate/get/(:num)', 'Api\Estimate::getEstimateById/$1');
+$routes->delete('estimate/delete/(:num)', 'Api\Estimate::deleteEstimate/$1');
