@@ -275,21 +275,33 @@ class Estimate extends BaseController
 }
 
  
-    public function delete()
+        public function delete()
     {
         $estimate_id = $this->request->getPost('estimate_id');
+
         if (!$estimate_id) {
-            return $this->response->setJSON(['status' => 'error', 'message' => 'Invalid ID']);
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Invalid Estimate ID.'
+            ]);
         }
- 
+
         $estimateModel = new EstimateModel();
-        $itemModel = new EstimateItemModel();
- 
-        $itemModel->where('estimate_id', $estimate_id)->delete();
-        $estimateModel->delete($estimate_id);
- 
-        return $this->response->setJSON(['status' => 'success']);
+        $update = $estimateModel->update($estimate_id, ['is_deleted' => 1]);
+
+        if ($update) {
+            return $this->response->setJSON([
+                'status' => 'success',
+                'message' => 'Estimate deleted successfully.'
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Failed to delete estimate. Please try again.'
+            ]);
+        }
     }
+
  
   public function edit($id)
 {
