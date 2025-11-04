@@ -64,50 +64,62 @@ class JobOrder extends ResourceController
         ]);
     }
 
-    if ($estimate['is_converted'] == 1) {
-        return $this->respond([
-            'status' => false,
-            'message' => "Estimate ID {$estimateId} is already converted."
-        ]);
-    }
-
-    // Get next joborder number
-    $lastJobOrderNo = $this->jobOrderModel->selectMax('joborder_no')->first();
-    $nextJobOrderNo = isset($lastJobOrderNo['joborder_no'])
-        ? ((int)$lastJobOrderNo['joborder_no'] + 1)
-        : 1;
-
-    $progress = $this->request->getVar('progress') ?? '0%';
-
+    $input = $this->request->getJSON(true);
+    $progressList = $input['progress_list'] ?? [];
+    $jobOrderId = $input['joborder_id'] ?? null; 
     $this->db->transBegin();
 
-    // Insert into joborder (main table)
-    $jobOrderData = [
-        'estimate_id'  => $estimateId,
-        'user_id'      => $user['user_id'],
-        'customer_id'  => $estimate['customer_id'] ?? null,
-        'company_id'   => $user['company_id'],
-        'joborder_no'  => $nextJobOrderNo,
-        'progress'     => $progress,
-        'discount'     => $estimate['discount'] ?? 0,
-        'sub_total'    => $estimate['sub_total'] ?? 0,
-        'total_amount' => $estimate['total_amount'] ?? 0,
-        'is_converted' => 0,
-        'is_deleted'   => 0,
-        'created_at'   => date('Y-m-d H:i:s'),
-        'created_by'   => $user['user_id'],
-    ];
+    $isUpdate = false;
+    if ($jobOrderId) {
+        $existingJobOrder = $this->jobOrderModel
+            ->where('joborder_id', $jobOrderId)
+            ->where('is_deleted', 0)
+            ->first();
 
-    $jobOrderId = $this->jobOrderModel->insert($jobOrderData);
+        if (!$existingJobOrder) {
+            return $this->respond([
+                'status' => false,
+                'message' => "Job Order ID {$jobOrderId} not found for update."
+            ]);
+        }
 
-    if (!$jobOrderId) {
-        $this->db->transRollback();
-        return $this->respond(['status' => false, 'message' => 'Failed to create job order.']);
+        $isUpdate = true;
+        $this->jobOrderModel->update($jobOrderId, [
+            'estimate_id'  => $estimateId,
+            'discount'     => $estimate['discount'] ?? 0,
+            'sub_total'    => $estimate['sub_total'] ?? 0,
+            'total_amount' => $estimate['total_amount'] ?? 0,
+            'updated_at'   => date('Y-m-d H:i:s'),
+            'updated_by'   => $user['user_id'],
+        ]);
+    } else {
+        $lastJobOrderNo = $this->jobOrderModel->selectMax('joborder_no')->first();
+        $nextJobOrderNo = isset($lastJobOrderNo['joborder_no'])
+            ? ((int)$lastJobOrderNo['joborder_no'] + 1)
+            : 1;
+
+        $jobOrderData = [
+            'estimate_id'  => $estimateId,
+            'user_id'      => $user['user_id'],
+            'customer_id'  => $estimate['customer_id'] ?? null,
+            'company_id'   => $user['company_id'],
+            'joborder_no'  => $nextJobOrderNo,
+            'discount'     => $estimate['discount'] ?? 0,
+            'sub_total'    => $estimate['sub_total'] ?? 0,
+            'total_amount' => $estimate['total_amount'] ?? 0,
+            'is_converted' => 1,
+            'is_deleted'   => 0,
+            'created_at'   => date('Y-m-d H:i:s'),
+            'created_by'   => $user['user_id'],
+        ];
+
+        $jobOrderId = $this->jobOrderModel->insert($jobOrderData);
+        if (!$jobOrderId) {
+            $this->db->transRollback();
+            return $this->respond(['status' => false, 'message' => 'Failed to create job order.']);
+        }
     }
-
-    // Get estimate items
     $estimateItems = $this->estimateItemModel->getItemsByEstimateId($estimateId);
-
     if (empty($estimateItems)) {
         $this->db->transRollback();
         return $this->respond(['status' => false, 'message' => 'No items found for this estimate.']);
@@ -115,15 +127,26 @@ class JobOrder extends ResourceController
 
     $savedItems = [];
     foreach ($estimateItems as $item) {
-        $itemProgress = $item['progress'] ?? $progress; // item-wise progress if exists
+        $itemProgress = '0%';
+        foreach ($progressList as $progressData) {
+            if (
+                isset($progressData['item_id'], $progressData['progress']) &&
+                $progressData['item_id'] == $item['item_id']
+            ) {
+                $itemProgress = $progressData['progress'];
+                break;
+            }
+        }
+        $existingItem = $this->jobOrderItemModel
+            ->where('joborder_id', $jobOrderId)
+            ->where('item_id', $item['item_id'])
+            ->first();
 
         $itemData = [
             'joborder_id'           => $jobOrderId,
-            'estimate_item_id'       => $item['estimate_item_id'] ?? null,
             'item_id'               => $item['item_id'],
             'description'           => $item['description'],
             'quantity'              => $item['quantity'],
-            'unit'                  => $item['unit'] ?? null,
             'market_price'          => $item['market_price'],
             'selling_price'         => $item['selling_price'],
             'difference_percentage' => $item['difference_percentage'],
@@ -131,20 +154,20 @@ class JobOrder extends ResourceController
             'discount'              => $estimate['discount'] ?? 0,
             'progress'              => $itemProgress,
             'status'                => 1,
-            'created_at'            => date('Y-m-d H:i:s'),
-            'created_by'            => $user['user_id'],
+            'updated_at'            => date('Y-m-d H:i:s'),
+            'updated_by'            => $user['user_id'],
         ];
 
-        $inserted = $this->jobOrderItemModel->insert($itemData);
-        if (!$inserted) {
-            $this->db->transRollback();
-            return $this->respond(['status' => false, 'message' => 'Failed to insert job order item.']);
+        if ($existingItem) {
+            $this->jobOrderItemModel->update($existingItem['joborder_item_id'], $itemData);
+        } else {
+            $itemData['created_at'] = date('Y-m-d H:i:s');
+            $itemData['created_by'] = $user['user_id'];
+            $this->jobOrderItemModel->insert($itemData);
         }
 
         $savedItems[] = $itemData;
     }
-
-    // Mark estimate as converted
     $this->estimateModel->update($estimateId, ['is_converted' => 1]);
 
     if ($this->db->transStatus() === false) {
@@ -153,22 +176,62 @@ class JobOrder extends ResourceController
     }
 
     $this->db->transCommit();
+    $message = $isUpdate
+        ? "Job Order ID {$jobOrderId} successfully updated."
+        : "Estimate ID {$estimateId} successfully converted into a Job Order.";
 
     return $this->respond([
         'status'  => true,
-        'message' => "Estimate ID {$estimateId} successfully converted into a Job Order.",
+        'message' => $message,
         'data'    => [
             'joborder_id'  => $jobOrderId,
-            'joborder_no'  => $nextJobOrderNo,
             'estimate_id'  => $estimateId,
             'customer_id'  => $estimate['customer_id'],
-            'progress'     => $progress,
             'total_amount' => $estimate['total_amount'],
             'sub_total'    => $estimate['sub_total'],
             'items'        => $savedItems
         ]
     ]);
 }
+
+    public function getAllJobOrders()
+    {
+        $authHeader = AuthHelper::getAuthorizationToken($this->request);
+        $user = $this->authService->getAuthenticatedUser($authHeader);
+
+        if (!$user) {
+            return $this->failUnauthorized('Invalid or missing token.');
+        }
+
+        $pageIndex = (int) $this->request->getGet('pageIndex');
+        $pageSize  = (int) $this->request->getGet('pageSize');
+        $search    = $this->request->getGet('search');
+
+        if ($pageSize <= 0) $pageSize = 10;
+        $offset = $pageIndex * $pageSize;
+
+        $result = $this->jobOrderModel->getAllJobOrders(
+            $user['company_id'],
+            $pageSize,
+            $offset,
+            $search
+        );
+        foreach ($result['data'] as &$jobOrder) {
+            $jobOrder['items'] = $this->jobOrderItemModel
+                ->where('joborder_id', $jobOrder['joborder_id'])
+                ->findAll();
+        }
+
+        return $this->response->setJSON([
+            'success' => true,
+            'message' => 'Job Orders fetched successfully.',
+            'total'   => $result['total'],
+            'data'    => $result['data']
+        ]);
+    }
+
+
+
 
 
 }

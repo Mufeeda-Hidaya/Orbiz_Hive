@@ -32,9 +32,10 @@ class Enquiry extends ResourceController
     {
         $authHeader = AuthHelper::getAuthorizationToken($this->request);
         $user = $this->authService->getAuthenticatedUser($authHeader);
-        if(!$user){
+        if (!$user) {
             return $this->failUnauthorized('Invalid or missing token.');
         }
+
         $enquiryModel     = new EnquiryModel();
         $enquiryItemModel = new EnquiryItemModel();
         $customerModel    = new CustomerModel();
@@ -56,30 +57,59 @@ class Enquiry extends ResourceController
             ]);
         }
 
+        $uploadDir = FCPATH . 'uploads/enquiry/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0777, true);
+        }
+
         $validItems = [];
-        foreach ($items as $item) {
-            $desc = trim($item['description'] ?? '');
-            $qty  = floatval($item['quantity'] ?? 0);
+        foreach ($items as $index => $item) {
+            $desc  = trim($item['description'] ?? '');
+            $qty   = floatval($item['quantity'] ?? 0);
+            $image = $item['image'] ?? null;
+            $imagePath = null;
+
+            if ($image && preg_match('/^data:image\/(\w+);base64,/', $image, $type)) {
+                $image = substr($image, strpos($image, ',') + 1);
+                $type = strtolower($type[1]);
+                if (!in_array($type, ['jpg', 'jpeg', 'png', 'gif'])) {
+                    return $this->response->setJSON(['status' => false, 'message' => 'Invalid image type.']);
+                }
+                $imageData = base64_decode($image);
+                $fileName = uniqid('item_') . '.' . $type;
+                file_put_contents($uploadDir . $fileName, $imageData);
+                $imagePath = 'uploads/enquiry/' . $fileName;
+            }
+            elseif ($image && preg_match('/\.(jpg|jpeg|png|gif)$/i', $image)) {
+                $imagePath = strpos($image, 'uploads/enquiry/') === false
+                    ? 'uploads/enquiry/' . $image
+                    : $image;
+            }
+            elseif (isset($_FILES['items']['name'][$index]['image'])) {
+                $imgFile = $this->request->getFile("items[$index][image]");
+                if ($imgFile && $imgFile->isValid() && !$imgFile->hasMoved()) {
+                    $newName = $imgFile->getRandomName();
+                    $imgFile->move($uploadDir, $newName);
+                    $imagePath = 'uploads/enquiry/' . $newName;
+                }
+            }
+
             if ($desc && $qty > 0) {
                 $validItems[] = [
                     'description' => $desc,
-                    'quantity'    => $qty
+                    'quantity'    => $qty,
+                    'image'       => $imagePath
                 ];
             }
         }
 
         if (empty($validItems)) {
-            return $this->response->setJSON([
-                'status'  => false,
-                'message' => 'Each item must have valid description and quantity.'
-            ]);
+            return $this->response->setJSON(['status' => false, 'message' => 'Each item must have valid description and quantity.']);
         }
 
-        $userId     = session()->get('user_id') ?? 1;
-        $companyId  = 1;
-
+        $userId    = session()->get('user_id') ?? 1;
+        $companyId = 1;
         $existingCustomer = $customerModel->where('name', $name)->first();
-
         if ($existingCustomer) {
             $customerId = $existingCustomer['customer_id'];
             if (trim($existingCustomer['address']) !== $address) {
@@ -93,7 +123,7 @@ class Enquiry extends ResourceController
             $customerModel->insert([
                 'name'       => $name,
                 'address'    => $address,
-                'company_id'  => $companyId,
+                'company_id' => $companyId,
                 'created_by' => $userId,
                 'created_at' => date('Y-m-d H:i:s'),
                 'is_deleted' => 0
@@ -103,11 +133,9 @@ class Enquiry extends ResourceController
         if (!empty($enquiryId)) {
             $existing = $enquiryModel->find($enquiryId);
             if (!$existing) {
-                return $this->response->setJSON([
-                    'status'  => false,
-                    'message' => 'Enquiry not found.'
-                ]);
+                return $this->response->setJSON(['status' => false, 'message' => 'Enquiry not found.']);
             }
+
             $enquiryModel->update($enquiryId, [
                 'customer_id' => $customerId,
                 'name'        => $name,
@@ -115,6 +143,7 @@ class Enquiry extends ResourceController
                 'updated_by'  => $userId,
                 'updated_at'  => date('Y-m-d H:i:s')
             ]);
+
             $enquiryItemModel->where('enquiry_id', $enquiryId)->delete();
 
             foreach ($validItems as $item) {
@@ -122,27 +151,26 @@ class Enquiry extends ResourceController
                     'enquiry_id'  => $enquiryId,
                     'description' => $item['description'],
                     'quantity'    => $item['quantity'],
+                    'images'      => $item['image'],
                     'status'      => 1,
                     'created_at'  => date('Y-m-d H:i:s')
                 ]);
             }
 
             return $this->response->setJSON([
-                'status'     => 'success',
-                'message'    => 'Enquiry updated successfully.',
-                'enquiry_id' => $enquiryId,
-                'customer'   => [
+                'status'  => 'success',
+                'message' => 'Enquiry updated successfully.',
+                'data'    => [
+                    'enquiry_id'  => $enquiryId,
                     'customer_id' => $customerId,
                     'name'        => $name,
-                    'address'     => $address
+                    'address'     => $address,
+                    'items'       => $validItems
                 ]
             ]);
         }
-        $lastEnquiry = $enquiryModel
-            ->where('company_id', $companyId)
-            ->orderBy('enquiry_no', 'DESC')
-            ->first();
 
+        $lastEnquiry = $enquiryModel->where('company_id', $companyId)->orderBy('enquiry_no', 'DESC')->first();
         $nextEnquiryNo = $lastEnquiry ? $lastEnquiry['enquiry_no'] + 1 : 1;
 
         $enquiryModel->insert([
@@ -164,19 +192,21 @@ class Enquiry extends ResourceController
                 'enquiry_id'  => $newEnquiryId,
                 'description' => $item['description'],
                 'quantity'    => $item['quantity'],
+                'images'      => $item['image'],
                 'status'      => 1,
                 'created_at'  => date('Y-m-d H:i:s')
             ]);
         }
 
         return $this->response->setJSON([
-            'status'     => 'success',
-            'message'    => 'Enquiry created successfully.',
-            'enquiry_id' => $newEnquiryId,
-            'customer'   => [
+            'status'  => 'success',
+            'message' => 'Enquiry created successfully.',
+            'data'    => [
+                'enquiry_id'  => $newEnquiryId,
                 'customer_id' => $customerId,
                 'name'        => $name,
-                'address'     => $address
+                'address'     => $address,
+                'items'       => $validItems
             ]
         ]);
     }
@@ -196,7 +226,7 @@ class Enquiry extends ResourceController
         $result = $this->enquiryModel->getAllEnquiries($pageSize, $offset, $search);
         foreach ($result['data'] as &$enquiry) {
             $enquiry['items'] = $this->enquiryItemModel
-                ->select('item_id,description, quantity')
+                ->select('item_id, description, quantity, images')
                 ->where('enquiry_id', $enquiry['enquiry_id'])
                 ->where('status !=', 9)
                 ->findAll();
@@ -227,7 +257,7 @@ class Enquiry extends ResourceController
         }
 
         $items = $this->enquiryItemModel
-            ->select('item_id,description, quantity')
+            ->select('item_id, description, quantity, images')
             ->where('enquiry_id', $id)
             ->where('status !=', 9)
             ->findAll();

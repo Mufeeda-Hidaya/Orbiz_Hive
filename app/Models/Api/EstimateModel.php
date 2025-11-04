@@ -13,10 +13,11 @@ class EstimateModel extends Model
     public function getAllEstimates($companyId, $pageSize, $offset, $search = '')
     {
         $builder = $this->db->table('estimates AS e')
-                            ->select('e.estimate_id,e.estimate_no,e.customer_id,c.name AS customer_name,c.address AS customer_address,e.total_amount,e.sub_total,e.date,e.company_id')
+                            ->select('e.estimate_id,e.estimate_no,e.customer_id,c.name AS customer_name,c.address AS customer_address,e.total_amount,e.sub_total,e.date,e.company_id,e.is_converted')
                             ->join('customers AS c', 'c.customer_id = e.customer_id', 'left')
                             ->where('e.company_id', $companyId)
-                            ->where('e.is_deleted', 0);
+                            ->where('e.is_deleted', 0)
+                            ->where('e.is_converted !=', 1);
 
         if (!empty($search)) {
             $builder->groupStart()

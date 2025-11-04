@@ -13,7 +13,7 @@ class JobOrderItemModel extends Model
         'item_id',
         'description',
         'quantity',
-        'unit',
+        // 'unit',
         'market_price',
         'selling_price',
         'difference_percentage',
