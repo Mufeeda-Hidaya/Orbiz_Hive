@@ -219,3 +219,5 @@ $routes->get('order/getAll', 'Api\JobOrder::getAllJobOrders');
 //Delivery 
 
 $routes->post('joborder/convertToDelivery/(:num)', 'Api\Delivery::convertToDelivery/$1');
+$routes->post('delivery/markAsDelivered/(:num)', 'Api\Delivery::markAsDelivered/$1');
+
