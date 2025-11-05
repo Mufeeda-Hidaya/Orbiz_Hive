@@ -7,7 +7,7 @@ class EnquiryItemModel extends Model
 {
     protected $table = 'enquiry_items';
     protected $primaryKey = 'item_id';
-    protected $allowedFields = ['enquiry_id','description','quantity','created_at','updated_at','status'];
+    protected $allowedFields = ['enquiry_id','description','quantity','created_at','updated_at','images','status'];
 
     public function getItemsByEnquiryId($enquiryId)
     {

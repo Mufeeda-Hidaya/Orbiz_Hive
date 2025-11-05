@@ -8,7 +8,7 @@ class EstimateModel extends Model
     protected $primaryKey = 'estimate_id';
     protected $allowedFields = [
         'enquiry_id','customer_id','customer_address','discount','total_amount','sub_total',
-        'date','phone_number','is_converted','company_id','estimate_no'
+        'date','phone_number','is_converted','company_id','estimate_no','is_deleted'
     ];
 
     public function getLastEstimateNoByCompany($companyId)
@@ -57,7 +57,8 @@ class EstimateModel extends Model
 {
     $builder = $this->db->table('estimates')
         ->join('customers', 'customers.customer_id = estimates.customer_id', 'left')
-        ->where('estimates.company_id', $companyId);
+        ->where('estimates.company_id', $companyId)
+        ->where('estimates.is_deleted', 0);
 
     return $builder->get()->getNumRows();
 }
@@ -67,7 +68,8 @@ public function getFilteredCount($searchValue, $companyId = 1)
     $searchValue = trim($searchValue);
     $builder = $this->db->table('estimates')
         ->join('customers', 'customers.customer_id = estimates.customer_id', 'left')
-        ->where('estimates.company_id', $companyId);
+        ->where('estimates.company_id', $companyId)
+        ->where('estimates.is_deleted', 0);
 
     if (!empty($searchValue)) {
         $normalizedSearch = str_replace(' ', '', strtolower($searchValue));
@@ -93,7 +95,8 @@ public function getFilteredEstimates($searchValue, $start, $length, $orderByColu
     $builder = $this->db->table('estimates')
         ->select('estimates.*, customers.name AS customer_name, customers.address AS customer_address')
         ->join('customers', 'customers.customer_id = estimates.customer_id', 'left')
-        ->where('estimates.company_id', $companyId);
+        ->where('estimates.company_id', $companyId)
+        ->where('estimates.is_deleted', 0);
 
     if (!empty($searchValue)) {
         $normalizedSearch = str_replace(' ', '', strtolower($searchValue));
@@ -120,7 +123,8 @@ public function getFilteredEstimates($searchValue, $start, $length, $orderByColu
     return $this->db->table('estimates')
         ->select('estimates.*, customers.name AS customer_name, customers.address AS customer_address')
         ->join('customers', 'customers.customer_id = estimates.customer_id', 'left')
-        ->where('estimates.company_id', $companyId) 
+        ->where('estimates.company_id', $companyId)
+        ->where('estimates.is_deleted', 0)
         ->orderBy('estimates.date', 'DESC')
         ->limit($limit)
         ->get()

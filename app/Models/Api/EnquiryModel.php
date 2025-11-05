@@ -21,7 +21,8 @@ class EnquiryModel extends Model
                 customers.address AS customer_address
             ')
             ->join('customers', 'customers.customer_id = enquiries.customer_id', 'left')
-            ->where('enquiries.is_deleted', 0);
+            ->where('enquiries.is_deleted', 0)
+            ->where('enquiries.is_converted', 0);
 
         if (!empty($search)) {
             $builder->groupStart()
