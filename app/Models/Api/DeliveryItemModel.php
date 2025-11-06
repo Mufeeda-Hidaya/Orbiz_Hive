@@ -9,7 +9,7 @@ class DeliveryItemModel extends Model
     protected $primaryKey = 'delivery_item_id';
     protected $allowedFields = [
         'delivery_id', 'item_id', 'description', 'quantity',
-        'selling_price', 'sub_total', 'discount', 'status', 'delivery_status',
+        'selling_price', 'sub_total', 'discount', 'status', 'delivery_status', 'delivered_at',
         'created_at', 'created_by', 'updated_at', 'updated_by'
     ];
 }

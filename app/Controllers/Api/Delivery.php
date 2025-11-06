@@ -149,6 +149,100 @@ class Delivery extends ResourceController
 }
 
 
+// public function markAsDelivered($deliveryId = null)
+// {
+//     $authHeader = \App\Helpers\AuthHelper::getAuthorizationToken($this->request);
+//     $user = $this->authService->getAuthenticatedUser($authHeader);
+
+//     if (!$user) {
+//         return $this->failUnauthorized('Invalid or missing token.');
+//     }
+
+//     if (empty($deliveryId) || !is_numeric($deliveryId)) {
+//         return $this->respond([
+//             'status' => false,
+//             'message' => 'Invalid or missing delivery ID.'
+//         ]);
+//     }
+
+//     $this->deliveryModel = new DeliveryModel();
+//     $this->deliveryItemModel = new DeliveryItemModel();
+
+//     $delivery = $this->deliveryModel->find($deliveryId);
+
+//     if (!$delivery || $delivery['is_deleted'] == 1) {
+//         return $this->respond([
+//             'status' => false,
+//             'message' => "Delivery ID {$deliveryId} not found or deleted."
+//         ]);
+//     }
+
+//     // Optional: Allow partial delivery by receiving delivered item IDs
+//     $input = $this->request->getJSON(true);
+//     $deliveredItems = $input['delivered_items'] ?? []; // e.g. [1, 2, 3]
+
+//     $this->db->transBegin();
+
+//     if (!empty($deliveredItems)) {
+//         // Mark specific items as delivered
+//         foreach ($deliveredItems as $itemId) {
+//             $this->deliveryItemModel->update($itemId, [
+//                 'delivery_status' => 'delivered',
+//                 'delivered_at' => date('Y-m-d H:i:s'),
+//                 'updated_by' => $user['user_id'],
+//             ]);
+//         }
+
+//         // Check if all items are delivered → mark delivery as delivered
+//         $pendingCount = $this->deliveryItemModel
+//             ->where('delivery_id', $deliveryId)
+//             ->where('delivery_status !=', 'delivered')
+//             ->countAllResults();
+
+//         if ($pendingCount == 0) {
+//             $this->deliveryModel->update($deliveryId, [
+//                 'delivery_status' => 'delivered',
+//                 'delivered_at' => date('Y-m-d H:i:s'),
+//                 'updated_by' => $user['user_id'],
+//             ]);
+//         }
+
+//     } else {
+//         // Mark entire delivery as delivered
+//         $this->deliveryModel->update($deliveryId, [
+//             'delivery_status' => 'delivered',
+//             'delivered_at' => date('Y-m-d H:i:s'),
+//             'updated_by' => $user['user_id'],
+//         ]);
+
+//         // Mark all items under it as delivered
+//         $this->deliveryItemModel
+//             ->where('delivery_id', $deliveryId)
+//             ->set([
+//                 'delivery_status' => 'delivered',
+//                 'delivered_at' => date('Y-m-d H:i:s'),
+//                 'updated_by' => $user['user_id'],
+//             ])
+//             ->update();
+//     }
+
+//     if ($this->db->transStatus() === false) {
+//         $this->db->transRollback();
+//         return $this->respond(['status' => false, 'message' => 'Failed to mark as delivered.']);
+//     }
+
+//     $this->db->transCommit();
+
+//     return $this->respond([
+//         'status' => true,
+//         'message' => "Delivery ID {$deliveryId} marked as delivered successfully.",
+//         'data' => [
+//             'delivery_id' => $deliveryId,
+//             'delivered_at' => date('Y-m-d H:i:s')
+//         ]
+//     ]);
+// }
+
 public function markAsDelivered($deliveryId = null)
 {
     $authHeader = \App\Helpers\AuthHelper::getAuthorizationToken($this->request);
@@ -177,23 +271,24 @@ public function markAsDelivered($deliveryId = null)
         ]);
     }
 
-    // Optional: Allow partial delivery by receiving delivered item IDs
+    // ✅ Get JSON payload
     $input = $this->request->getJSON(true);
     $deliveredItems = $input['delivered_items'] ?? []; // e.g. [1, 2, 3]
+    $deliveredAt = !empty($input['delivered_at']) ? $input['delivered_at'] : date('Y-m-d H:i:s');
 
     $this->db->transBegin();
 
     if (!empty($deliveredItems)) {
-        // Mark specific items as delivered
+        // ✅ Partial delivery
         foreach ($deliveredItems as $itemId) {
             $this->deliveryItemModel->update($itemId, [
                 'delivery_status' => 'delivered',
-                'delivered_at' => date('Y-m-d H:i:s'),
+                'delivered_at' => $deliveredAt,
                 'updated_by' => $user['user_id'],
             ]);
         }
 
-        // Check if all items are delivered → mark delivery as delivered
+        // ✅ Check if all items are now delivered
         $pendingCount = $this->deliveryItemModel
             ->where('delivery_id', $deliveryId)
             ->where('delivery_status !=', 'delivered')
@@ -202,25 +297,24 @@ public function markAsDelivered($deliveryId = null)
         if ($pendingCount == 0) {
             $this->deliveryModel->update($deliveryId, [
                 'delivery_status' => 'delivered',
-                'delivered_at' => date('Y-m-d H:i:s'),
+                'delivered_at' => $deliveredAt,
                 'updated_by' => $user['user_id'],
             ]);
         }
 
     } else {
-        // Mark entire delivery as delivered
+        // ✅ Full delivery
         $this->deliveryModel->update($deliveryId, [
             'delivery_status' => 'delivered',
-            'delivered_at' => date('Y-m-d H:i:s'),
+            'delivered_at' => $deliveredAt,
             'updated_by' => $user['user_id'],
         ]);
 
-        // Mark all items under it as delivered
         $this->deliveryItemModel
             ->where('delivery_id', $deliveryId)
             ->set([
                 'delivery_status' => 'delivered',
-                'delivered_at' => date('Y-m-d H:i:s'),
+                'delivered_at' => $deliveredAt,
                 'updated_by' => $user['user_id'],
             ])
             ->update();
@@ -238,10 +332,11 @@ public function markAsDelivered($deliveryId = null)
         'message' => "Delivery ID {$deliveryId} marked as delivered successfully.",
         'data' => [
             'delivery_id' => $deliveryId,
-            'delivered_at' => date('Y-m-d H:i:s')
+            'delivered_at' => $deliveredAt
         ]
     ]);
 }
+
 
  public function getAllDeliveries()
     {
