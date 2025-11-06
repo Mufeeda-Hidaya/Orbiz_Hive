@@ -230,6 +230,47 @@ class JobOrder extends ResourceController
         ]);
     }
 
+    //Progress update
+    public function updateJobOrderProgress()
+{
+    $json = $this->request->getJSON(true);
+    $joborderId = $json['joborder_id'] ?? null;
+    $progress = $json['progress'] ?? null;
+
+    if (!$joborderId || $progress === null) {
+        return $this->response->setJSON([
+            'status' => false,
+            'message' => 'joborder_id and progress are required'
+        ]);
+    }
+
+    // Update all joborder_items for that joborder_id
+    $builder = $this->db->table('joborder_items');
+    $builder->where('joborder_id', $joborderId);
+    $updateResult = $builder->update(['progress' => $progress]);
+
+    if ($updateResult) {
+        // Optionally update main joborder progress
+        $this->db->table('joborder')
+            ->where('joborder_id', $joborderId)
+            ->update(['updated_at' => date('Y-m-d H:i:s')]);
+
+        return $this->response->setJSON([
+            'status' => true,
+            'message' => 'Job order progress updated successfully',
+            'data' => [
+                'joborder_id' => $joborderId,
+                'progress' => $progress
+            ]
+        ]);
+    } else {
+        return $this->response->setJSON([
+            'status' => false,
+            'message' => 'Failed to update progress'
+        ]);
+    }
+}
+
 
 
 

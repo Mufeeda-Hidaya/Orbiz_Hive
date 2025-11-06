@@ -215,6 +215,8 @@ $routes->delete('estimate/delete/(:num)', 'Api\Estimate::deleteEstimate/$1');
 // Job Orders
 $routes->post('estimate/convertToOrder/(:num)', 'Api\JobOrder::convertToJobOrder/$1');
 $routes->get('order/getAll', 'Api\JobOrder::getAllJobOrders');
+$routes->post('joborder/update-progress', 'Api\JobOrder::updateJobOrderProgress');
+
 
 //Delivery 
 
