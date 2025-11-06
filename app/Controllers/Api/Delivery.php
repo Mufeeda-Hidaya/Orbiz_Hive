@@ -243,4 +243,42 @@ public function markAsDelivered($deliveryId = null)
     ]);
 }
 
+ public function getAllDeliveries()
+    {
+        $authHeader = AuthHelper::getAuthorizationToken($this->request);
+        $user = $this->authService->getAuthenticatedUser($authHeader);
+
+        if (!$user) {
+            return $this->failUnauthorized('Invalid or missing token.');
+        }
+
+        $pageIndex = (int) $this->request->getGet('pageIndex');
+        $pageSize  = (int) $this->request->getGet('pageSize');
+        $search    = $this->request->getGet('search');
+
+        if ($pageSize <= 0) $pageSize = 10;
+        $offset = $pageIndex * $pageSize;
+
+        $result = $this->deliveryModel->getAllDeliveries(
+            $user['company_id'],
+            $pageSize,
+            $offset,
+            $search
+        );
+
+        // Attach delivery items if available
+        foreach ($result['data'] as &$delivery) {
+            $delivery['items'] = $this->deliveryItemModel
+                ->where('delivery_id', $delivery['delivery_id'])
+                ->findAll();
+        }
+
+        return $this->response->setJSON([
+            'success' => true,
+            'message' => 'Deliveries fetched successfully.',
+            'total'   => $result['total'],
+            'data'    => $result['data']
+        ]);
+    }
+
 }
