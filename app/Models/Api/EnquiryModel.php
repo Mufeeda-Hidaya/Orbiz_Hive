@@ -18,7 +18,8 @@ class EnquiryModel extends Model
                 enquiries.enquiry_id,
                 enquiries.enquiry_no,
                 customers.name AS customer_name,
-                customers.address AS customer_address
+                customers.address AS customer_address,
+                customers.phone AS customer_phone
             ')
             ->join('customers', 'customers.customer_id = enquiries.customer_id', 'left')
             ->where('enquiries.is_deleted', 0)
