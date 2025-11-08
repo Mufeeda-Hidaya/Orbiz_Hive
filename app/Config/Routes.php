@@ -223,4 +223,6 @@ $routes->post('joborder/update-progress', 'Api\JobOrder::updateJobOrderProgress'
 $routes->post('joborder/convertToDelivery/(:num)', 'Api\Delivery::convertToDelivery/$1');
 $routes->post('delivery/markAsDelivered/(:num)', 'Api\Delivery::markAsDelivered/$1');
 $routes->get('delivery/getAll', 'Api\Delivery::getAllDeliveries');
+$routes->post('upload-image', 'Api\Enquiry::uploadImage');
+
 
