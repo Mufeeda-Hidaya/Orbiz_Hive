@@ -7,6 +7,7 @@ use App\Controllers\BaseController;
 use App\Models\Api\EnquiryModel;
 use App\Models\Api\EstimateModel;
 use App\Models\Api\EstimateItemModel;
+use App\Models\Api\SettingsModel;
 use App\Models\EnquiryItemModel;
 use App\Models\Manageuser_Model;
 use App\Models\customerModel;
@@ -32,6 +33,7 @@ class Estimate extends ResourceController
         $this->userModel = new Manageuser_Model();
         $this->customerModel = new customerModel();
         $this->enquiryModel = new EnquiryModel();
+        $this->settingsModel = new SettingsModel();
         $this->estimateModel = new EstimateModel();
         $this->estimateItemModel = new EstimateItemModel();
         $this->enquiryItemModel = new EnquiryItemModel();
@@ -48,74 +50,76 @@ class Estimate extends ResourceController
         }
 
         if (empty($enquiryId) || !is_numeric($enquiryId)) {
-            return $this->respond([
-                'status' => false,
-                'message' => 'Invalid or missing enquiry ID.'
-            ]);
+            return $this->respond(['status' => false, 'message' => 'Invalid enquiry ID']);
         }
 
-        $enquiry = $this->enquiryModel->getDetails($enquiryId);
-        if (!$enquiry) {
-            return $this->respond([
-                'status' => false,
-                'message' => 'Enquiry not found.'
-            ]);
-        }
+        // Fetch enquiry
+        $enquiry = $this->enquiryModel->where('enquiry_id', $enquiryId)->first();
 
-        if ($enquiry['is_deleted'] == 1) {
-            return $this->respond([
-                'status' => false,
-                'message' => "Enquiry ID {$enquiryId} is deleted and cannot be converted into an estimate."
-            ]);
-        }
+        if (!$enquiry)
+            return $this->respond(['status' => false, 'message' => 'Enquiry not found']);
 
-        if ($enquiry['is_converted'] == 1) {
-            return $this->respond([
-                'status' => false,
-                'message' => "Enquiry ID {$enquiryId} is already converted to an estimate."
-            ]);
-        }
-        $lastEstimateNo = $this->estimateModel
-            ->selectMax('estimate_no')
-            ->first();
+        if ($enquiry['is_deleted'])
+            return $this->respond(['status'=>false,'message'=>"Enquiry deleted"]);
 
-        $nextEstimateNo = isset($lastEstimateNo['estimate_no'])
-            ? ((int)$lastEstimateNo['estimate_no'] + 1)
-            : 1;
+        if ($enquiry['is_converted'])
+            return $this->respond(['status'=>false,'message'=>"Already converted"]);
+
+
+        // Fetch settings
+        $settings = $this->settingsModel->where('company_id', $user['company_id'])->first();
+
+        if (!$settings)
+            return $this->respond(['status' => false, 'message' => 'Settings not found']);
+
+        $defaultGP = floatval($settings['gp_percentage']);
+        $defaultLabourRate = floatval($settings['labour_rate']);
+
+        // Estimate number
+        $last = $this->estimateModel->selectMax('estimate_no')->first();
+        $nextEstimateNo = ($last && $last['estimate_no']) ? $last['estimate_no'] + 1 : 1;
+
         $this->db->transBegin();
-
         $estimateData = [
-            'enquiry_id'       => $enquiryId,
-            'user_id'          => $user['user_id'],
-            'customer_id'      => $enquiry['customer_id'] ?? null,
-            'customer_address' => $enquiry['customer_address'] ?? '',
-            'discount'         => 0,
-            'total_amount'     => 0,
-            'sub_total'        => 0,
-            'date'             => date('Y-m-d H:i:s'),
-            'phone_number'     => $enquiry['customer_phone'] ?? '',
-            'is_converted'     => 0,
-            'company_id'       => $user['company_id'],
-            'estimate_no'      => $nextEstimateNo,
+        'enquiry_id'       => $enquiryId,
+        'user_id'          => $user['user_id'],
+        'customer_id'      => $enquiry['customer_id'] ?? null,
+        'customer_address' => $enquiry['address'] ?? '',
+        'phone_number'     => $enquiry['phone'] ?? '',
+        'discount'         => 0,
+        'total_amount'     => 0,
+        'sub_total'        => 0,
+        'date'             => date('Y-m-d H:i:s'),
+        'is_converted'     => 0,
+        'company_id'       => $user['company_id'],
+        'estimate_no'      => $nextEstimateNo
         ];
 
-        $estimateId = $this->estimateModel->insert($estimateData);
+
+        $this->estimateModel->insert($estimateData);
+        $estimateId = $this->estimateModel->getInsertID();
+
         if (!$estimateId) {
             $this->db->transRollback();
-            return $this->respond(['status' => false, 'message' => 'Failed to create estimate.']);
+            return $this->respond(['status' => false, 'message' => 'Estimate creation failed']);
         }
-        $enquiryItems = $this->enquiryItemModel->getItemsByEnquiryId($enquiryId);
-        $payloadItems = json_decode(json_encode($this->request->getVar('items')), true);
+
+        // Request items
+        $payloadItems = $this->request->getVar('items');
+        $payloadItems = json_decode(json_encode($payloadItems), true);
+
+        $enquiryItems = $this->enquiryItemModel
+            ->where('enquiry_id', $enquiryId)
+            ->findAll();
 
         $totalAmount = 0;
         $savedItems = [];
 
         foreach ($enquiryItems as $item) {
-            $itemId = $item['item_id'];
-            $inputItem = null;
 
+            $inputItem = null;
             foreach ($payloadItems as $pi) {
-                if ($pi['item_id'] == $itemId) {
+                if ($pi['item_id'] == $item['item_id']) {
                     $inputItem = $pi;
                     break;
                 }
@@ -123,63 +127,95 @@ class Estimate extends ResourceController
 
             if (!$inputItem) continue;
 
-            $marketPrice  = isset($inputItem['market_price']) ? (float)$inputItem['market_price'] : 0;
-            $sellingPrice = isset($inputItem['selling_price']) ? (float)$inputItem['selling_price'] : 0;
-            $difference   = isset($inputItem['difference']) ? (float)$inputItem['difference'] : 0;
+            $workType = $inputItem['work_type'];
+            $gp = floatval($inputItem['gp_percentage'] ?? $defaultGP);
 
-            $estimateItemData = [
-                'estimate_id'           => $estimateId,
-                'description'           => $item['description'],
-                'market_price'          => $marketPrice,
-                'selling_price'         => $sellingPrice,
-                'difference_percentage' => $difference,
-                'quantity'              => $item['quantity'],
-                'status'                => 1,
-                'total'                 => $sellingPrice * $item['quantity'],
-                'item_order'            => 1,
-            ];
+            // Labour rate ALWAYS from settings
+            $labourRate = $defaultLabourRate;
 
-            $inserted = $this->estimateItemModel->insert($estimateItemData);
-            if (!$inserted) {
-                $this->db->transRollback();
-                return $this->respond(['status' => false, 'message' => 'Failed to add item to estimate.']);
+            if ($workType === "own_production") {
+
+                // Values from payload
+                $materialCost  = floatval($inputItem['material_cost'] ?? 0);
+                $labourHour    = floatval($inputItem['labour_hour'] ?? 0);
+                $labourCost    = floatval($inputItem['labour_cost'] ?? 0);   // <-- from payload
+                $transportCost = floatval($inputItem['transportation_cost'] ?? 0);
+
+                // Total cost = material + labour_cost (from payload) + transport
+                $totalCost = $materialCost + $labourCost + $transportCost;
+
+                // Selling price with GP
+                $sellingPrice = $totalCost + ($totalCost * $gp / 100);
+
+            } else {
+
+                // SUBCONTRACT CASE
+                $totalCost = floatval($inputItem['cost'] ?? 0);
+                $sellingPrice = $totalCost + ($totalCost * $gp / 100);
+
+                // Reset unused fields
+                $materialCost = 0;
+                $labourHour = 0;
+                $labourCost = 0;
+                $transportCost = 0;
             }
 
-            $totalAmount += $estimateItemData['total'];
+            $total = $sellingPrice * $item['quantity'];
+
+            $estimateItemData = [
+                'estimate_id' => $estimateId,
+                'description' => $item['description'],
+                'work_type' => $workType,
+                'material_cost' => $materialCost,
+                'labour_hour' => $labourHour,
+                'labour_rate' => $labourRate,
+                'transportation_cost' => $transportCost,
+                'labour_cost' => $labourCost,        // PAYLOAD VALUE
+                'total_cost' => $totalCost,
+                'gp_percentage' => $gp,
+                'selling_price' => $sellingPrice,
+                'quantity' => $item['quantity'],
+                'total' => $total,
+                'status' => 1,
+                'item_order' => 1
+            ];
+
+            $this->estimateItemModel->insert($estimateItemData);
+
             $savedItems[] = $estimateItemData;
+            $totalAmount += $total;
         }
 
+
+        // Update totals
         $this->estimateModel->update($estimateId, [
             'total_amount' => $totalAmount,
-            'sub_total'    => $totalAmount
+            'sub_total' => $totalAmount
         ]);
 
         $this->enquiryModel->update($enquiryId, ['is_converted' => 1]);
 
-        if ($this->db->transStatus() === false) {
+
+        if (!$this->db->transStatus()) {
             $this->db->transRollback();
-            return $this->respond(['status' => false, 'message' => 'Database transaction failed.']);
+            return $this->respond(['status' => false, 'message' => 'Transaction failed']);
         }
 
         $this->db->transCommit();
 
         return $this->respond([
-            'status'  => true,
-            'message' => "Enquiry ID {$enquiryId} successfully converted into an estimate.",
-            'data'    => [
-                'estimate_id'       => $estimateId,
-                'estimate_no'       => $nextEstimateNo,
-                'user_id'           => $user['user_id'], 
-                'enquiry_id'        => $enquiryId,
-                'customer_id'       => $enquiry['customer_id'],
-                'customer_name'     => $enquiry['customer_name'],
-                'customer_address'  => $enquiry['customer_address'],
-                'total_amount'      => $totalAmount,
-                'items'             => $savedItems
+            'status' => true,
+            'message' => "Estimate created successfully",
+            'data' => [
+                'estimate_id' => $estimateId,
+                'estimate_no' => $nextEstimateNo,
+                'total_amount' => $totalAmount,
+                'items' => $savedItems
             ]
         ]);
     }
-     public function getAllEstimates()
+
+    public function getAllEstimates()
     {
         $authHeader = AuthHelper::getAuthorizationToken($this->request);
         $user = $this->authService->getAuthenticatedUser($authHeader);

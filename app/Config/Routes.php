@@ -141,6 +141,7 @@ $routes->get('add_enquiry', 'Supplier::add_enquiry');
 $routes->post('enquiry/saveEnquiry', 'Supplier::saveEnquiry');
 $routes->post('enquiry/delete', 'Supplier::delete');
 // $routes->post('supplier/get_address', 'Supplier::get_address');
+$routes->post('customer/get-address-phone', 'Customer::get_address_phone');
 $routes->get('enquiry/edit/(:num)', 'Supplier::edit/$1');
 
 // $routes->get('supplier/getSupplier/(:num)', 'Supplier::getSupplier/$1');
@@ -226,3 +227,4 @@ $routes->get('delivery/getAll', 'Api\Delivery::getAllDeliveries');
 $routes->post('upload-image', 'Api\Enquiry::uploadImage');
 
 
+$routes->get('estimate/generateEstimate/(:num)', 'Estimate::generateEstimate/$1');
