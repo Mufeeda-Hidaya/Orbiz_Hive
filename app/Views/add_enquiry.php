@@ -262,6 +262,38 @@
     });
 });
 
+// Prefill customer address and phone fetch 
+
+$('#customer_id').on('change', function () {
+    var customerId = $(this).val();
+
+    if (!customerId) {
+        $('#customer_address').val('');
+        $('#phone_number').val('');
+        return;
+    }
+
+    $.ajax({
+        url: "<?= site_url('customer/get-address-phone') ?>",
+        type: "POST",
+        data: { customer_id: customerId },
+        dataType: "json",
+        success: function (res) {
+
+            if (res.status === "success") {
+                $('#customer_address').val(res.address);
+                $('#phone_number').val(res.phone);
+            } else {
+                $('#customer_address').val('');
+                $('#phone_number').val('');
+            }
+        },
+        error: function () {
+            $('#customer_address').val('');
+            $('#phone_number').val('');
+        }
+    });
+});
 
 
 

@@ -51,38 +51,51 @@ public function store()
     $role_name_raw = $this->request->getPost('role_name');
     $access_data = $this->request->getPost('access');
 
-    $normalized_role_name = trim(preg_replace('/\s+/', ' ', strtolower($role_name_raw)));
-
+    // $normalized_role_name = trim(preg_replace('/\s+/', ' ', strtolower($role_name_raw)));
+    $normalized_role_name = trim(preg_replace('/\s+/', ' ', $role_name_raw));
     $duplicate = $this->roleModel
         ->where('REPLACE(LOWER(TRIM(role_name)), " ", "") =', str_replace(' ', '', $normalized_role_name))
         ->where('company_id', session()->get('company_id'))
         ->first();
 
     if ($duplicate) {
-        return $this->response->setJSON(['status' => 'error', 'message' => 'Role Already Exists.']);
+        return $this->response->setJSON([
+            'status' => 'error',
+            'message' => 'Role Already Exists.'
+        ]);
+    }
+    if (empty($access_data)) {
+        return $this->response->setJSON([
+            'status' => 'error',
+            'message' => 'Please select at least one permission.'
+        ]);
     }
 
+    // Insert Role
     $this->roleModel->insert([
         'role_name'   => ucwords($normalized_role_name),
-        'company_id'  => session()->get('company_id'),   
+        'company_id'  => session()->get('company_id'),
         'created_at'  => date('Y-m-d H:i:s'),
         'updated_at'  => date('Y-m-d H:i:s')
     ]);
 
     $role_id = $this->roleModel->getInsertID();
 
-    if (!empty($access_data)) {
-        foreach ($access_data as $menu => $value) {
-            $this->roleMenuModel->insert([
-                'role_id'   => $role_id,
-                'menu_name' => $menu,
-                'access'    => 1
-            ]);
-        }
+    // Insert Permissions
+    foreach ($access_data as $menu => $value) {
+        $this->roleMenuModel->insert([
+            'role_id'   => $role_id,
+            'menu_name' => $menu,
+            'access'    => 1
+        ]);
     }
 
-    return $this->response->setJSON(['status' => 'success', 'message' => 'Role Created Successfully.']);
+    return $this->response->setJSON([
+        'status' => 'success',
+        'message' => 'Role Created Successfully.'
+    ]);
 }
+
 
     public function rolelist()
     {
@@ -167,7 +180,7 @@ if (empty($company_id)) {
         ];
     }
 
-    // Also pass $company_id to these methods
+   
    $totalRec = $this->roleModel->getAllFilteredRecords($condition, $fromstart, $tolimit, $orderBy, $orderDir, $company_id);
     $totalCount = $this->roleModel->getAllRoleCount($company_id);
     $filteredCountObj = $this->roleModel->getFilterRoleCount($condition, $company_id);

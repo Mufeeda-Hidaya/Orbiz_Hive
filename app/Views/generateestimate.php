@@ -201,14 +201,14 @@
             $grandTotal = 0.000000;
 
             foreach ($items as $item):
-              $grandTotal = bcadd((string) $grandTotal, (string) $item['total'], 6); // 6 decimals
+              $grandTotal = bcadd((string) $grandTotal, (string) $item['total'], 4); // 4 decimals
               ?>
               <tr>
                 <td><?= $si++ ?></td>
                 <td><?= esc($item['description']) ?></td>
                 <td><?= number_format((float)($item['selling_price'] ?? 0), 4, '.', '') ?></td>
                 <td><?= $item['quantity'] ?></td>
-                <td><?= number_format($item['total'], 6, '.', '') ?></td>
+                <td><?= number_format($item['total'], 4, '.', '') ?></td>
               </tr>
             <?php endforeach; ?>
 
@@ -234,7 +234,7 @@
             <tr>
               <td colspan="4" style="text-align: right;">SUBTOTAL</td>
               <td style="text-align: right; font-weight: 100;">
-                <?= sprintf('%.6f', $grandTotal) ?> KWD
+                <?= sprintf('%.4f', $grandTotal) ?> KWD
               </td>
             </tr>
 
@@ -242,7 +242,7 @@
             <tr>
               <td colspan="4" style="text-align: right;">DISCOUNT</td>
               <td style="text-align: right; font-weight: 100;">
-                <?= sprintf('%.6f', $estimate['discount'] ?? 0) ?> KWD
+                <?= sprintf('%.4f', $estimate['discount'] ?? 0) ?> KWD
               </td>
             </tr>
 
@@ -250,7 +250,7 @@
             <tr>
               <td colspan="4" style="text-align: right;">TOTAL</td>
               <td style="text-align: right; font-weight: 100;">
-                <?= sprintf('%.6f', $estimate['total_amount'] ?? 0) ?> KWD
+                <?= sprintf('%.4f', $estimate['total_amount'] ?? 0) ?> KWD
               </td>
             </tr>
           </tfoot>

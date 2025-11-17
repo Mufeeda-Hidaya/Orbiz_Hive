@@ -250,5 +250,26 @@ public function get_discount($id)
         return $this->response->setJSON(['discount' => 0.000000]);
     }
 }
+public function get_address_phone()
+{
+    $customer_id = $this->request->getPost('customer_id');
+
+    $model = new CustomerModel();
+    $customer = $model->find($customer_id);
+
+    if ($customer) {
+        return $this->response->setJSON([
+            'status' => 'success',
+            'address' => $customer['address'],
+            'phone' => $customer['phone']
+        ]);
+    }
+
+    return $this->response->setJSON([
+        'status' => 'error',
+        'message' => 'Customer not found'
+    ]);
+}
+
 
 }

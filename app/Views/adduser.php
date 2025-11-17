@@ -79,7 +79,7 @@
               <?php else: ?>
                 <!-- Edit Mode -->
                 <div class="col-md-12">
-                  <p class="text-muted"><b>Enter a new password and confirm it only if you wish to change your current password.</b></p>
+                  <p class="text-muted"><b>Change Password.</b></p>
                 </div>
                 <div class="row">
                   <div class="col-md-6">

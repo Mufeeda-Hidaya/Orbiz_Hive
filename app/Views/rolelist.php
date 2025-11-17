@@ -140,7 +140,7 @@
                 { searchable: false, orderable: false, targets: [0, 2, 5] } 
             ],
             language: {
-        infoFiltered: "", // ✅ Hides "(filtered from X total entries)"
+        infoFiltered: "", 
     }
         });
 
@@ -176,7 +176,7 @@
                 dataType: "json",
                 success: function (res) {
                     if (res.status === 'success') {
-                        alertBox.removeClass().addClass('alert alert-danger text-center position-fixed').text('Role Deleted Successfully.').fadeIn();
+                        alertBox.removeClass().addClass('alert alert-success text-center position-fixed').text('Role Deleted Successfully.').fadeIn();
                         setTimeout(() => alertBox.fadeOut(), 2000);
                         table.ajax.reload(null, false);
                     } else {
