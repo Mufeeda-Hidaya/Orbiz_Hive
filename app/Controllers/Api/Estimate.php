@@ -60,11 +60,13 @@ class Estimate extends ResourceController
             return $this->respond(['status' => false, 'message' => 'Enquiry not found']);
 
         if ($enquiry['is_deleted'])
-            return $this->respond(['status'=>false,'message'=>"Enquiry deleted"]);
+            return $this->respond(['status' => false, 'message' => "Enquiry deleted"]);
 
-        if ($enquiry['is_converted'])
+        $estimateId = $this->request->getVar('estimate_id');
+
+        if (!$estimateId && $enquiry['is_converted']) {
             return $this->respond(['status'=>false,'message'=>"Already converted"]);
-
+        }
 
         // Fetch settings
         $settings = $this->settingsModel->where('company_id', $user['company_id'])->first();
@@ -75,36 +77,58 @@ class Estimate extends ResourceController
         $defaultGP = floatval($settings['gp_percentage']);
         $defaultLabourRate = floatval($settings['labour_rate']);
 
-        // Estimate number
-        $last = $this->estimateModel->selectMax('estimate_no')->first();
-        $nextEstimateNo = ($last && $last['estimate_no']) ? $last['estimate_no'] + 1 : 1;
-
         $this->db->transBegin();
-        $estimateData = [
-        'enquiry_id'       => $enquiryId,
-        'user_id'          => $user['user_id'],
-        'customer_id'      => $enquiry['customer_id'] ?? null,
-        'customer_address' => $enquiry['address'] ?? '',
-        'phone_number'     => $enquiry['phone'] ?? '',
-        'discount'         => 0,
-        'total_amount'     => 0,
-        'sub_total'        => 0,
-        'date'             => date('Y-m-d H:i:s'),
-        'is_converted'     => 0,
-        'company_id'       => $user['company_id'],
-        'estimate_no'      => $nextEstimateNo
-        ];
 
+        if ($estimateId) 
+        {
+            $existing = $this->estimateModel->find($estimateId);
 
-        $this->estimateModel->insert($estimateData);
-        $estimateId = $this->estimateModel->getInsertID();
+            if (!$existing) {
+                return $this->respond(['status' => false, 'message' => 'Estimate not found']);
+            }
 
-        if (!$estimateId) {
-            $this->db->transRollback();
-            return $this->respond(['status' => false, 'message' => 'Estimate creation failed']);
+            // Update only basic fields
+            $this->estimateModel->update($estimateId, [
+                'customer_id'      => $enquiry['customer_id'] ?? null,
+                'customer_address' => $enquiry['address'] ?? '',
+                'phone_number'     => $enquiry['phone'] ?? '',
+                'company_id'       => $user['company_id']
+            ]);
+
+            // Delete old items
+            $this->estimateItemModel->where('estimate_id', $estimateId)->delete();
+
+        } 
+        else 
+        {
+            $last = $this->estimateModel->selectMax('estimate_no')->first();
+            $nextEstimateNo = ($last && $last['estimate_no']) ? $last['estimate_no'] + 1 : 1;
+
+            $estimateData = [
+                'enquiry_id'       => $enquiryId,
+                'user_id'          => $user['user_id'],
+                'customer_id'      => $enquiry['customer_id'] ?? null,
+                'customer_address' => $enquiry['address'] ?? '',
+                'phone_number'     => $enquiry['phone'] ?? '',
+                'discount'         => 0,
+                'total_amount'     => 0,
+                'sub_total'        => 0,
+                'date'             => date('Y-m-d H:i:s'),
+                'is_converted'     => 0,
+                'company_id'       => $user['company_id'],
+                'estimate_no'      => $nextEstimateNo
+            ];
+
+            $this->estimateModel->insert($estimateData);
+            $estimateId = $this->estimateModel->getInsertID();
+
+            if (!$estimateId) {
+                $this->db->transRollback();
+                return $this->respond(['status' => false, 'message' => 'Estimate creation failed']);
+            }
+
+            $this->enquiryModel->update($enquiryId, ['is_converted' => 1]);
         }
-
-        // Request items
         $payloadItems = $this->request->getVar('items');
         $payloadItems = json_decode(json_encode($payloadItems), true);
 
@@ -129,31 +153,23 @@ class Estimate extends ResourceController
 
             $workType = $inputItem['work_type'];
             $gp = floatval($inputItem['gp_percentage'] ?? $defaultGP);
-
-            // Labour rate ALWAYS from settings
             $labourRate = $defaultLabourRate;
 
             if ($workType === "own_production") {
 
-                // Values from payload
                 $materialCost  = floatval($inputItem['material_cost'] ?? 0);
                 $labourHour    = floatval($inputItem['labour_hour'] ?? 0);
-                $labourCost    = floatval($inputItem['labour_cost'] ?? 0);   // <-- from payload
+                $labourCost    = floatval($inputItem['labour_cost'] ?? 0);
                 $transportCost = floatval($inputItem['transportation_cost'] ?? 0);
 
-                // Total cost = material + labour_cost (from payload) + transport
                 $totalCost = $materialCost + $labourCost + $transportCost;
-
-                // Selling price with GP
                 $sellingPrice = $totalCost + ($totalCost * $gp / 100);
 
             } else {
 
-                // SUBCONTRACT CASE
                 $totalCost = floatval($inputItem['cost'] ?? 0);
                 $sellingPrice = $totalCost + ($totalCost * $gp / 100);
 
-                // Reset unused fields
                 $materialCost = 0;
                 $labourHour = 0;
                 $labourCost = 0;
@@ -170,7 +186,7 @@ class Estimate extends ResourceController
                 'labour_hour' => $labourHour,
                 'labour_rate' => $labourRate,
                 'transportation_cost' => $transportCost,
-                'labour_cost' => $labourCost,        // PAYLOAD VALUE
+                'labour_cost' => $labourCost,
                 'total_cost' => $totalCost,
                 'gp_percentage' => $gp,
                 'selling_price' => $sellingPrice,
@@ -186,15 +202,10 @@ class Estimate extends ResourceController
             $totalAmount += $total;
         }
 
-
-        // Update totals
         $this->estimateModel->update($estimateId, [
             'total_amount' => $totalAmount,
             'sub_total' => $totalAmount
         ]);
-
-        $this->enquiryModel->update($enquiryId, ['is_converted' => 1]);
-
 
         if (!$this->db->transStatus()) {
             $this->db->transRollback();
@@ -205,15 +216,15 @@ class Estimate extends ResourceController
 
         return $this->respond([
             'status' => true,
-            'message' => "Estimate created successfully",
+            'message' => $estimateId ? "Estimate updated successfully" : "Estimate created successfully",
             'data' => [
                 'estimate_id' => $estimateId,
-                'estimate_no' => $nextEstimateNo,
                 'total_amount' => $totalAmount,
                 'items' => $savedItems
             ]
         ]);
     }
+
 
     public function getAllEstimates()
     {
@@ -300,6 +311,34 @@ class Estimate extends ResourceController
         return $this->response->setJSON([
             'success' => true,
             'message' => "Estimate {$id} deleted successfully."
+        ]);
+    }
+    public function getSettingsData()
+    {
+        $authHeader = AuthHelper::getAuthorizationToken($this->request);
+        $user = $this->authService->getAuthenticatedUser($authHeader);
+        if (!$user) {
+            return $this->failUnauthorized('Invalid or missing token.');
+        }
+
+        $settings = $this->settingsModel
+            ->where('company_id', $user['company_id'])
+            ->first();
+
+        if (!$settings) {
+            return $this->respond([
+                'status'  => false,
+                'message' => 'Settings not found'
+            ]);
+        }
+
+        return $this->respond([
+            'status'  => true,
+            'message' => 'Settings fetched successfully',
+            'data'    => [
+                'gp_percentage' => floatval($settings['gp_percentage']),
+                'labour_rate'   => floatval($settings['labour_rate'])
+            ]
         ]);
     }
 }
