@@ -242,7 +242,7 @@ class Enquiry extends ResourceController
         ]);
     }
 
-    // ✅ Filter and validate items
+    //  Filter and validate items
     $validItems = [];
     foreach ($items as $item) {
         $desc = trim($item['description'] ?? '');
@@ -268,7 +268,7 @@ class Enquiry extends ResourceController
     $userId    = session()->get('user_id') ?? 1;
     $companyId = 1;
 
-    // ✅ Handle customer
+    //  Handle customer
     $existingCustomer = $customerModel->where('name', $name)->first();
     if ($existingCustomer) {
         $customerId = $existingCustomer['customer_id'];
@@ -299,7 +299,7 @@ class Enquiry extends ResourceController
         $customerId = $customerModel->getInsertID();
     }
 
-    // ✅ Update existing enquiry
+    //  Update existing enquiry
     if (!empty($enquiryId)) {
         $existing = $enquiryModel->find($enquiryId);
         if (!$existing) {
@@ -342,7 +342,7 @@ class Enquiry extends ResourceController
         ]);
     }
 
-    // ✅ Create new enquiry
+    // Create new enquiry
     $lastEnquiry = $enquiryModel->where('company_id', $companyId)->orderBy('enquiry_no', 'DESC')->first();
     $nextEnquiryNo = $lastEnquiry ? $lastEnquiry['enquiry_no'] + 1 : 1;
 
@@ -366,7 +366,7 @@ class Enquiry extends ResourceController
             'enquiry_id'  => $newEnquiryId,
             'description' => $item['description'],
             'quantity'    => $item['quantity'],
-            'images'      => $item['images'], // ✅ store image JSON here
+            'images'      => $item['images'], //  store image JSON here
             'status'      => 1,
             'created_at'  => date('Y-m-d H:i:s')
         ]);
