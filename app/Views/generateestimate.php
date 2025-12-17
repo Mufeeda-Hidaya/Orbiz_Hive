@@ -234,7 +234,7 @@
             <tr>
               <td colspan="4" style="text-align: right;">SUBTOTAL</td>
               <td style="text-align: right; font-weight: 100;">
-                <?= sprintf('%.4f', $grandTotal) ?> KWD
+                <?= sprintf('%.4f', $grandTotal) ?> AED
               </td>
             </tr>
 
@@ -242,7 +242,7 @@
             <tr>
               <td colspan="4" style="text-align: right;">DISCOUNT</td>
               <td style="text-align: right; font-weight: 100;">
-                <?= sprintf('%.4f', $estimate['discount'] ?? 0) ?> KWD
+                <?= sprintf('%.4f', $estimate['discount'] ?? 0) ?> AED
               </td>
             </tr>
 
@@ -250,7 +250,7 @@
             <tr>
               <td colspan="4" style="text-align: right;">TOTAL</td>
               <td style="text-align: right; font-weight: 100;">
-                <?= sprintf('%.4f', $estimate['total_amount'] ?? 0) ?> KWD
+                <?= sprintf('%.4f', $estimate['total_amount'] ?? 0) ?> AED
               </td>
             </tr>
           </tfoot>
