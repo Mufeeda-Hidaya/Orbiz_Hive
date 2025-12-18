@@ -111,7 +111,7 @@ class JobOrder extends ResourceController
                 'discount'     => $estimate['discount'],
                 'sub_total'    => $estimate['sub_total'],
                 'total_amount' => $estimate['total_amount'],
-                'is_converted' => 1,
+                'is_converted' => 0,
                 'is_deleted'   => 0,
                 'created_at'   => date('Y-m-d H:i:s'),
                 'created_by'   => $user['user_id'],
@@ -126,10 +126,15 @@ class JobOrder extends ResourceController
             }
         }
         $estimateItems = $this->estimateItemModel
-            ->where('estimate_id', $estimateId)
-            ->where('status', 1)
+            ->select('estimate_items.*, enquiry_items.item_id AS enquiry_item_id')
+            ->join(
+                'enquiry_items',
+                'enquiry_items.item_id = estimate_items.enquiry_item_id',
+                'left'
+            )
+            ->where('estimate_items.estimate_id', $estimateId)
+            ->where('estimate_items.status', 1)
             ->findAll();
-
         if (!$estimateItems) {
             $this->db->transRollback();
             return $this->respond([
@@ -159,6 +164,7 @@ class JobOrder extends ResourceController
             $jobItemData = [
                 'joborder_id'      => $jobOrderId,
                 'estimate_item_id' => $item['item_id'], 
+                'enquiry_item_id'  => $item['enquiry_item_id'],
                 'description'      => $item['description'],
                 'quantity'         => $item['quantity'],
                 'sub_total'        => $item['total'],
