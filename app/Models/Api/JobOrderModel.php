@@ -96,6 +96,7 @@ class JobOrderModel extends Model
             ->join('enquiry_items ei', 'ei.item_id = joi.enquiry_item_id', 'left')
             ->where('jo.company_id', $companyId)
             ->where('jo.is_deleted', 0)
+            ->where('jo.is_converted !=', 1)
             ->limit($limit, $offset)
             ->orderBy('jo.joborder_id', 'DESC');
 

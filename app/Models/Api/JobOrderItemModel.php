@@ -10,7 +10,7 @@ class JobOrderItemModel extends Model
     protected $allowedFields = [
         'joborder_id',
         'estimate_item_id',
-        'item_id',
+        'enquiry_item_id',
         'description',
         'quantity',
         'sub_total',
