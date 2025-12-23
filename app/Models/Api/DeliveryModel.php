@@ -8,13 +8,13 @@ class DeliveryModel extends Model
     protected $table = 'delivery';
     protected $primaryKey = 'delivery_id';
     protected $allowedFields = [
-        'joborder_id', 'user_id', 'customer_id', 'company_id',
+        'joborder_id', 'user_id', 'customer_id',
         'delivery_no', 'discount', 'sub_total', 'total_amount','delivery_status','delivered_at',
         'is_converted', 'is_deleted', 'created_at', 'created_by',
         'updated_at', 'updated_by'
     ];
 
-     public function getAllDeliveries($companyId, $limit = 10, $offset = 0, $search = null)
+     public function getAllDeliveries($limit = 10, $offset = 0, $search = null)
     {
         $builder = $this->db->table($this->table . ' d');
         $builder->select("
@@ -27,7 +27,7 @@ class DeliveryModel extends Model
         $builder->join('customers c', 'c.customer_id = d.customer_id', 'left');
         $builder->join('joborder jo', 'jo.joborder_id = d.joborder_id', 'left');
         $builder->where('d.is_deleted', 0);
-        $builder->where('d.company_id', $companyId);
+        // $builder->where('d.company_id', $companyId);
 
         if (!empty($search)) {
             $builder->groupStart()

@@ -9,7 +9,7 @@ use App\Models\EstimateModel;
 use App\Models\EstimateItemModel;
 use App\Models\Manageuser_Model;
 use App\Models\SalesModel;
-use App\Models\Managecompany_Model;
+// use App\Models\Managecompany_Model;
 use App\Models\TransactionModel;
 
 use Google\Cloud\Translate\V2\TranslateClient;
@@ -19,12 +19,12 @@ class Invoice extends BaseController
     public function add()
 {
     $customerModel = new customerModel();
-    $companyId = session()->get('company_id');
+    // $companyId = session()->get('company_id');
 
     // Only fetch active (not deleted) customers
     $customers = $customerModel
         ->where('is_deleted', 0)
-        ->where('company_id', $companyId)
+        // ->where('company_id', $companyId)
         ->findAll();
 
     return view('invoice_form', [
@@ -74,14 +74,14 @@ class Invoice extends BaseController
         ];
 
         $orderByColumn = $columns[$orderColumnIndex] ?? 'invoices.invoice_id';
-        $companyId = $session->get('company_id');
+        // $companyId = $session->get('company_id');
 
         $invoiceModel = new InvoiceModel();
         $itemModel = new InvoiceItemModel();
-        $invoices = $invoiceModel->where('company_id', $companyId)->findAll();
-        $totalRecords = $invoiceModel->getInvoiceCount($companyId);
-        $filteredRecords = $invoiceModel->getFilteredCount($searchValue, $companyId);
-        $records = $invoiceModel->getFilteredInvoices($searchValue, $start, $length, $orderByColumn, $orderDir, $companyId);
+        // $invoices = $invoiceModel->where('company_id', $companyId)->findAll();
+        $totalRecords = $invoiceModel->getInvoiceCount();
+        $filteredRecords = $invoiceModel->getFilteredCount($searchValue);
+        $records = $invoiceModel->getFilteredInvoices($searchValue, $start, $length, $orderByColumn, $orderDir);
 
         $data = [];
         $slno = $start + 1;
@@ -104,7 +104,7 @@ class Invoice extends BaseController
                 'discount' => $row['discount'],
                 'total_amount' => $row['total_amount'],
                 'status' => $row['status'] ?? 'unpaid',
-                'company_id' => $companyId,
+                // 'company_id' => $companyId,
                 'invoice_date' => date('d-m-Y', strtotime($row['invoice_date'])),
                 'payment_mode' => !empty($row['payment_mode']) ? strtolower($row['payment_mode']) : '',
 
@@ -156,8 +156,8 @@ class Invoice extends BaseController
 
         $customer = $customerModel->find($invoice['customer_id']);
 
-        $companyId = session()->get('company_id');
-        $company = $companyModel->find($companyId);
+        // $companyId = session()->get('company_id');
+        // $company = $companyModel->find($companyId);
 
         $invoice['payment_mode'] = strtolower($invoice['payment_mode'] ?? '');
 
@@ -166,16 +166,16 @@ class Invoice extends BaseController
             'items' => $invoice['items'],
             'user_name' => session()->get('user_name') ?? 'Salesman',
             'customer' => $customer ?? [],
-            'company' => $company,
+            // 'company' => $company,
         ];
 
-        if ($companyId == 69) {
-            return view('invoice_print', $viewData);
-        } elseif ($companyId == 70) {
-            return view('generate_invoice', $viewData);
-        } else {
-            return view('invoice_print', $viewData);
-        }
+        // if ($companyId == 69) {
+        //     return view('invoice_print', $viewData);
+        // } elseif ($companyId == 70) {
+        //     return view('generate_invoice', $viewData);
+        // } else {
+        //     return view('invoice_print', $viewData);
+        // }
     }
 
 
@@ -209,7 +209,7 @@ class Invoice extends BaseController
 
     $invoiceId = $request->getPost('invoice_id');
     $originalStatus = $request->getPost('original_status');
-    $companyId = session()->get('company_id');
+    // $companyId = session()->get('company_id');
 
     $totalAmount = $this->calculateTotal($request);
 
@@ -223,7 +223,7 @@ class Invoice extends BaseController
     'invoice_date' => date('Y-m-d'),
     'user_id' => session()->get('user_id') ?? 1,
     'status' => ($invoiceId && $originalStatus) ? $originalStatus : 'unpaid',
-    'company_id' => $companyId,
+    // 'company_id' => $companyId,
     // ✅ Add these two lines to fix balance calculation
     'paid_amount' => 0,
     'balance_amount' => $totalAmount
@@ -236,7 +236,7 @@ class Invoice extends BaseController
     } else {
         //  Generate company-specific invoice_no
         $lastInvoice = $invoiceModel
-            ->where('company_id', $companyId)
+            // ->where('company_id', $companyId)
             ->orderBy('invoice_no', 'DESC')
             ->first();
 
@@ -259,7 +259,7 @@ class Invoice extends BaseController
                 'customer_id' => $customerId,
                 'invoice_id'  => $invoiceId,
                 'user_id'     => session()->get('user_id') ?? 1,
-                'company_id'  => $companyId,
+                // 'company_id'  => $companyId,
                 'invoice_amount' => $totalAmount,
                 'paid_amount' => $totalAmount,   // full payment
                 'partial_paid_amount' => $totalAmount,
@@ -351,10 +351,10 @@ class Invoice extends BaseController
         ->orderBy('item_order', 'ASC') // <---- FIXED HERE
         ->findAll();
 
-    $companyId = session()->get('company_id');
+    // $companyId = session()->get('company_id');
     $customers = $customerModel
         ->where('is_deleted', 0)
-        ->where('company_id', $companyId)
+        // ->where('company_id', $companyId)
         ->findAll();
 
     $data = [
@@ -474,10 +474,10 @@ public function convertFromEstimate($estimateId)
         ->orderBy('item_order', 'ASC') // ensures consistent order
         ->findAll();
 
-    $companyId = session()->get('company_id');
+    // $companyId = session()->get('company_id');
     $customers = $customerModel
         ->where('is_deleted', 0)
-        ->where('company_id', $companyId)
+        // ->where('company_id', $companyId)
         ->findAll();
 
     // ✅ Set additional fields safely
@@ -557,7 +557,7 @@ public function convertFromEstimate($estimateId)
                 'customer_id' => $invoice['customer_id'],
                 'invoice_id' => $invoiceId,
                 'user_id' => session()->get('user_id') ?? 1,
-                'company_id' => $invoice['company_id'],
+                // 'company_id' => $invoice['company_id'],
                 'invoice_amount' => $invoice['total_amount'],
                 'paid_amount' => $delta,               // just this payment
                 'partial_paid_amount' => $newPaid,     // cumulative total paid
@@ -635,7 +635,7 @@ public function convertFromEstimate($estimateId)
             'customer_id' => $invoice['customer_id'],
             'invoice_id'  => $invoice_id,
             'user_id'     => session()->get('user_id') ?? 1,
-            'company_id'  => $invoice['company_id'],
+            // 'company_id'  => $invoice['company_id'],
             'invoice_amount' => $total,
             'paid_amount'  => $new_payment,       // this payment only
             'partial_paid_amount' => $updated_paid, // cumulative
@@ -663,8 +663,8 @@ public function convertFromEstimate($estimateId)
         $to = $this->request->getGet('to_date');
         $customer_id = $this->request->getGet('customer_id');
         $session = session();
-        $companyId = $session->get('company_id');
-        $customer = $salesModel->getCustomer($companyId);
+        // $companyId = $session->get('company_id');
+        $customer = $salesModel->getCustomer();
 
         $data['customers'] = $customer;
 

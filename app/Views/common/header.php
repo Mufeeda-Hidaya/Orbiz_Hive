@@ -1,16 +1,16 @@
 <?php
 $session = session();
-$company_id = $session->get('company_id') ?? null; 
+// $company_id = $session->get('company_id') ?? null; 
 $user_id = $session->get('user_id') ?? null;       
 
-if (!$company_id) {
-    $company_id = 1; 
-}
-$company = [];
-if ($company_id) {
-    $companyModel = new \App\Models\Managecompany_Model();
-    $company = $companyModel->find($company_id);
-}
+// if (!$company_id) {
+//     $company_id = 1; 
+// }
+// $company = [];
+// if ($company_id) {
+//     $companyModel = new \App\Models\Managecompany_Model();
+//     $company = $companyModel->find($company_id);
+// }
 ?>
 
 <!DOCTYPE html>

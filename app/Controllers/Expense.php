@@ -25,12 +25,12 @@ class Expense extends BaseController
     {
         $SupplierModel = new SupplierModel();
         $session    = session();
-        $companyId  = $session->get('company_id');
+        // $companyId  = $session->get('company_id');
         $data = [
             'isEdit' => !empty($id),
             'expense' => null,
            'suppliers' => $SupplierModel
-            ->where('company_id', $companyId)
+            // ->where('company_id', $companyId)
             ->where('is_deleted', 0)   // exclude deleted
             ->findAll()
         
@@ -48,7 +48,7 @@ class Expense extends BaseController
     {
         $expenseModel = new Expense_Model();
          $session = session();
-            $companyId = $session->get('company_id'); 
+            // $companyId = $session->get('company_id'); 
 
 
         $id           = $this->request->getPost('id');
@@ -73,7 +73,7 @@ class Expense extends BaseController
             'amount'       => $amount,
             'payment_mode' => $payment_mode,
             'reference'    => $reference,
-            'company_id'   => $companyId,
+            // 'company_id'   => $companyId,
             'supplier_id'  => $supplier_id
         ];
 
@@ -142,15 +142,15 @@ class Expense extends BaseController
     $condition = "1=1";
      $user = $userModel->find($session->get('user_id'));
     $roleId = $user['role_id'];
-    $companyId = $session->get('company_id');
+    // $companyId = $session->get('company_id');
 
-    if ($roleId == 1) { 
-        if (!empty($companyId)) {
-            $condition .= " AND company_id = " . (int) $companyId;
-        }
-    } else {
-         $condition .= " AND company_id = " . (int) $user['company_id'];
-    }
+    // if ($roleId == 1) { 
+    //     if (!empty($companyId)) {
+    //         $condition .= " AND company_id = " . (int) $companyId;
+    //     }
+    // } else {
+    //      $condition .= " AND company_id = " . (int) $user['company_id'];
+    // }
 
     $search = trim(preg_replace('/\s+/', ' ', $search)); 
 
@@ -221,7 +221,7 @@ class Expense extends BaseController
 {
     $model = new Expense_Model();
      $session = session();
-    $companyId = $session->get('company_id');
+    // $companyId = $session->get('company_id');
 
     $date     = $this->request->getPost('date');       
     $month    = $this->request->getPost('month');
@@ -230,7 +230,7 @@ class Expense extends BaseController
     $toDate   = $this->request->getPost('toDate');
 
     $builder = $model->builder();
-    $builder->where('company_id', $companyId);
+    // $builder->where('company_id', $companyId);
 
     
     if (!empty($fromDate) && !empty($toDate)) {

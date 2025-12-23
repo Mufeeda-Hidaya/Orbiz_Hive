@@ -1,0 +1,346 @@
+CRITICAL - 2025-12-20 07:12:10 --> ErrorException: Undefined variable $companies
+[Method: GET, Route: admin/login]
+in APPPATH\Views\login.php on line 72.
+ 1 APPPATH\Views\login.php(72): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined variable $companies', 'C:\\wamp64\\www\\Orbiz_Hive\\app\\Views\\login.php', 72)
+ 2 SYSTEMPATH\View\View.php(224): include('C:\\wamp64\\www\\Orbiz_Hive\\app\\Views\\login.php')
+ 3 SYSTEMPATH\View\View.php(227): CodeIgniter\View\View->{closure:CodeIgniter\View\View::render():221}()
+ 4 SYSTEMPATH\Common.php(1173): CodeIgniter\View\View->render('login', [], true)
+ 5 APPPATH\Controllers\Login.php(41): view('login', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Login->index()
+ 7 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Login))
+ 8 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ERROR - 2025-12-20 07:14:09 --> mysqli_sql_exception: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'FROM user
+            
+            WHERE user.email = 'admin@gmail.com'
+     ' at line 8 in C:\wamp64\www\Orbiz_Hive\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\wamp64\www\Orbiz_Hive\system\Database\MySQLi\Connection.php(327): mysqli->query('\r\n            S...', 0)
+#1 C:\wamp64\www\Orbiz_Hive\system\Database\BaseConnection.php(738): CodeIgniter\Database\MySQLi\Connection->execute('\r\n            S...')
+#2 C:\wamp64\www\Orbiz_Hive\system\Database\BaseConnection.php(652): CodeIgniter\Database\BaseConnection->simpleQuery('\r\n            S...')
+#3 C:\wamp64\www\Orbiz_Hive\app\Models\Login_Model.php(29): CodeIgniter\Database\BaseConnection->query('\r\n            S...', Array)
+#4 C:\wamp64\www\Orbiz_Hive\app\Controllers\Login.php(56): App\Models\Login_Model->authenticateNow('admin@gmail.com', 'admin123')
+#5 C:\wamp64\www\Orbiz_Hive\system\CodeIgniter.php(933): App\Controllers\Login->authenticate()
+#6 C:\wamp64\www\Orbiz_Hive\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Login))
+#7 C:\wamp64\www\Orbiz_Hive\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#8 C:\wamp64\www\Orbiz_Hive\system\Boot.php(334): CodeIgniter\CodeIgniter->run()
+#9 C:\wamp64\www\Orbiz_Hive\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#10 C:\wamp64\www\Orbiz_Hive\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#11 {main}
+CRITICAL - 2025-12-20 07:14:09 --> CodeIgniter\Database\Exceptions\DatabaseException: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'FROM user
+            
+            WHERE user.email = 'admin@gmail.com'
+     ' at line 8
+[Method: POST, Route: admin/login/authenticate]
+in SYSTEMPATH\Database\BaseConnection.php on line 692.
+ 1 APPPATH\Models\Login_Model.php(29): CodeIgniter\Database\BaseConnection->query('
+            SELECT 
+                user.user_id, 
+                user.name, 
+                user.email, 
+                user.role_id,
+                user.status AS user_status,
+            
+            FROM user
+            
+            WHERE user.email = ?
+              AND user.password = ?
+            LIMIT 1
+        ', [...])
+ 2 APPPATH\Controllers\Login.php(56): App\Models\Login_Model->authenticateNow('admin@gmail.com', 'admin123')
+ 3 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Login->authenticate()
+ 4 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Login))
+ 5 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 6 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 7 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 8 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-12-20 07:14:09 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'FROM user
+            
+            WHERE user.email = 'admin@gmail.com'
+     ' at line 8
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 332.
+ 1 SYSTEMPATH\Database\BaseConnection.php(738): CodeIgniter\Database\MySQLi\Connection->execute('
+            SELECT 
+                user.user_id, 
+                user.name, 
+                user.email, 
+                user.role_id,
+                user.status AS user_status,
+            
+            FROM user
+            
+            WHERE user.email = \'admin@gmail.com\'
+              AND user.password = \'0192023a7bbd73250516f069df18b500\'
+            LIMIT 1
+        ')
+ 2 SYSTEMPATH\Database\BaseConnection.php(652): CodeIgniter\Database\BaseConnection->simpleQuery('
+            SELECT 
+                user.user_id, 
+                user.name, 
+                user.email, 
+                user.role_id,
+                user.status AS user_status,
+            
+            FROM user
+            
+            WHERE user.email = \'admin@gmail.com\'
+              AND user.password = \'0192023a7bbd73250516f069df18b500\'
+            LIMIT 1
+        ')
+ 3 APPPATH\Models\Login_Model.php(29): CodeIgniter\Database\BaseConnection->query('
+            SELECT 
+                user.user_id, 
+                user.name, 
+                user.email, 
+                user.role_id,
+                user.status AS user_status,
+            
+            FROM user
+            
+            WHERE user.email = ?
+              AND user.password = ?
+            LIMIT 1
+        ', [...])
+ 4 APPPATH\Controllers\Login.php(56): App\Models\Login_Model->authenticateNow('admin@gmail.com', 'admin123')
+ 5 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Login->authenticate()
+ 6 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Login))
+ 7 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-12-20 07:14:09 --> [Caused by] mysqli_sql_exception: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'FROM user
+            
+            WHERE user.email = 'admin@gmail.com'
+     ' at line 8
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 327.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(327): mysqli->query('
+            SELECT 
+                user.user_id, 
+                user.name, 
+                user.email, 
+                user.role_id,
+                user.status AS user_status,
+            
+            FROM user
+            
+            WHERE user.email = \'admin@gmail.com\'
+              AND user.password = \'0192023a7bbd73250516f069df18b500\'
+            LIMIT 1
+        ', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(738): CodeIgniter\Database\MySQLi\Connection->execute('
+            SELECT 
+                user.user_id, 
+                user.name, 
+                user.email, 
+                user.role_id,
+                user.status AS user_status,
+            
+            FROM user
+            
+            WHERE user.email = \'admin@gmail.com\'
+              AND user.password = \'0192023a7bbd73250516f069df18b500\'
+            LIMIT 1
+        ')
+ 3 SYSTEMPATH\Database\BaseConnection.php(652): CodeIgniter\Database\BaseConnection->simpleQuery('
+            SELECT 
+                user.user_id, 
+                user.name, 
+                user.email, 
+                user.role_id,
+                user.status AS user_status,
+            
+            FROM user
+            
+            WHERE user.email = \'admin@gmail.com\'
+              AND user.password = \'0192023a7bbd73250516f069df18b500\'
+            LIMIT 1
+        ')
+ 4 APPPATH\Models\Login_Model.php(29): CodeIgniter\Database\BaseConnection->query('
+            SELECT 
+                user.user_id, 
+                user.name, 
+                user.email, 
+                user.role_id,
+                user.status AS user_status,
+            
+            FROM user
+            
+            WHERE user.email = ?
+              AND user.password = ?
+            LIMIT 1
+        ', [...])
+ 5 APPPATH\Controllers\Login.php(56): App\Models\Login_Model->authenticateNow('admin@gmail.com', 'admin123')
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Login->authenticate()
+ 7 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Login))
+ 8 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ERROR - 2025-12-20 07:14:28 --> mysqli_sql_exception: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'FROM user
+            
+            WHERE user.email = 'admin@gmail.com'
+     ' at line 8 in C:\wamp64\www\Orbiz_Hive\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\wamp64\www\Orbiz_Hive\system\Database\MySQLi\Connection.php(327): mysqli->query('\r\n            S...', 0)
+#1 C:\wamp64\www\Orbiz_Hive\system\Database\BaseConnection.php(738): CodeIgniter\Database\MySQLi\Connection->execute('\r\n            S...')
+#2 C:\wamp64\www\Orbiz_Hive\system\Database\BaseConnection.php(652): CodeIgniter\Database\BaseConnection->simpleQuery('\r\n            S...')
+#3 C:\wamp64\www\Orbiz_Hive\app\Models\Login_Model.php(29): CodeIgniter\Database\BaseConnection->query('\r\n            S...', Array)
+#4 C:\wamp64\www\Orbiz_Hive\app\Controllers\Login.php(56): App\Models\Login_Model->authenticateNow('admin@gmail.com', 'admin123')
+#5 C:\wamp64\www\Orbiz_Hive\system\CodeIgniter.php(933): App\Controllers\Login->authenticate()
+#6 C:\wamp64\www\Orbiz_Hive\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Login))
+#7 C:\wamp64\www\Orbiz_Hive\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#8 C:\wamp64\www\Orbiz_Hive\system\Boot.php(334): CodeIgniter\CodeIgniter->run()
+#9 C:\wamp64\www\Orbiz_Hive\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#10 C:\wamp64\www\Orbiz_Hive\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#11 {main}
+CRITICAL - 2025-12-20 07:14:28 --> CodeIgniter\Database\Exceptions\DatabaseException: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'FROM user
+            
+            WHERE user.email = 'admin@gmail.com'
+     ' at line 8
+[Method: POST, Route: admin/login/authenticate]
+in SYSTEMPATH\Database\BaseConnection.php on line 692.
+ 1 APPPATH\Models\Login_Model.php(29): CodeIgniter\Database\BaseConnection->query('
+            SELECT 
+                user.user_id, 
+                user.name, 
+                user.email, 
+                user.role_id,
+                user.status AS user_status,
+            
+            FROM user
+            
+            WHERE user.email = ?
+              AND user.password = ?
+            LIMIT 1
+        ', [...])
+ 2 APPPATH\Controllers\Login.php(56): App\Models\Login_Model->authenticateNow('admin@gmail.com', 'admin123')
+ 3 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Login->authenticate()
+ 4 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Login))
+ 5 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 6 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 7 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 8 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-12-20 07:14:28 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'FROM user
+            
+            WHERE user.email = 'admin@gmail.com'
+     ' at line 8
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 332.
+ 1 SYSTEMPATH\Database\BaseConnection.php(738): CodeIgniter\Database\MySQLi\Connection->execute('
+            SELECT 
+                user.user_id, 
+                user.name, 
+                user.email, 
+                user.role_id,
+                user.status AS user_status,
+            
+            FROM user
+            
+            WHERE user.email = \'admin@gmail.com\'
+              AND user.password = \'0192023a7bbd73250516f069df18b500\'
+            LIMIT 1
+        ')
+ 2 SYSTEMPATH\Database\BaseConnection.php(652): CodeIgniter\Database\BaseConnection->simpleQuery('
+            SELECT 
+                user.user_id, 
+                user.name, 
+                user.email, 
+                user.role_id,
+                user.status AS user_status,
+            
+            FROM user
+            
+            WHERE user.email = \'admin@gmail.com\'
+              AND user.password = \'0192023a7bbd73250516f069df18b500\'
+            LIMIT 1
+        ')
+ 3 APPPATH\Models\Login_Model.php(29): CodeIgniter\Database\BaseConnection->query('
+            SELECT 
+                user.user_id, 
+                user.name, 
+                user.email, 
+                user.role_id,
+                user.status AS user_status,
+            
+            FROM user
+            
+            WHERE user.email = ?
+              AND user.password = ?
+            LIMIT 1
+        ', [...])
+ 4 APPPATH\Controllers\Login.php(56): App\Models\Login_Model->authenticateNow('admin@gmail.com', 'admin123')
+ 5 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Login->authenticate()
+ 6 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Login))
+ 7 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-12-20 07:14:28 --> [Caused by] mysqli_sql_exception: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'FROM user
+            
+            WHERE user.email = 'admin@gmail.com'
+     ' at line 8
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 327.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(327): mysqli->query('
+            SELECT 
+                user.user_id, 
+                user.name, 
+                user.email, 
+                user.role_id,
+                user.status AS user_status,
+            
+            FROM user
+            
+            WHERE user.email = \'admin@gmail.com\'
+              AND user.password = \'0192023a7bbd73250516f069df18b500\'
+            LIMIT 1
+        ', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(738): CodeIgniter\Database\MySQLi\Connection->execute('
+            SELECT 
+                user.user_id, 
+                user.name, 
+                user.email, 
+                user.role_id,
+                user.status AS user_status,
+            
+            FROM user
+            
+            WHERE user.email = \'admin@gmail.com\'
+              AND user.password = \'0192023a7bbd73250516f069df18b500\'
+            LIMIT 1
+        ')
+ 3 SYSTEMPATH\Database\BaseConnection.php(652): CodeIgniter\Database\BaseConnection->simpleQuery('
+            SELECT 
+                user.user_id, 
+                user.name, 
+                user.email, 
+                user.role_id,
+                user.status AS user_status,
+            
+            FROM user
+            
+            WHERE user.email = \'admin@gmail.com\'
+              AND user.password = \'0192023a7bbd73250516f069df18b500\'
+            LIMIT 1
+        ')
+ 4 APPPATH\Models\Login_Model.php(29): CodeIgniter\Database\BaseConnection->query('
+            SELECT 
+                user.user_id, 
+                user.name, 
+                user.email, 
+                user.role_id,
+                user.status AS user_status,
+            
+            FROM user
+            
+            WHERE user.email = ?
+              AND user.password = ?
+            LIMIT 1
+        ', [...])
+ 5 APPPATH\Controllers\Login.php(56): App\Models\Login_Model->authenticateNow('admin@gmail.com', 'admin123')
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Login->authenticate()
+ 7 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Login))
+ 8 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))

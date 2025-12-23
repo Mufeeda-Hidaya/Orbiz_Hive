@@ -9,7 +9,7 @@ class EnquiryModel extends Model
     protected $primaryKey = 'enquiry_id';
     protected $allowedFields = [
         'enquiry_no','customer_id','address','phone','name','user_id',
-    'created_by','created_at','company_id','is_deleted', 'is_converted','updated_by','updated_at'
+    'created_by','created_at','is_deleted', 'is_converted','updated_by','updated_at'
     ];
 
     public function getAllEnquiries($pageSize = 10, $offset = 0, $search = '')

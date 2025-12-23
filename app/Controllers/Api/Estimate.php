@@ -70,7 +70,7 @@ class Estimate extends ResourceController
         }
 
         $settings = $this->settingsModel
-            ->where('company_id', $user['company_id'])
+            // ->where('company_id', $user['company_id'])
             ->first();
 
         if (!$settings) {
@@ -88,7 +88,7 @@ class Estimate extends ResourceController
                 'customer_id' => $enquiry['customer_id'] ?? null,
                 'customer_address' => $enquiry['address'] ?? '',
                 'phone_number' => $enquiry['phone'] ?? '',
-                'company_id' => $user['company_id']
+                // 'company_id' => $user['company_id']
             ]);
 
             $this->estimateItemModel
@@ -110,7 +110,7 @@ class Estimate extends ResourceController
                 'total_amount' => 0,
                 'sub_total' => 0,
                 'date' => date('Y-m-d H:i:s'),
-                'company_id' => $user['company_id'],
+                // 'company_id' => $user['company_id'],
                 'estimate_no' => $nextEstimateNo
             ]);
 
@@ -252,7 +252,7 @@ class Estimate extends ResourceController
         $offset = $pageIndex * $pageSize;
 
         $result = $this->estimateModel
-            ->getEstimates($user['company_id'], $pageSize, $offset, $search);
+            ->getEstimates($pageSize, $offset, $search);
 
         foreach ($result['data'] as &$estimate) {
 
@@ -301,7 +301,7 @@ class Estimate extends ResourceController
             return $this->failUnauthorized('Invalid or missing token.');
         }
 
-        $estimate = $this->estimateModel->getEstimateById($id, $user['company_id']);
+        $estimate = $this->estimateModel->getEstimateById($id);
 
         if (!$estimate) {
             return $this->response->setJSON([
@@ -362,7 +362,7 @@ class Estimate extends ResourceController
         }
 
         $settings = $this->settingsModel
-            ->where('company_id', $user['company_id'])
+            // ->where('company_id', $user['company_id'])
             ->first();
 
         if (!$settings) {

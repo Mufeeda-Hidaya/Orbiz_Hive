@@ -142,7 +142,7 @@ class Estimate extends BaseController
         'total_amount'     => $grandTotal,
         'date'             => date('Y-m-d'),
         'phone_number'     => $phoneNumber,
-        'company_id'       => 1
+        // 'company_id'       => 1
     ];
     $itemsArray = [];
     foreach ($description as $key => $desc) {
@@ -398,7 +398,7 @@ private function translateToArabic($text)
         $role = $roleModel->find($roleId);
         $roleName = $role['role_name'] ?? '';
     }
-    $companyId = $estimate['company_id'] ?? session()->get('company_id');
+    // $companyId = $estimate['company_id'] ?? session()->get('company_id');
     $company = $companyModel->find($companyId) ?? [
         'company_name' => '',
         'company_name_ar' => '',

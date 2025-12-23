@@ -17,7 +17,7 @@ class Customer extends BaseController
     public function create()
     {
         $session = session();
-        $company_id = $this->request->getPost('company_id') ?? $session->get('company_id') ?? 1;
+        // $company_id = $this->request->getPost('company_id') ?? $session->get('company_id') ?? 1;
         $user_id = $session->get('user_id');
 
         $name = ucwords(strtolower(trim($this->request->getPost('name'))));
@@ -41,7 +41,7 @@ class Customer extends BaseController
             'client_name' => $clientname,
             'address' => $address,
             'phone' => $phone,
-            'company_id' => $company_id,
+            // 'company_id' => $company_id,
             'user_id' => $user_id, // always from session
             'max_discount' => round((float) ($max_discount ?? 0), 6)
         ];
@@ -124,10 +124,10 @@ class Customer extends BaseController
     {
         $session = session();
         $customerModel = new customerModel();
-        $company_id = $session->get('company_id');
+        // $company_id = $session->get('company_id');
 
         $data['customers'] = $customerModel
-            ->where('company_id', $company_id)
+            // ->where('company_id', $company_id)
             ->where('is_deleted', 0)
             ->findAll();
 
@@ -139,7 +139,7 @@ class Customer extends BaseController
         $session = session();
         $request = service('request');
         $model = new CustomerModel();
-        $company_id = $session->get('company_id');
+        // $company_id = $session->get('company_id');
 
         $draw = $request->getPost('draw') ?? 1;
         $start = $request->getPost('start') ?? 0;
@@ -167,8 +167,8 @@ class Customer extends BaseController
             $start,
             $length,
             $orderColumn,
-            $orderDir,
-            $company_id
+            $orderDir
+            // $company_id
         );
 
         $result = [];
@@ -187,7 +187,7 @@ class Customer extends BaseController
 
         // ✅ Correct counts
         $recordsTotal = $model->getAllCustomerCount();
-        $recordsFiltered = $model->getFilteredCustomerCount($search, $company_id)->filCustomers;
+        $recordsFiltered = $model->getFilteredCustomerCount($search)->filCustomers;
 
         return $this->response->setJSON([
             'draw' => intval($draw),

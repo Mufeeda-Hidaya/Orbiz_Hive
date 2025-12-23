@@ -25,12 +25,12 @@ class Supplier extends BaseController
     $enquiryModel = new SupplierModel();
     $enquiryItemModel = new EnquiryItemModel();
 
-    $companyId = 1;
+    // $companyId = 1;
 
     // Load all customers
     $data['customers'] = $customerModel
         ->where('is_deleted', 0)
-        ->where('company_id', $companyId)
+        // ->where('company_id', $companyId)
         ->orderBy('customer_id', 'DESC')
         ->findAll();
 
@@ -97,7 +97,7 @@ class Supplier extends BaseController
     $name     = $customer['name'];
     $phone    = $customer['phone'];
     $userId   = session()->get('user_id') ?? 1;
-    $companyId = 1;
+    // $companyId = 1;
 
     // -------------------------
     // 3. Prepare enquiry data
@@ -108,7 +108,7 @@ class Supplier extends BaseController
         'address'     => $address,
         'phone'       => $phone,
         'user_id'     => $userId,
-        'company_id'  => $companyId,
+        // 'company_id'  => $companyId,
         'is_deleted'  => 0,
         'created_by'  => $userId,
         'created_at'  => date('Y-m-d H:i:s'),
@@ -170,7 +170,7 @@ class Supplier extends BaseController
     // 5. New enquiry — Generate enquiry number
     // -------------------------
     $lastEnquiry = $enquiryModel
-        ->where('company_id', $companyId)
+        // ->where('company_id', $companyId)
         ->orderBy('enquiry_no', 'DESC')
         ->first();
 
@@ -232,7 +232,8 @@ class Supplier extends BaseController
         $columnMap = [
             0 => 'enquiry_id',
             1 => 'name',
-            2 => 'address'
+            2 => 'address',
+            3 => 'client_name'
         ];
         $orderColumn = $columnMap[$columnIndex] ?? 'enquiry_id';
 
@@ -248,6 +249,7 @@ class Supplier extends BaseController
                 'enquiry_id' => $row['enquiry_id'],
                 'name'       => ucwords(strtolower($row['name'] ?? '')),
                 'address'    => ucwords(strtolower($row['address'] ?? '')),
+                'client_name'  => ucwords(strtolower($row['client_name'] ?? '')),
                 'is_converted' => $row['is_converted'] ?? 0,
             ];
         }

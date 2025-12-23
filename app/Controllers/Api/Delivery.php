@@ -82,7 +82,7 @@ class Delivery extends ResourceController
             'joborder_id'  => $joborderId,
             'user_id'      => $user['user_id'],
             'customer_id'  => $jobOrder['customer_id'],
-            'company_id'   => $user['company_id'],
+            // 'company_id'   => $user['company_id'],
             'delivery_no'  => $nextDeliveryNo,
             'discount'     => $jobOrder['discount'],
             'sub_total'    => $jobOrder['sub_total'],
@@ -263,7 +263,7 @@ class Delivery extends ResourceController
         $offset = $pageIndex * $pageSize;
 
         $result = $this->deliveryModel->getAllDeliveries(
-            $user['company_id'],
+            // $user['company_id'],
             $pageSize,
             $offset,
             $search

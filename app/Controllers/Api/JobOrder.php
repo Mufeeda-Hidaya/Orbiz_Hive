@@ -106,7 +106,7 @@ class JobOrder extends ResourceController
                 'estimate_id'  => $estimateId,
                 'user_id'      => $user['user_id'],
                 'customer_id'  => $estimate['customer_id'],
-                'company_id'   => $user['company_id'],
+                // 'company_id'   => $user['company_id'],
                 'joborder_no'  => $nextNo,
                 'discount'     => $estimate['discount'],
                 'sub_total'    => $estimate['sub_total'],
@@ -234,7 +234,7 @@ class JobOrder extends ResourceController
         $offset = $pageIndex * $pageSize;
 
         $result = $this->jobOrderModel->getAllJobOrders(
-            $user['company_id'],
+            // $user['company_id'],
             $pageSize,
             $offset,
             $search

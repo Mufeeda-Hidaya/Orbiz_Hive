@@ -4,7 +4,7 @@ namespace App\Controllers;
 use App\Controllers\BaseController;
 use App\Models\Manageuser_Model;
 use App\Models\RoleModel;
-use App\Models\Managecompany_Model;
+// use App\Models\Managecompany_Model;
 
 class Manageuser extends BaseController
 {
@@ -23,21 +23,21 @@ public function index($uid = null)
 
     $userModel           = new Manageuser_Model();
     $roleModel           = new RoleModel();
-    $managecompany_Model = new Managecompany_Model();
+    // $managecompany_Model = new Managecompany_Model();
 
     $userData = $isEdit ? $userModel->find($uid) : [];
 
-    $loggedInCompanyId = $session->get('company_id');
+    // $loggedInCompanyId = $session->get('company_id');
     // fetch only roles for the logged-in company
-    $roles = $roleModel->where('company_id', $loggedInCompanyId)->findAll();
-    $companies = $managecompany_Model->where('company_id', $loggedInCompanyId)->findAll();
+    $roles     = $roleModel->findAll();
+    // $companies = $managecompany_Model->where('company_id', $loggedInCompanyId)->findAll();
 
     return view('adduser', [
         'uid'       => $uid,
         'isEdit'    => $isEdit,
         'userData'  => $userData,
         'roles'     => $roles,
-        'companies' => $companies
+        // 'companies' => $companies
     ]);
 }
     public function add(){
@@ -119,7 +119,7 @@ public function index($uid = null)
             'email'       => $email,
             'phonenumber' => $phone,
             'role_id'     => $roleId,
-            'company_id'  => 1
+            // 'company_id'  => 1
         ];
 
         if (!$isEdit && $pw !== '') {
@@ -176,7 +176,7 @@ public function userlistajax()
     $db = \Config\Database::connect();
     $session = \Config\Services::session();
     $roleId = $session->get('role_Id');
-    $companyId = $session->get('company_id');
+    // $companyId = $session->get('company_id');
 
     $draw = $_POST['draw'] ?? 1;
     $fromstart = $_POST['start'] ?? 0;
@@ -197,9 +197,9 @@ public function userlistajax()
     $orderColumn = $columnMap[$columnIndex] ?? 'user_id';
 
   $condition = "1=1";
-if (!empty($companyId)) {
-    $condition .= " AND user.company_id = " . (int)$companyId;
-}
+// if (!empty($companyId)) {
+//     $condition .= " AND user.company_id = " . (int)$companyId;
+// }
 
 
     // Search logic
@@ -234,7 +234,8 @@ if (!empty($companyId)) {
 
     }
     
-    $totalCondition = ($roleId == 1) ? "1=1" : "user.company_id = " . (int)$companyId;
+    // $totalCondition = ($roleId == 1) ? "1=1" : "user.company_id = " . (int)$companyId;
+    $totalCondition = "1=1";
     $total = $userModel->getAllUserCount($totalCondition)->totuser ?? 0;
     $filtered = $userModel->getFilterUserCount($condition);
     $filteredTotal = isset($filtered->totuser) ? (int) $filtered->totuser : 0;

@@ -8,7 +8,7 @@ class Expense_Model extends Model
 {
     protected $table = 'expenses';
     protected $primaryKey = 'id';
-    protected $allowedFields = ['date', 'particular', 'amount', 'payment_mode', 'reference', 'company_id', 'supplier_id']; 
+    protected $allowedFields = ['date', 'particular', 'amount', 'payment_mode', 'reference', 'supplier_id']; 
 
     public function getAllExpenseCount() {
         return $this->db->query("SELECT COUNT(*) AS totexpense FROM expenses")->getRow();
@@ -24,14 +24,14 @@ class Expense_Model extends Model
             'payment_mode'  => 'e.payment_mode',
             'reference'     => 'e.reference',
             'supplier_id'   => 'e.supplier_id',
-            'company_id'    => 'e.company_id',
+            // 'company_id'    => 'e.company_id',
             'supplier_name' => 's.name',
         ];
 
         $orderBy = array_key_exists($orderBy, $allowedColumns) ? $allowedColumns[$orderBy] : 'e.id';
         $orderDir = strtolower($orderDir) === 'asc' ? 'ASC' : 'DESC';
 
-        $condition = str_replace('company_id', 'e.company_id', $condition);
+        // $condition = str_replace('company_id', 'e.company_id', $condition);
         $condition = str_replace('supplier_id', 'e.supplier_id', $condition);
 
         $sql = "
@@ -47,7 +47,7 @@ class Expense_Model extends Model
     }
 
     public function getFilterExpenseCount($condition) {
-        $condition = str_replace('company_id', 'e.company_id', $condition);
+        // $condition = str_replace('company_id', 'e.company_id', $condition);
         $condition = str_replace('supplier_id', 'e.supplier_id', $condition);
 
         $sql = "
@@ -63,12 +63,12 @@ class Expense_Model extends Model
     public function getTodayExpenseTotal()
     {
         $expenseModel = new Expense_Model();
-        $companyId = session()->get('company_id');
+        // $companyId = session()->get('company_id');
         $today = date('Y-m-d');
 
         $total = $expenseModel
             ->selectSum('amount')
-            ->where('company_id', $companyId)
+            // ->where('company_id', $companyId)
             ->where('date', $today)
             ->first();
 
@@ -80,14 +80,14 @@ class Expense_Model extends Model
     public function getMonthlyExpenseTotal()
     {
         $expenseModel = new Expense_Model();
-        $companyId = session()->get('company_id');
+        // $companyId = session()->get('company_id');
 
         $start = date('Y-m-01');
         $end = date('Y-m-t');
 
         $total = $expenseModel
             ->selectSum('amount')
-            ->where('company_id', $companyId)
+            // ->where('company_id', $companyId)
             ->where('date >=', $start)
             ->where('date <=', $end)
             ->first();

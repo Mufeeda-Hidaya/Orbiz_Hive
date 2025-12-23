@@ -63,10 +63,10 @@ abstract class BaseController extends Controller
         $userModel = new \App\Models\Manageuser_Model();
         $user = $userModel->find($userId);
 
-        if ($user && isset($user['company_id'])) {
-            $companyModel = new \App\Models\Managecompany_Model();
-            $companyData = $companyModel->find($user['company_id']);
-        }
+        // if ($user && isset($user['company_id'])) {
+        //     $companyModel = new \App\Models\Managecompany_Model();
+        //     $companyData = $companyModel->find($user['company_id']);
+        // }
     }
     $renderer = \Config\Services::renderer();
     $renderer->setVar('company', $companyData);

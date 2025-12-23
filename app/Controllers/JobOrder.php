@@ -9,7 +9,7 @@ use App\Models\EstimateModel;
 use App\Models\EstimateItemModel;
 use App\Models\Manageuser_Model;
 use App\Models\SalesModel;
-use App\Models\Managecompany_Model;
+// use App\Models\Managecompany_Model;
 use App\Models\TransactionModel;
 
 use Google\Cloud\Translate\V2\TranslateClient;
@@ -19,11 +19,11 @@ class JobOrder extends BaseController
     public function add()
 {
     $customerModel = new customerModel();
-    $companyId = session()->get('company_id');
+    // $companyId = session()->get('company_id');
 
     $customers = $customerModel
         ->where('is_deleted', 0)
-        ->where('company_id', $companyId)
+        // ->where('company_id', $companyId)
         ->findAll();
 
     return view('add_joborder', [
@@ -73,14 +73,14 @@ class JobOrder extends BaseController
         ];
 
         $orderByColumn = $columns[$orderColumnIndex] ?? 'invoices.invoice_id';
-        $companyId = $session->get('company_id');
+        // $companyId = $session->get('company_id');
 
         $invoiceModel = new InvoiceModel();
         $itemModel = new InvoiceItemModel();
-        $invoices = $invoiceModel->where('company_id', $companyId)->findAll();
-        $totalRecords = $invoiceModel->getInvoiceCount($companyId);
-        $filteredRecords = $invoiceModel->getFilteredCount($searchValue, $companyId);
-        $records = $invoiceModel->getFilteredInvoices($searchValue, $start, $length, $orderByColumn, $orderDir, $companyId);
+        // $invoices = $invoiceModel->where('company_id', $companyId)->findAll();
+        $totalRecords = $invoiceModel->getInvoiceCount();
+        $filteredRecords = $invoiceModel->getFilteredCount($searchValue);
+        $records = $invoiceModel->getFilteredInvoices($searchValue, $start, $length, $orderByColumn, $orderDir);
 
         $data = [];
         $slno = $start + 1;
@@ -103,7 +103,7 @@ class JobOrder extends BaseController
                 'discount' => $row['discount'],
                 'total_amount' => $row['total_amount'],
                 'status' => $row['status'] ?? 'unpaid',
-                'company_id' => $companyId,
+                // 'company_id' => $companyId,
                 'invoice_date' => date('d-m-Y', strtotime($row['invoice_date'])),
                 'payment_mode' => !empty($row['payment_mode']) ? strtolower($row['payment_mode']) : '',
 
@@ -144,7 +144,7 @@ class JobOrder extends BaseController
     {
         $invoiceModel = new InvoiceModel();
         $customerModel = new customerModel();
-        $companyModel = new Managecompany_Model();
+        // $companyModel = new Managecompany_Model();
 
 
         $invoice = $invoiceModel->getInvoiceWithItems($id);
@@ -155,8 +155,8 @@ class JobOrder extends BaseController
 
         $customer = $customerModel->find($invoice['customer_id']);
 
-        $companyId = session()->get('company_id');
-        $company = $companyModel->find($companyId);
+        // $companyId = session()->get('company_id');
+        // $company = $companyModel->find($companyId);
 
         $invoice['payment_mode'] = strtolower($invoice['payment_mode'] ?? '');
 
@@ -165,16 +165,16 @@ class JobOrder extends BaseController
             'items' => $invoice['items'],
             'user_name' => session()->get('user_name') ?? 'Salesman',
             'customer' => $customer ?? [],
-            'company' => $company,
+            // 'company' => $company,
         ];
 
-        if ($companyId == 69) {
-            return view('invoice_print', $viewData);
-        } elseif ($companyId == 70) {
-            return view('generate_invoice', $viewData);
-        } else {
-            return view('invoice_print', $viewData);
-        }
+        // if ($companyId == 69) {
+        //     return view('invoice_print', $viewData);
+        // } elseif ($companyId == 70) {
+        //     return view('generate_invoice', $viewData);
+        // } else {
+        //     return view('invoice_print', $viewData);
+        // }
     }
 
     public function save()
@@ -217,13 +217,13 @@ class JobOrder extends BaseController
         if ($totalAmount < 0) $totalAmount = 0;
 
         $joborderId = $request->getPost('joborder_id');
-        $companyId = session()->get('company_id');
+        // $companyId = session()->get('company_id');
         $userId = session()->get('user_id') ?? 1;
 
         $jobOrderData = [
             'customer_id'      => $customerId,
             'estimate_id'      => $estimateId,
-            'company_id'       => $companyId,
+            // 'company_id'       => $companyId,
             'customer_name'    => $request->getPost('customer_name'),
             'customer_address' => $request->getPost('customer_address'),
             'phone_number'     => $request->getPost('phone_number'),
@@ -242,7 +242,7 @@ class JobOrder extends BaseController
         } else {
             // Generate next job order number (company-specific)
             $lastOrder = $jobOrderModel
-                ->where('company_id', $companyId)
+                // ->where('company_id', $companyId)
                 ->orderBy('joborder_no', 'DESC')
                 ->first();
 
@@ -346,10 +346,10 @@ class JobOrder extends BaseController
         ->orderBy('item_order', 'ASC') // <---- FIXED HERE
         ->findAll();
 
-    $companyId = session()->get('company_id');
+    // $companyId = session()->get('company_id');
     $customers = $customerModel
         ->where('is_deleted', 0)
-        ->where('company_id', $companyId)
+        // ->where('company_id', $companyId)
         ->findAll();
 
     $data = [
@@ -469,10 +469,10 @@ public function convertFromEstimate($estimateId)
         ->orderBy('item_order', 'ASC') // ensures consistent order
         ->findAll();
 
-    $companyId = session()->get('company_id');
+    // $companyId = session()->get('company_id');
     $customers = $customerModel
         ->where('is_deleted', 0)
-        ->where('company_id', $companyId)
+        // ->where('company_id', $companyId)
         ->findAll();
 
     // ✅ Set additional fields safely
@@ -658,8 +658,8 @@ public function convertFromEstimate($estimateId)
         $to = $this->request->getGet('to_date');
         $customer_id = $this->request->getGet('customer_id');
         $session = session();
-        $companyId = $session->get('company_id');
-        $customer = $salesModel->getCustomer($companyId);
+        // $companyId = $session->get('company_id');
+        $customer = $salesModel->getCustomer();
 
         $data['customers'] = $customer;
 

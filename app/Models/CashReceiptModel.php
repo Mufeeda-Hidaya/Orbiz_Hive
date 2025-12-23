@@ -7,18 +7,18 @@ class CashReceiptModel extends Model
     protected $table = 'joborder';
     protected $primaryKey = 'joborder_id';
     protected $allowedFields = [
-        'estimate_id','company_id','customer_id','customer_address','customer_phone','customer_email',
+        'estimate_id','customer_id','customer_address','customer_phone','customer_email',
         'total_amount','status','user_id','discount','invoice_date','billing_address',
         'shipping_address','lpo_no','phone_number','delivery_date','paid_amount','balance_amount','payment_mode'
     ];
 
-    public function getAllFilteredCashReceipts($company_id, $search = '', $start = 0, $length = 10, $orderColumn = 'joborder_id', $orderDir = 'DESC')
+    public function getAllFilteredCashReceipts( $search = '', $start = 0, $length = 10, $orderColumn = 'joborder_id', $orderDir = 'DESC')
     {
         $builder = $this->db->table('joborder i')
             ->select('i.*, c.name AS customer_name')
             ->join('customers c', 'c.customer_id = i.customer_id', 'left')
-            ->where('i.status !=', 'unpaid')
-            ->where('i.company_id', $company_id);
+            ->where('i.status !=', 'unpaid');
+            // ->where('i.company_id', $company_id);
 
         if (!empty($search)) {
             $search = strtolower(trim($search));
@@ -42,19 +42,19 @@ class CashReceiptModel extends Model
                        ->getResultArray();
     }
 
-    public function getAllCashReceiptsCount($company_id)
+    public function getAllCashReceiptsCount()
     {
         return $this->db->table('joborder')
-            ->where('company_id', $company_id)
+            // ->where('company_id', $company_id)
             ->countAllResults();
     }
 
-    public function getFilteredCashReceiptsCount($company_id, $search = '')
+    public function getFilteredCashReceiptsCount($search = '')
     {
         $builder = $this->db->table('joborder i')
             ->join('customers c', 'c.customer_id = i.customer_id', 'left')
-            ->where('i.status !=', 'unpaid')
-            ->where('i.company_id', $company_id);
+            ->where('i.status !=', 'unpaid');
+            // ->where('i.company_id', $company_id);
 
         if (!empty($search)) {
             $search = strtolower(trim($search));

@@ -55,7 +55,7 @@ public function store()
     $normalized_role_name = trim(preg_replace('/\s+/', ' ', $role_name_raw));
     $duplicate = $this->roleModel
         ->where('REPLACE(LOWER(TRIM(role_name)), " ", "") =', str_replace(' ', '', $normalized_role_name))
-        ->where('company_id', session()->get('company_id'))
+        // ->where('company_id', session()->get('company_id'))
         ->first();
 
     if ($duplicate) {
@@ -74,7 +74,7 @@ public function store()
     // Insert Role
     $this->roleModel->insert([
         'role_name'   => ucwords($normalized_role_name),
-        'company_id'  => session()->get('company_id'),
+        // 'company_id'  => session()->get('company_id'),
         'created_at'  => date('Y-m-d H:i:s'),
         'updated_at'  => date('Y-m-d H:i:s')
     ]);
@@ -111,12 +111,12 @@ public function store()
     $tolimit = $_POST['length'] ?? 10;
     $search = $_POST['search']['value'];
     $condition = "1=1";
-    $company_id = session()->get('company_id');
+    // $company_id = session()->get('company_id');
 
     
-if (empty($company_id)) {
-    die("Company ID missing in session!");
-}
+// if (empty($company_id)) {
+//     die("Company ID missing in session!");
+// }
     $search = trim(preg_replace('/\s+/', ' ', $search)); 
 
     if (!empty($search)) {
@@ -141,7 +141,7 @@ if (empty($company_id)) {
     $slno = $fromstart + 1;
 
     // Pass $company_id to match your model signature
-    $totalRec = $this->roleModel->getAllFilteredRecords($condition, $fromstart, $tolimit, $orderBy, $orderDir, $company_id);
+    $totalRec = $this->roleModel->getAllFilteredRecords($condition, $fromstart, $tolimit, $orderBy, $orderDir);
     $result = [];
     
 
@@ -181,9 +181,9 @@ if (empty($company_id)) {
     }
 
    
-   $totalRec = $this->roleModel->getAllFilteredRecords($condition, $fromstart, $tolimit, $orderBy, $orderDir, $company_id);
-    $totalCount = $this->roleModel->getAllRoleCount($company_id);
-    $filteredCountObj = $this->roleModel->getFilterRoleCount($condition, $company_id);
+   $totalRec = $this->roleModel->getAllFilteredRecords($condition, $fromstart, $tolimit, $orderBy, $orderDir);
+    $totalCount = $this->roleModel->getAllRoleCount();
+    $filteredCountObj = $this->roleModel->getFilterRoleCount($condition);
     $filteredCount = $filteredCountObj->filRecords ?? 0;
 
     echo json_encode([
