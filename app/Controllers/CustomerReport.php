@@ -7,11 +7,11 @@ class CustomerReport extends Controller
 {
     public function index()
     {
-        $companyId = session()->get('company_id'); // current logged-in company
+        // $companyId = session()->get('company_id'); // current logged-in company
         
         $customerModel = new \App\Models\customerModel();
         $data['customers'] = $customerModel
-            ->where('company_id', $companyId)  // only customers of this company
+            // ->where('company_id', $companyId)  // only customers of this company
             ->where('is_deleted', 0)           // exclude deleted customers
             ->findAll();
 
@@ -23,7 +23,7 @@ class CustomerReport extends Controller
         $request = \Config\Services::request();
         $customer_id = $request->getPost('customer_id');
         $type = $request->getPost('type'); // 'invoice' or 'estimate'
-        $companyId = session()->get('company_id'); // current logged-in company
+        // $companyId = session()->get('company_id'); // current logged-in company
         $db = db_connect();
 
         $data = [];
@@ -31,8 +31,8 @@ class CustomerReport extends Controller
         if ($type == 'joborder') {
             $builder = $db->table('joborder i')
                 ->select('i.*, c.name as customer_name')
-                ->join('customers c', 'c.customer_id = i.customer_id AND c.company_id = '.$companyId.' AND c.is_deleted = 0', 'left')
-                ->where('i.company_id', $companyId)
+                ->join('customers c', 'c.customer_id = i.customer_id  AND c.is_deleted = 0', 'left')
+                // ->where('i.company_id', $companyId)
                 ->orderBy('i.joborder_id', 'DESC');
 
             if(!empty($customer_id)){
@@ -62,8 +62,8 @@ class CustomerReport extends Controller
         if ($type == 'estimate') {
             $builder = $db->table('estimates e')
                 ->select('e.*, c.name as customer_name')
-                ->join('customers c', 'c.customer_id = e.customer_id AND c.company_id = '.$companyId.' AND c.is_deleted = 0', 'left')
-                ->where('e.company_id', $companyId)
+                ->join('customers c', 'c.customer_id = e.customer_id AND c.is_deleted = 0', 'left')
+                // ->where('e.company_id', $companyId)
                 ->orderBy('e.estimate_id', 'DESC');
 
             if(!empty($customer_id)){

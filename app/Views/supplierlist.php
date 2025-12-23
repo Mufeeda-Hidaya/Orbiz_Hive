@@ -26,7 +26,8 @@
                 <th class="d-none">ID</th>
                 <th>Sl No</th>
                 <th>Name</th>
-                <th>Address</th>
+                <th >Address</th>
+                <th>Contact Person</th>
                 <th style="width: 100px;">Action</th>
             </tr>
         </thead>
@@ -82,6 +83,7 @@ $(document).ready(function () {
             { data: "slno" ,orderable:"false"},
             { data: "name" },
             { data: "address" },
+            { data: "client_name" },
             {
                 data: "enquiry_id",
                 orderable: false,
@@ -207,182 +209,5 @@ $(document).ready(function () {
         });
     });
 
-
-    
-
-
 });
 </script>
-
-
-
-
-
-// <!-- <script>
-    
-// debugger;
-// alert("hai");
-// let table;
-// let deleteId = null;
-// const alertBox = $('.alert');
-// const supplierModal = new bootstrap.Modal(document.getElementById('supplierModal'));
-// const deleteModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
-
-// let originalName = '';
-// let originalAddress = '';
-
-// $(document).ready(function () {
-    
-//     alert("hai");
-//     $('#customersTable').DataTable({
-//         ajax: {
-//             url: "<?= base_url('supplier/fetch') ?>",
-//             type: "POST",
-//             dataSrc: "data"
-//         },
-//         processing: true,
-//         serverSide: true,
-//         order: [[0, 'desc']],
-//         columns: [
-//             { data: "enquiry_id", visible: false },
-//             { data: "slno" },
-//             { data: "name" },
-//             { data: "address" },
-//             {
-//                 data: "enquiry_id",
-//                 render: data => `
-//                     <div class="d-flex gap-2">
-//                         <a href="javascript:void(0);" class="edit-supplier" data-id="${data}" title="Edit" style="color:rgb(13, 162, 199);">
-//                             <i class="bi bi-pencil-fill"></i>
-//                         </a>
-//                         <a href="javascript:void(0);" class="delete-supplier" data-id="${data}" title="Delete" style="color: #dc3545;">
-//                             <i class="bi bi-trash-fill"></i>
-//                         </a>
-//                     </div>`
-//             }
-//         ]
-//     });
-// });
-
-
-//     // Add Supplier
-//     // $('#addSupplierBtn').click(() => {
-//     //     $('#supplierForm')[0].reset();
-//     //     $('#supplier_id').val('');
-//     //     $('#supplierModalLabel').text('Add Supplier');
-//     //     $('#saveSupplierBtn').prop('disabled', false);
-//     //     supplierModal.show();
-
-//     //     originalName = '';
-//     //     originalAddress = '';
-//     //     originalMaxDiscount = '';
-//     // });
-
-//     // Edit Supplier
-//     $(document).on('click', '.edit-supplier', function () {
-//         const id = $(this).data('id');
-//         $.get("<?= base_url('supplier/getSupplier/') ?>" + id, function (data) {
-//             if (data.status !== 'error') {
-//                 $('#supplier_id').val(data.supplier_id);
-//                 $('#name').val(data.name);
-//                 $('#address').val(data.address);
-//                 $('#supplierModalLabel').text('Edit Customer');
-
-//                 originalName = data.name.trim();
-//                 originalAddress = data.address.trim();
-                
-
-//                 $('#saveSupplierBtn').prop('disabled', true);
-//                 supplierModal.show();
-//             } else {
-//                 showAlert('danger', data.message);
-//             }
-//         });
-//     });
-
-//     // Check if input values changed from original (only in Edit)
-//     $('#name, #address').on('input', function () {
-//     const isEdit = $('#supplier_id').val() !== '';
-//     if (!isEdit) return;
-
-//     const currentName = $('#name').val().trim();
-//     const currentAddress = $('#address').val().trim();
-    
-
-//     const hasChanged = currentName !== originalName || currentAddress !== originalAddress || currentMaxDiscount !== originalMaxDiscount;
-//     $('#saveSupplierBtn').prop('disabled', !hasChanged);
-// });
-
-
-//     // Submit Form
-//     $('#supplierForm').submit(function (e) {
-//         e.preventDefault();
-//         const $btn = $('#saveSupplierBtn');
-//         $btn.prop('disabled', true);
-
-//         // Capitalize before sending
-//         const name = $('#name').val().trim().replace(/\b\w/g, c => c.toUpperCase());
-//         const address = $('#address').val().trim().replace(/\b\w/g, c => c.toUpperCase());
-//         $('#name').val(name);
-//         $('#address').val(address);
-
-//         $.post("<?= base_url('supplier/create') ?>", $(this).serialize(), function (res) {
-//             if (res.status === 'success') {
-//                 showAlert('success', res.message);
-//                 table.ajax.reload(null, false);
-//                 supplierModal.hide();
-//             } else {
-//                 showAlert('danger', res.message);
-//                 $btn.prop('disabled', false);
-//             }
-//         }, 'json').fail(function () {
-//             showAlert('danger', 'Something went wrong!');
-//             $btn.prop('disabled', false);
-//         });
-//     });
-
-//     // Reset button on modal close
-//     $('#supplierModal').on('hidden.bs.modal', function () {
-//         $('#saveSupplierBtn').prop('disabled', true);
-//         originalName = '';
-//         originalAddress = '';
-//     });
-
-//     // View Estimate
-//     $(document).on('click', '.view-estimate', function () {
-//         const supplier_id  = $(this).data('id');
-//         window.location.href = "<?= base_url('estimate/supplier/') ?>" + supplier_id ;
-//     });
-
-//     // Delete
-//     $(document).on('click', '.delete-supplier', function () {
-//         deleteId = $(this).data('id');
-//         deleteModal.show();
-//     });
-
-//     $('#confirm-delete-btn').click(function () {
-//         if (!deleteId) return;
-
-//         $.post("<?= base_url('supplier/delete') ?>", {
-//             id: deleteId,
-//             '<?= csrf_token() ?>': '<?= csrf_hash() ?>'
-//         }, function (res) {
-//             if (res.status === 'success') {
-//                 showAlert('success', res.message);
-//                 table.ajax.reload(null, false);
-//             } else {
-//                 showAlert('danger', res.message);
-//             }
-//             deleteModal.hide();
-//             deleteId = null;
-//         }, 'json');
-//     });
-
-//     function showAlert(type, message) {
-//         alertBox.removeClass().addClass(`alert alert-${type} text-center position-fixed`)
-//             .text(message).fadeIn();
-//         setTimeout(() => alertBox.fadeOut(), 2000);
-//     }
-// });
-// 
-

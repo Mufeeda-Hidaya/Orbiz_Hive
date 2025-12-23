@@ -22,7 +22,7 @@ class CashReceipt extends BaseController
 public function ajaxListJson()
 {
     $session = session();
-    $company_id = $session->get('company_id'); 
+    // $company_id = $session->get('company_id'); 
 
     $request = service('request');
     $draw = $request->getPost('draw') ?? 1;
@@ -46,7 +46,7 @@ public function ajaxListJson()
 
     $orderColumn = $columnMap[$columnIndex] ?? 'joborder_id';
     $receipts = $this->cashModel->getAllFilteredCashReceipts(
-        $company_id,
+        // $company_id,
         $search,
         $fromstart,
         $tolimit,
@@ -71,8 +71,8 @@ public function ajaxListJson()
         ];
     }
 
-    $total = $this->cashModel->getAllCashReceiptsCount($company_id);
-    $filteredTotal = $this->cashModel->getFilteredCashReceiptsCount($company_id, $search)->filReceipts;
+    $total = $this->cashModel->getAllCashReceiptsCount();
+    $filteredTotal = $this->cashModel->getFilteredCashReceiptsCount( $search)->filReceipts;
 
     return $this->response->setJSON([
         'draw' => intval($draw),

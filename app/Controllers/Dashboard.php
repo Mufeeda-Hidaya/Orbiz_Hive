@@ -37,17 +37,17 @@ class Dashboard extends BaseController
 public function index()
 {
     $session = session();
-    $company_id = $session->get('company_id');
+    // $company_id = $session->get('company_id');
     $roleName = strtolower($session->get('role_Name')); // normalize
 
     if ($roleName === 'admin') {
         // ADMIN DASHBOARD
         $estimateModel = new \App\Models\EstimateModel();
-        $recentEstimates = $estimateModel->getRecentEstimatesWithCustomer($company_id);
+        $recentEstimates = $estimateModel->getRecentEstimatesWithCustomer();
 
         $invoiceModel = new \App\Models\InvoiceModel();
-        $dailyRevenue = $invoiceModel->getTodayRevenue($company_id);
-        $monthlyRevenue = $invoiceModel->getMonthlyRevenue($company_id);
+        $dailyRevenue = $invoiceModel->getTodayRevenue();
+        $monthlyRevenue = $invoiceModel->getMonthlyRevenue();
 
         return view('dashboard', [
             'estimates' => $recentEstimates,
@@ -66,13 +66,13 @@ public function index()
 {
     $expenseModel = new \App\Models\Expense_Model();
     $session = session();
-    $company_id = $session->get('company_id'); // company from logged-in user
+    // $company_id = $session->get('company_id'); // company from logged-in user
     $today = date('Y-m-d');
 
     $total = $expenseModel
         ->selectSum('amount')
         ->where('date', $today)
-        ->where('company_id', $company_id)
+        // ->where('company_id', $company_id)
         ->first();
 
     return $this->response->setJSON([
@@ -84,7 +84,7 @@ public function getMonthlyExpenseTotal()
 {
     $expenseModel = new \App\Models\Expense_Model();
     $session = session();
-    $company_id = $session->get('company_id'); // company from logged-in user
+    // $company_id = $session->get('company_id'); // company from logged-in user
 
     $start = date('Y-m-01'); // First day of month
     $end = date('Y-m-t');    // Last day of month
@@ -93,7 +93,7 @@ public function getMonthlyExpenseTotal()
         ->selectSum('amount')
         ->where('date >=', $start)
         ->where('date <=', $end)
-        ->where('company_id', $company_id)
+        // ->where('company_id', $company_id)
         ->first();
 
     return $this->response->setJSON([
@@ -106,13 +106,13 @@ public function getTodayRevenueTotal()
 {
     $invoiceModel = new \App\Models\InvoiceModel();
     $session = session();
-    $company_id = $session->get('company_id');
+    // $company_id = $session->get('company_id');
     $today = date('Y-m-d');
 
     $total = $invoiceModel
         ->selectSum('paid_amount') 
         ->where('invoice_date', $today)
-        ->where('company_id', $company_id)
+        // ->where('company_id', $company_id)
         ->whereIn('status', ['paid', 'partial paid']) // only include paid & partial
         ->first();
 
@@ -123,13 +123,13 @@ public function getMonthlyRevenueTotal()
 {
     $invoiceModel = new \App\Models\InvoiceModel();
     $session = session();
-    $company_id = $session->get('company_id');
+    // $company_id = $session->get('company_id');
 
     $total = $invoiceModel
         ->selectSum('paid_amount') 
         ->where('MONTH(invoice_date)', date('m'))
         ->where('YEAR(invoice_date)', date('Y'))
-        ->where('company_id', $company_id)
+        // ->where('company_id', $company_id)
         ->whereIn('status', ['paid', 'partial paid'])
         ->first();
 

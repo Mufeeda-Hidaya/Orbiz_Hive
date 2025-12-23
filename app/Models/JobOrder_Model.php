@@ -11,7 +11,7 @@ class JobOrder_Model extends Model
     protected $allowedFields = 
     ['customer_id',
     'estimate_id', 
-    'company_id',
+    // 'company_id',
     'customer_name',
     'customer_address',
     'phone_number',
@@ -20,14 +20,14 @@ class JobOrder_Model extends Model
     'joborder_no',
     'sub_total',
     'user_id',
-    'company_id',
+    // 'company_id',
     'is_convereted'
     ];
     protected $returnType = 'array';
     
-     public function getInvoiceCount($companyId)
+     public function getInvoiceCount()
     {
-          return $this->where('company_id', $companyId)->countAllResults();
+          return $this->countAllResults();
     }
     public function getInvoiceListWithCustomer()
 {
@@ -36,12 +36,12 @@ class JobOrder_Model extends Model
                 ->orderBy('invoices.invoice_id', 'desc')
                 ->findAll();
 }
-    public function getFilteredCount($searchValue, $companyId)
+    public function getFilteredCount($searchValue)
     {
         $searchValue = trim($searchValue);
         $builder = $this->db->table('invoices')
-            ->join('customers', 'customers.customer_id = invoices.customer_id', 'left')
-            ->where('invoices.company_id', $companyId);
+            ->join('customers', 'customers.customer_id = invoices.customer_id', 'left');
+            // ->where('invoices.company_id', $companyId);
 
         if (!empty($searchValue)) {
     $normalizedSearch = preg_replace('/\s+/', '', strtolower($searchValue)); 
@@ -61,14 +61,14 @@ class JobOrder_Model extends Model
 
 
 
-   public function getFilteredInvoices($searchValue = '', $start = 0, $length = 10, $orderColumn = 'invoice_id', $orderDir = 'desc', $companyId = null)
+   public function getFilteredInvoices($searchValue = '', $start = 0, $length = 10, $orderColumn = 'invoice_id', $orderDir = 'desc' )
 {
     $searchValue = trim($searchValue);
     $builder = $this->db->table('invoices')
         ->select('invoices.invoice_id, invoices.invoice_no,invoices.customer_id, invoices.discount, invoices.total_amount, invoices.invoice_date, invoices.phone_number, invoices.lpo_no, invoices.status, customers.name AS customer_name, customers.address AS customer_address')
         ->join('customers', 'customers.customer_id = invoices.customer_id', 'left')
-        ->join('user', 'user.user_id = invoices.user_id', 'left')
-        ->where('invoices.company_id', $companyId); 
+        ->join('user', 'user.user_id = invoices.user_id', 'left');
+        // ->where('invoices.company_id', $companyId); 
    if (!empty($searchValue)) {
         $normalizedSearch = str_replace(' ', '', strtolower($searchValue));
 
@@ -102,13 +102,13 @@ class JobOrder_Model extends Model
          invoices.status,
          invoices.lpo_no,
          invoices.invoice_date,
-         company.company_name AS company_name,
+        
          customers.name AS customer_name, 
          customers.address AS customer_address'
     )
     ->join('customers', 'customers.customer_id = invoices.customer_id', 'left')
     ->join('user', 'user.user_id = invoices.user_id', 'left')
-    ->join('company', 'company.company_id = user.company_id', 'left')
+    // ->join('company', 'company.company_id = user.company_id', 'left')
     ->where('invoices.invoice_id', $id)
     ->first();
 
@@ -122,13 +122,13 @@ class JobOrder_Model extends Model
 
     return $invoice;
 }
-public function getTodayRevenue($companyId)
+public function getTodayRevenue()
 {
     $today = date('Y-m-d');
     $tomorrow = date('Y-m-d', strtotime('+1 day'));
 
     $row = $this->selectSum('total_amount')
-        ->where('company_id', $companyId)
+        // ->where('company_id', $companyId)
         ->where('invoice_date >=', $today)
         ->where('invoice_date <', $tomorrow)
         ->get()
@@ -136,13 +136,13 @@ public function getTodayRevenue($companyId)
 
     return $row ? (float)$row->total_amount : 0;
 }
-public function getMonthlyRevenue($companyId)
+public function getMonthlyRevenue()
 {
     $start = date('Y-m-01');
     $end = date('Y-m-t');
 
     $row = $this->selectSum('total_amount')
-        ->where('company_id', $companyId)
+        // ->where('company_id', $companyId)
         ->where('invoice_date >=', $start)
         ->where('invoice_date <=', $end)
         ->get()
@@ -156,10 +156,10 @@ public function getMonthlyRevenue($companyId)
                     ->join('customers', 'customers.customer_id = invoices.customer_id', 'left')
                     ->findAll();
     }
-public function getLastInvoiceIdByCompany($companyId)
+public function getLastInvoiceIdByCompany()
 {
     return $this->select('invoice_id')
-                ->where('company_id', $companyId)
+                // ->where('company_id', $companyId)
                 ->orderBy('invoice_no', 'DESC')
                 ->first();
 }

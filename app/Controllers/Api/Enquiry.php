@@ -266,7 +266,7 @@ class Enquiry extends ResourceController
     }
 
     $userId    = session()->get('user_id') ?? 1;
-    $companyId = 1;
+    // $companyId = 1;
 
     //  Handle customer
     $existingCustomer = $customerModel->where('name', $name)->first();
@@ -291,7 +291,7 @@ class Enquiry extends ResourceController
             'name'       => $name,
             'phone'      => $phone,
             'address'    => $address,
-            'company_id' => $companyId,
+            // 'company_id' => $companyId,
             'created_by' => $userId,
             'created_at' => date('Y-m-d H:i:s'),
             'is_deleted' => 0
@@ -343,7 +343,7 @@ class Enquiry extends ResourceController
     }
 
     // Create new enquiry
-    $lastEnquiry = $enquiryModel->where('company_id', $companyId)->orderBy('enquiry_no', 'DESC')->first();
+    $lastEnquiry = $enquiryModel->orderBy('enquiry_no', 'DESC')->first();
     $nextEnquiryNo = $lastEnquiry ? $lastEnquiry['enquiry_no'] + 1 : 1;
 
     $enquiryModel->insert([
@@ -351,7 +351,7 @@ class Enquiry extends ResourceController
         'name'        => $name,
         'phone'       => $phone,
         'address'     => $address,
-        'company_id'  => $companyId,
+        // 'company_id'  => $companyId,
         'user_id'     => $userId,
         'enquiry_no'  => $nextEnquiryNo,
         'is_deleted'  => 0,

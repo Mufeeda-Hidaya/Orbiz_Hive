@@ -6,7 +6,7 @@ class Manageuser_Model extends Model
 {
     protected $table = 'user';
     protected $primaryKey = 'user_id';
-    protected $allowedFields = ['name', 'email', 'phonenumber', 'password', 'role_id', 'jwt_token','company_id', 'status'];
+    protected $allowedFields = ['name', 'email', 'phonenumber', 'password', 'role_id', 'jwt_token','status'];
 
     //  Custom soft delete implementation
     public function softDelete($user_id)
@@ -18,12 +18,12 @@ class Manageuser_Model extends Model
     {
         $db = \Config\Database::connect();
         $session = \Config\Services::session();
-        $companyId = $session->get('company_id');
+        // $companyId = $session->get('company_id');
 
         $query = "SELECT COUNT(*) as totuser FROM user WHERE $condition";
-        if (!empty($companyId)) {
-            $query .= " AND company_id = " . (int)$companyId;
-        }
+        // if (!empty($companyId)) {
+        //     $query .= " AND company_id = " . (int)$companyId;
+        // }
 
         return $db->query($query)->getRow();
     }
@@ -33,7 +33,7 @@ class Manageuser_Model extends Model
         $db = \Config\Database::connect();
         $builder = $db->table('user');
         $session = \Config\Services::session();
-        $companyId = $session->get('company_id');
+        // $companyId = $session->get('company_id');
 
         $builder->select('COUNT(*) as totuser');
         $builder->join('role_acces', 'role_acces.role_id = user.role_id', 'left');
@@ -45,9 +45,9 @@ class Manageuser_Model extends Model
         // Always exclude deleted users
         $builder->where('user.status !=', 9);
 
-        if (!empty($companyId)) {
-            $builder->where('user.company_id', $companyId);
-        }
+        // if (!empty($companyId)) {
+        //     $builder->where('user.company_id', $companyId);
+        // }
 
         return $builder->get()->getRow();
     }
@@ -59,13 +59,13 @@ class Manageuser_Model extends Model
         $builder->join('role_acces', 'role_acces.role_id = user.role_id', 'left');
 
         $session = \Config\Services::session();
-        $companyId = $session->get('company_id');
+        // $companyId = $session->get('company_id');
 
         $builder->where('user.status !=', 9);
 
-        if (!empty($companyId)) {
-            $builder->where('user.company_id', $companyId);
-        }
+        // if (!empty($companyId)) {
+        //     $builder->where('user.company_id', $companyId);
+        // }
 
         if (!empty($condition) && $condition !== "1=1") {
             $builder->where($condition);

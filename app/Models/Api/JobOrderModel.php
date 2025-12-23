@@ -11,7 +11,7 @@ class JobOrderModel extends Model
         'estimate_id',
         'user_id',
         'customer_id',
-        'company_id',
+        // 'company_id',
         'joborder_no',
         'discount',
         'sub_total',
@@ -67,7 +67,7 @@ class JobOrderModel extends Model
                 jo.estimate_id,
                 jo.user_id,
                 jo.customer_id,
-                jo.company_id,
+             
                 jo.joborder_no,
                 jo.discount,
                 jo.sub_total,
@@ -94,7 +94,7 @@ class JobOrderModel extends Model
             ->join('customers c', 'c.customer_id = jo.customer_id', 'left')
             ->join('joborder_items joi', 'joi.joborder_id = jo.joborder_id', 'left')
             ->join('enquiry_items ei', 'ei.item_id = joi.enquiry_item_id', 'left')
-            ->where('jo.company_id', $companyId)
+            // ->where('jo.company_id', $companyId)
             ->where('jo.is_deleted', 0)
             ->where('jo.is_converted !=', 1)
             ->limit($limit, $offset)
@@ -125,7 +125,7 @@ class JobOrderModel extends Model
                     'customer_name'    => $row['customer_name'],
                     'customer_address' => $row['customer_address'],
                     'customer_phone'   => $row['customer_phone'],
-                    'company_id'       => $row['company_id'],
+                    // 'company_id'       => $row['company_id'],
                     'joborder_no'      => $row['joborder_no'],
                     'discount'         => $row['discount'],
                     'sub_total'        => $row['sub_total'],
@@ -153,7 +153,7 @@ class JobOrderModel extends Model
         }
 
         $total = $this->db->table('joborder')
-            ->where('company_id', $companyId)
+            // ->where('company_id', $companyId)
             ->where('is_deleted', 0)
             ->countAllResults();
 
