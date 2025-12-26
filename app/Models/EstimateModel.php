@@ -7,18 +7,20 @@ class EstimateModel extends Model
     protected $table = 'estimates';
     protected $primaryKey = 'estimate_id';
     protected $allowedFields = [
-        'enquiry_id',
-        'customer_id',
-        'customer_address',
-        'discount',
-        'total_amount',
-        'sub_total',
-        'date',
-        'phone_number',
-        'is_converted',
-        'estimate_no',
-        'is_deleted'
-    ];
+    'enquiry_id',
+    'customer_id',
+    'customer_address',
+    'discount',
+    'total_amount',
+    'sub_total',
+    'date',
+    'phone_number',
+    'is_converted',
+    'estimate_no',
+    'status'
+];
+
+
 
     public function getLastEstimateNoByCompany()
     {
@@ -70,7 +72,8 @@ class EstimateModel extends Model
         $builder = $this->db->table('estimates')
             ->join('customers', 'customers.customer_id = estimates.customer_id', 'left')
             // ->where('estimates.company_id', $companyId)
-            ->where('estimates.is_deleted', 0);
+            ->where('estimates.status', 1);
+
 
         return $builder->get()->getNumRows();
     }
@@ -81,7 +84,8 @@ class EstimateModel extends Model
         $builder = $this->db->table('estimates')
             ->join('customers', 'customers.customer_id = estimates.customer_id', 'left')
             // ->where('estimates.company_id', $companyId)
-            ->where('estimates.is_deleted', 0);
+           ->where('estimates.status', 1);
+
 
         if (!empty($searchValue)) {
             $normalizedSearch = str_replace(' ', '', strtolower($searchValue));
@@ -108,7 +112,8 @@ class EstimateModel extends Model
             ->select('estimates.*, customers.name AS customer_name, customers.address AS customer_address')
             ->join('customers', 'customers.customer_id = estimates.customer_id', 'left')
             // ->where('estimates.company_id', $companyId)
-            ->where('estimates.is_deleted', 0);
+           ->where('estimates.status', 1);
+
 
         if (!empty($searchValue)) {
             $normalizedSearch = str_replace(' ', '', strtolower($searchValue));
@@ -136,7 +141,7 @@ class EstimateModel extends Model
             ->select('estimates.*, customers.name AS customer_name, customers.address AS customer_address')
             ->join('customers', 'customers.customer_id = estimates.customer_id', 'left')
             // ->where('estimates.company_id', $companyId)
-            ->where('estimates.is_deleted', 0)
+            ->where('estimates.status', 1)
             ->orderBy('estimates.date', 'DESC')
             ->limit($limit)
             ->get()
