@@ -431,7 +431,13 @@
                 width: 'calc(100% - 40px)',
                 minimumResultsForSearch: 0
             });
-
+            $('#popup_person').on('input', function () {
+                let value = $(this).val();
+                let capitalized = value.replace(/\b\w/g, function (char) {
+                    return char.toUpperCase();
+                });
+                $(this).val(capitalized);
+            });
             $('#popup_name').on('input', function () {
                 let value = $(this).val();
                 let capitalized = value.replace(/\b\w/g, function (char) {
@@ -504,12 +510,13 @@
         });
 
         //  Enable Save button only when required fields are filled
-        $('#popup_name, #popup_address, #popup_phone').on('input', function () {
+        $('#popup_person,#popup_name, #popup_address, #popup_phone').on('input', function () {
+            let personname = $('#popup_person').val().trim();
             let name = $('#popup_name').val().trim();
             let address = $('#popup_address').val().trim();
             let phone = $('#popup_phone').val().trim();
 
-            if (name !== '' && address !== '' && phone !== '') {
+            if (personname !== '' && name !== '' && address !== '' && phone !== '') {
                 saveCustomerBtn.prop('disabled', false);
             } else {
                 saveCustomerBtn.prop('disabled', true);
@@ -520,16 +527,16 @@
         //  Handle customer form submit
         $('#customerForm').submit(function (e) {
             e.preventDefault();
-
+            let personname = $('#popup_person').val().trim();
             let name = $('#popup_name').val().trim();
             let address = $('#popup_address').val().trim();
             // let max_discount = $('#max_discount').val().trim();
             let phone = $('#popup_phone').val().trim();
-
+            personname = personname.replace(/\b\w/g, char => char.toUpperCase());
             name = name.replace(/\b\w/g, char => char.toUpperCase());
             address = address.replace(/(^\s*\w|[.!?]\s*\w)/g, char => char.toUpperCase());
 
-            if (!name || !address) {
+            if (!personname || !name || !address || !phone) {
                 $('#customerError').removeClass('d-none').text('Please Enter Valid Name And Address');
                 return;
             }
@@ -541,6 +548,7 @@
                 url: "<?= site_url('customer/create') ?>",
                 type: "POST",
                 data: {
+                    personname,
                     name,
                     address,
                     phone,

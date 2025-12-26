@@ -20,190 +20,187 @@ class Supplier extends BaseController
 
     // Create or Update 
     public function add_enquiry($id = null)
-{
-    $customerModel = new CustomerModel();
-    $enquiryModel = new SupplierModel();
-    $enquiryItemModel = new EnquiryItemModel();
+    {
+        $customerModel = new CustomerModel();
+        $enquiryModel = new SupplierModel();
+        $enquiryItemModel = new EnquiryItemModel();
 
-    // $companyId = 1;
+        // $companyId = 1;
 
-    // Load all customers
-    $data['customers'] = $customerModel
-        ->where('is_deleted', 0)
-        // ->where('company_id', $companyId)
-        ->orderBy('customer_id', 'DESC')
-        ->findAll();
+        // Load all customers
+        $data['customers'] = $customerModel
+            // ->where('is_deleted', 0)
+            // ->where('company_id', $companyId)
+            ->orderBy('customer_id', 'DESC')
+            ->findAll();
 
-    $data['enquiry'] = null;
-    $data['items'] = [];
+        $data['enquiry'] = null;
+        $data['items'] = [];
 
-    if ($id) {
-        // Load enquiry
-        $data['enquiry'] = $enquiryModel->where('is_deleted', 0)->find($id);
+        if ($id) {
+            // Load enquiry
+            $data['enquiry'] = $enquiryModel->where('is_deleted', 0)->find($id);
 
-        // Load items
-        $data['items'] = $enquiryItemModel->where('enquiry_id', $id)->findAll();
+            // Load items
+            $data['items'] = $enquiryItemModel->where('enquiry_id', $id)->findAll();
+        }
+
+        return view('add_enquiry', $data);
     }
-
-    return view('add_enquiry', $data);
-}
 
 
     public function saveEnquiry()
-{
-    $enquiryModel     = new SupplierModel();
-    $enquiryItemModel = new EnquiryItemModel();
-    $customerModel    = new CustomerModel();
+    {
+        $enquiryModel = new SupplierModel();
+        $enquiryItemModel = new EnquiryItemModel();
+        $customerModel = new CustomerModel();
 
-    $enquiryId   = $this->request->getPost('enquiry_id');
-    $customerId  = $this->request->getPost('customer_id');
-    $address     = trim($this->request->getPost('customer_address'));
-    $descriptions = $this->request->getPost('description');
-    $quantities   = $this->request->getPost('quantity');
+        $enquiryId = $this->request->getPost('enquiry_id');
+        $customerId = $this->request->getPost('customer_id');
+        $address = trim($this->request->getPost('customer_address'));
+        $descriptions = $this->request->getPost('description');
+        $quantities = $this->request->getPost('quantity');
 
-    // -------------------------
-    // 1. Validate inputs
-    // -------------------------
-    if (empty($customerId) || empty($address)) {
-        return $this->response->setJSON([
-            'status' => 'error',
-            'message' => 'Please fill all required fields.'
-        ]);
-    }
-
-    $validItems = 0;
-    foreach ($descriptions as $key => $desc) {
-        $desc = trim($desc);
-        $qty  = floatval($quantities[$key] ?? 0);
-        if ($desc !== '' && $qty > 0) {
-            $validItems++;
-        }
-    }
-    if ($validItems === 0) {
-        return $this->response->setJSON([
-            'status' => 'error',
-            'message' => 'Please add at least one item with description and quantity.'
-        ]);
-    }
-
-    // -------------------------
-    // 2. Fetch customer details
-    // -------------------------
-    $customer = $customerModel->find($customerId);
-    if (!$customer) {
-        return $this->response->setJSON(['status' => 'error', 'message' => 'Customer not found.']);
-    }
-
-    $name     = $customer['name'];
-    $phone    = $customer['phone'];
-    $userId   = session()->get('user_id') ?? 1;
-    // $companyId = 1;
-
-    // -------------------------
-    // 3. Prepare enquiry data
-    // -------------------------
-    $enquiryData = [
-        'customer_id' => $customerId,
-        'name'        => $name,
-        'address'     => $address,
-        'phone'       => $phone,
-        'user_id'     => $userId,
-        // 'company_id'  => $companyId,
-        'is_deleted'  => 0,
-        'created_by'  => $userId,
-        'created_at'  => date('Y-m-d H:i:s'),
-    ];
-
-    // -------------------------
-    // 4. Update existing enquiry
-    // -------------------------
-    if (!empty($enquiryId)) {
-        $existing = $enquiryModel->find($enquiryId);
-        if (!$existing) {
+        // -------------------------
+        // 1. Validate inputs
+        // -------------------------
+        if (empty($customerId) || empty($address)) {
             return $this->response->setJSON([
                 'status' => 'error',
-                'message' => 'Enquiry not found.'
+                'message' => 'Please fill all required fields.'
             ]);
         }
 
-        $hasChanges = (
-            $existing['customer_id'] != $customerId ||
-            $existing['address'] !== $address
-        );
+        $validItems = 0;
+        foreach ($descriptions as $key => $desc) {
+            $desc = trim($desc);
+            $qty = floatval($quantities[$key] ?? 0);
+            if ($desc !== '' && $qty > 0) {
+                $validItems++;
+            }
+        }
+        if ($validItems === 0) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Please add at least one item with description and quantity.'
+            ]);
+        }
 
-        if ($hasChanges) {
-            $enquiryData['updated_by'] = $userId;
-            $enquiryData['updated_at'] = date('Y-m-d H:i:s');
+        // -------------------------
+        // 2. Fetch customer details
+        // -------------------------
+        $customer = $customerModel->find($customerId);
+        if (!$customer) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Customer not found.']);
+        }
 
-            $enquiryModel->update($enquiryId, $enquiryData);
+        $name = $customer['name'];
+        $phone = $customer['phone'];
+        $userId = session()->get('user_id') ?? 1;
+        // $companyId = 1;
 
-            // Delete and reinsert items
-            $enquiryItemModel->where('enquiry_id', $enquiryId)->delete();
-            foreach ($descriptions as $key => $desc) {
-                $desc = trim($desc);
-                $qty  = floatval($quantities[$key] ?? 0);
-                if ($desc !== '' && $qty > 0) {
-                    $enquiryItemModel->insert([
-                        'enquiry_id' => $enquiryId,
-                        'description'=> $desc,
-                        'quantity'   => $qty,
-                        'created_at' => date('Y-m-d H:i:s')
-                    ]);
-                }
+        // -------------------------
+        // 3. Prepare enquiry data
+        // -------------------------
+        $enquiryData = [
+            'customer_id' => $customerId,
+            'name' => $name,
+            'address' => $address,
+            'phone' => $phone,
+            'user_id' => $userId,
+            // 'company_id'  => $companyId,
+            'is_deleted' => 0,
+            'created_by' => $userId,
+            'created_at' => date('Y-m-d H:i:s'),
+        ];
+
+        // -------------------------
+        // 4. Update existing enquiry
+        // -------------------------
+        if (!empty($enquiryId)) {
+            $existing = $enquiryModel->find($enquiryId);
+            if (!$existing) {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'message' => 'Enquiry not found.'
+                ]);
             }
 
-            return $this->response->setJSON([
-                'status' => 'success',
-                'message' => 'Enquiry updated successfully.',
-                'enquiry_id' => $enquiryId
-            ]);
-        } else {
-            return $this->response->setJSON([
-                'status' => 'nochange',
-                'message' => 'No changes detected.',
-                'enquiry_id' => $enquiryId
-            ]);
+            $hasChanges = (
+                $existing['customer_id'] != $customerId ||
+                $existing['address'] !== $address
+            );
+
+            if ($hasChanges) {
+                $enquiryData['updated_by'] = $userId;
+                $enquiryData['updated_at'] = date('Y-m-d H:i:s');
+
+                $enquiryModel->update($enquiryId, $enquiryData);
+
+                // Delete and reinsert items
+                $enquiryItemModel->where('enquiry_id', $enquiryId)->delete();
+                foreach ($descriptions as $key => $desc) {
+                    $desc = trim($desc);
+                    $qty = floatval($quantities[$key] ?? 0);
+                    if ($desc !== '' && $qty > 0) {
+                        $enquiryItemModel->insert([
+                            'enquiry_id' => $enquiryId,
+                            'description' => $desc,
+                            'quantity' => $qty,
+                            'created_at' => date('Y-m-d H:i:s')
+                        ]);
+                    }
+                }
+
+                return $this->response->setJSON([
+                    'status' => 'success',
+                    'message' => 'Enquiry updated successfully.',
+                    'enquiry_id' => $enquiryId
+                ]);
+            } else {
+                return $this->response->setJSON([
+                    'status' => 'nochange',
+                    'message' => 'No changes detected.',
+                    'enquiry_id' => $enquiryId
+                ]);
+            }
         }
-    }
 
-    // -------------------------
-    // 5. New enquiry — Generate enquiry number
-    // -------------------------
-    $lastEnquiry = $enquiryModel
-        // ->where('company_id', $companyId)
-        ->orderBy('enquiry_no', 'DESC')
-        ->first();
+        // -------------------------
+        // 5. New enquiry — Generate enquiry number
+        // -------------------------
+        $lastEnquiry = $enquiryModel
+            // ->where('company_id', $companyId)
+            ->orderBy('enquiry_no', 'DESC')
+            ->first();
 
-    $nextEnquiryNo = $lastEnquiry ? $lastEnquiry['enquiry_no'] + 1 : 1;
-    $enquiryData['enquiry_no'] = $nextEnquiryNo;
+        $nextEnquiryNo = $lastEnquiry ? $lastEnquiry['enquiry_no'] + 1 : 1;
+        $enquiryData['enquiry_no'] = $nextEnquiryNo;
 
-    // Insert new enquiry
-    $enquiryId = $enquiryModel->insert($enquiryData);
+        // Insert new enquiry
+        $enquiryId = $enquiryModel->insert($enquiryData);
 
-    // Insert enquiry items
-    foreach ($descriptions as $key => $desc) {
-        $desc = trim($desc);
-        $qty  = floatval($quantities[$key] ?? 0);
-        if ($desc !== '' && $qty > 0) {
-            $enquiryItemModel->insert([
-                'enquiry_id' => $enquiryId,
-                'description'=> $desc,
-                'quantity'   => $qty,
-                'created_at' => date('Y-m-d H:i:s')
-            ]);
+        // Insert enquiry items
+        foreach ($descriptions as $key => $desc) {
+            $desc = trim($desc);
+            $qty = floatval($quantities[$key] ?? 0);
+            if ($desc !== '' && $qty > 0) {
+                $enquiryItemModel->insert([
+                    'enquiry_id' => $enquiryId,
+                    'description' => $desc,
+                    'quantity' => $qty,
+                    'created_at' => date('Y-m-d H:i:s')
+                ]);
+            }
         }
+
+        return $this->response->setJSON([
+            'status' => 'success',
+            'message' => 'Enquiry generated successfully.',
+            'enquiry_id' => $enquiryId,
+            'enquiry_no' => $nextEnquiryNo
+        ]);
     }
-
-    return $this->response->setJSON([
-        'status' => 'success',
-        'message' => 'Enquiry generated successfully.',
-        'enquiry_id' => $enquiryId,
-        'enquiry_no' => $nextEnquiryNo
-    ]);
-}
-
-
-
 
 
     // List all enquiries (basic)
@@ -245,11 +242,11 @@ class Supplier extends BaseController
 
         foreach ($enquiries as $row) {
             $result[] = [
-                'slno'       => $slno++,
+                'slno' => $slno++,
                 'enquiry_id' => $row['enquiry_id'],
-                'name'       => ucwords(strtolower($row['name'] ?? '')),
-                'address'    => ucwords(strtolower($row['address'] ?? '')),
-                'client_name'  => ucwords(strtolower($row['client_name'] ?? '')),
+                'name' => ucwords(strtolower($row['name'] ?? '')),
+                'address' => ucwords(strtolower($row['address'] ?? '')),
+                'client_name' => ucwords(strtolower($row['client_name'] ?? '')),
                 'is_converted' => $row['is_converted'] ?? 0,
             ];
         }
@@ -259,10 +256,10 @@ class Supplier extends BaseController
         $totalRecords = $model->where('is_deleted', 0)->countAllResults();
 
         return $this->response->setJSON([
-            'draw'            => intval($draw),
-            'recordsTotal'    => $totalRecords,
+            'draw' => intval($draw),
+            'recordsTotal' => $totalRecords,
             'recordsFiltered' => $filteredTotal,
-            'data'            => $result
+            'data' => $result
         ]);
     }
 
