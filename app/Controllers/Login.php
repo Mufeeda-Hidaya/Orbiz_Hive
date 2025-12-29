@@ -68,6 +68,7 @@ $menuNameToKey = [
     'Job Order'  => 'invoices',
     'Delivery'   => 'delivery',
     'Users'      => 'adduserlist',
+    'Customer'   => 'customer'
 ];
 
 
