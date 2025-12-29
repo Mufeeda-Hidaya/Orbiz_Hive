@@ -25,7 +25,7 @@ class Customer extends BaseController
         $address = ucfirst(strtolower(trim($this->request->getPost('address'))));
         $customer_id = $this->request->getPost('customer_id');
         $phone = preg_replace('/[^0-9\+\-\(\)\s]/', '', trim($this->request->getPost('phone')));
-        $max_discount = $this->request->getPost('max_discount');
+        // $max_discount = $this->request->getPost('max_discount');
 
         // Validate required fields
         if (empty($name) || empty($clientname) || empty($address) || empty($user_id)) {
@@ -43,7 +43,7 @@ class Customer extends BaseController
             'phone' => $phone,
             // 'company_id' => $company_id,
             'user_id' => $user_id, // always from session
-            'max_discount' => round((float) ($max_discount ?? 0), 6)
+            // 'max_discount' => round((float) ($max_discount ?? 0), 6)
         ];
 
         if (!empty($customer_id)) {
@@ -102,7 +102,7 @@ class Customer extends BaseController
 
         $model = new customerModel();
         $results = $model
-            ->where('is_deleted', 0)
+            ->where('status', 'Active')
             ->like('name', $term)
             ->select('customer_id, name, address')
             ->orderBy('customer_id', 'DESC')
@@ -128,7 +128,7 @@ class Customer extends BaseController
 
         $data['customers'] = $customerModel
             // ->where('company_id', $company_id)
-            ->where('is_deleted', 0)
+            ->where('status', 'Active')
             ->findAll();
 
         return view('customerlist', $data);
@@ -234,7 +234,7 @@ class Customer extends BaseController
         $id = $this->request->getPost('id');
         $model = new customerModel();
 
-        if ($model->update($id, ['is_deleted' => 1])) {
+        if ($model->update($id, [ 'status'     => 'Deleted'])) {
             return $this->response->setJSON(['status' => 'success', 'message' => 'Customer Deleted Successfully.']);
         } else {
             return $this->response->setJSON(['status' => 'error', 'message' => 'Failed To Delete Customer.']);
