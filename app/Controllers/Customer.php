@@ -21,7 +21,7 @@ class Customer extends BaseController
         $user_id = $session->get('user_id');
 
         $name = ucwords(strtolower(trim($this->request->getPost('name'))));
-        $clientname = ucwords(strtolower(trim($this->request->getPost('client_name'))));
+        $clientname = ucwords(strtolower(trim($this->request->getPost('contact_person_name'))));
         $address = ucfirst(strtolower(trim($this->request->getPost('address'))));
         $customer_id = $this->request->getPost('customer_id');
         $phone = preg_replace('/[^0-9\+\-\(\)\s]/', '', trim($this->request->getPost('phone')));
@@ -38,7 +38,7 @@ class Customer extends BaseController
         $model = new customerModel();
         $data = [
             'name' => $name,
-            'client_name' => $clientname,
+            'contact_person_name' => $clientname,
             'address' => $address,
             'phone' => $phone,
             // 'company_id' => $company_id,
@@ -147,12 +147,12 @@ class Customer extends BaseController
         $order = $request->getPost('order');
         $search = trim($request->getPost('search')['value'] ?? '');
 
-        // ✅ Column mapping for sorting (ADD client_name)
+        // ✅ Column mapping for sorting (ADD contact_person_name)
         $columnMap = [
             0 => 'customer_id', // hidden
             1 => null,          // slno (not a DB column)
             2 => 'name',
-            3 => 'client_name',
+            3 => 'contact_person_name',
             4 => 'address',
             5 => 'phone'
         ];
@@ -179,7 +179,7 @@ class Customer extends BaseController
                 'slno' => $slno++,
                 'customer_id' => $row['customer_id'],
                 'name' => ucwords(strtolower($row['name'] ?? '')),
-                'client_name' => ucwords(strtolower($row['client_name'] ?? '')), // ✅ NEW
+                'contact_person_name' => ucwords(strtolower($row['contact_person_name'] ?? '')), // ✅ NEW
                 'address' => ucwords(strtolower($row['address'] ?? '')),
                 'phone' => $row['phone'] ?? ''
             ];

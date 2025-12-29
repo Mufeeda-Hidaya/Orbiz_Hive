@@ -7,7 +7,7 @@ class CustomerModel extends Model
 {
     protected $table = 'customers';
     protected $primaryKey = 'customer_id';
-    protected $allowedFields = ['name', 'client_name', 'address', 'phone', 'shipping_address', 'is_deleted', 'max_discount'];
+    protected $allowedFields = ['name', 'contact_person_name', 'address', 'phone', 'shipping_address', 'is_deleted', 'max_discount'];
 
     // Count all customers
     public function getAllCustomerCount()
@@ -31,12 +31,12 @@ class CustomerModel extends Model
             $normalizedSearch = str_replace(' ', '', strtolower($search));
             $builder->groupStart()
                 ->like('customers.name', $search)
-                ->orLike('customers.client_name', $search)
+                ->orLike('customers.contact_person_name', $search)
                 ->orLike('customers.address', $search)
                 ->orLike('customers.phone', $search)
                 ->orLike('customers.customer_id', $search)
                 ->orWhere("REPLACE(REPLACE(REPLACE(LOWER(customers.name), ' ', ''), '\n', ''), '\r', '') LIKE '%{$normalizedSearch}%'", null, false)
-                ->orWhere("REPLACE(REPLACE(REPLACE(LOWER(customers.client_name), ' ', ''), '\n', ''), '\r', '') LIKE '%{$normalizedSearch}%'", null, false)
+                ->orWhere("REPLACE(REPLACE(REPLACE(LOWER(customers.contact_person_name), ' ', ''), '\n', ''), '\r', '') LIKE '%{$normalizedSearch}%'", null, false)
                 ->orWhere("REPLACE(REPLACE(REPLACE(LOWER(customers.address), ' ', ''), '\n', ''), '\r', '') LIKE '%{$normalizedSearch}%'", null, false)
                 ->orWhere("REPLACE(REPLACE(REPLACE(LOWER(customers.phone), ' ', ''), '\n', ''), '\r', '') LIKE '%{$normalizedSearch}%'", null, false)
                 ->groupEnd();
@@ -48,7 +48,7 @@ class CustomerModel extends Model
     // Get filtered records with pagination
     public function getAllFilteredRecords($search = '', $fromstart = 0, $tolimit = 10, $orderColumn = 'customer_id', $orderDir = 'DESC')
     {
-        $allowedColumns = ['customer_id', 'name', 'client_name', 'address', 'phone'];
+        $allowedColumns = ['customer_id', 'name', 'contact_person_name', 'address', 'phone'];
         if (!in_array($orderColumn, $allowedColumns))
             $orderColumn = 'customer_id';
         $orderDir = strtoupper($orderDir) === 'ASC' ? 'ASC' : 'DESC';
@@ -60,12 +60,12 @@ class CustomerModel extends Model
             $normalizedSearch = str_replace(' ', '', strtolower($search));
             $builder->groupStart()
                 ->like('customers.name', $search)
-                ->orLike('customers.client_name', $search)
+                ->orLike('customers.contact_person_name', $search)
                 ->orLike('customers.address', $search)
                 ->orLike('customers.phone', $search)
                 ->orLike('customers.customer_id', $search)
                 ->orWhere("REPLACE(REPLACE(REPLACE(LOWER(customers.name), ' ', ''), '\n', ''), '\r', '') LIKE '%{$normalizedSearch}%'", null, false)
-                ->orWhere("REPLACE(REPLACE(REPLACE(LOWER(customers.client_name), ' ', ''), '\n', ''), '\r', '') LIKE '%{$normalizedSearch}%'",null,false)
+                ->orWhere("REPLACE(REPLACE(REPLACE(LOWER(customers.contact_person_name), ' ', ''), '\n', ''), '\r', '') LIKE '%{$normalizedSearch}%'",null,false)
                 ->orWhere("REPLACE(REPLACE(REPLACE(LOWER(customers.address), ' ', ''), '\n', ''), '\r', '') LIKE '%{$normalizedSearch}%'", null, false)
                 ->orWhere("REPLACE(REPLACE(REPLACE(LOWER(customers.phone), ' ', ''), '\n', ''), '\r', '') LIKE '%{$normalizedSearch}%'", null, false)
                 ->groupEnd();

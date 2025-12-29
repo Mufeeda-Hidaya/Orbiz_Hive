@@ -230,7 +230,7 @@ class Supplier extends BaseController
             0 => 'enquiry_id',
             1 => 'name',
             2 => 'address',
-            3 => 'client_name'
+            3 => 'contact_person_name'
         ];
         $orderColumn = $columnMap[$columnIndex] ?? 'enquiry_id';
 
@@ -246,7 +246,7 @@ class Supplier extends BaseController
                 'enquiry_id' => $row['enquiry_id'],
                 'name' => ucwords(strtolower($row['name'] ?? '')),
                 'address' => ucwords(strtolower($row['address'] ?? '')),
-                'client_name' => ucwords(strtolower($row['client_name'] ?? '')),
+                'contact_person_name' => ucwords(strtolower($row['contact_person_name'] ?? '')),
                 'is_converted' => $row['is_converted'] ?? 0,
             ];
         }
