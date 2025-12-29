@@ -284,5 +284,30 @@ class Customer extends BaseController
         ]);
     }
 
+    public function toggleBlock()
+    {
+        $id = $this->request->getPost('id');
+        $model = new customerModel();
+
+        $customer = $model->find($id);
+        if (!$customer) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Customer not found'
+            ]);
+        }
+
+        $newStatus = ($customer['status'] === 'Blocked') ? 'Active' : 'Blocked';
+
+        $model->update($id, ['status' => $newStatus]);
+
+        return $this->response->setJSON([
+            'status' => 'success',
+            'message' => 'Customer ' . ($newStatus === 'Blocked' ? 'blocked' : 'unblocked') . ' successfully',
+            'new_status' => $newStatus
+        ]);
+    }
+
+
 
 }

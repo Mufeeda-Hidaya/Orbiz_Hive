@@ -65,7 +65,7 @@ class CustomerModel extends Model
                 ->orLike('customers.phone', $search)
                 ->orLike('customers.customer_id', $search)
                 ->orWhere("REPLACE(REPLACE(REPLACE(LOWER(customers.name), ' ', ''), '\n', ''), '\r', '') LIKE '%{$normalizedSearch}%'", null, false)
-                ->orWhere("REPLACE(REPLACE(REPLACE(LOWER(customers.contact_person_name), ' ', ''), '\n', ''), '\r', '') LIKE '%{$normalizedSearch}%'",null,false)
+                ->orWhere("REPLACE(REPLACE(REPLACE(LOWER(customers.contact_person_name), ' ', ''), '\n', ''), '\r', '') LIKE '%{$normalizedSearch}%'", null, false)
                 ->orWhere("REPLACE(REPLACE(REPLACE(LOWER(customers.address), ' ', ''), '\n', ''), '\r', '') LIKE '%{$normalizedSearch}%'", null, false)
                 ->orWhere("REPLACE(REPLACE(REPLACE(LOWER(customers.phone), ' ', ''), '\n', ''), '\r', '') LIKE '%{$normalizedSearch}%'", null, false)
                 ->groupEnd();
