@@ -26,7 +26,7 @@
                     <th class="d-none">ID</th>
                     <th>Sl No</th>
                     <th>Customer Name</th>
-                    <th>Client Name</th>
+                    <th>Contact Person Name</th>
                     <th>Address</th>
                     <th>Phone Number</th>
                     <th style="width: 100px;">Action</th>
@@ -49,7 +49,7 @@
                 <div class="modal-body">
                     <input type="hidden" name="customer_id" id="customer_id">
                     <div class="mb-3">
-                        <label>Client Name</label>
+                        <label>Contact Person Name</label>
                         <input type="text" name="contact_person_name" id="contact_person_name" class="form-control" required
                             autocomplete="off" style="text-transform: capitalize;">
                     </div>

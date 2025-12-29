@@ -7,13 +7,13 @@ class CustomerModel extends Model
 {
     protected $table = 'customers';
     protected $primaryKey = 'customer_id';
-    protected $allowedFields = ['name', 'contact_person_name', 'address', 'phone', 'shipping_address', 'is_deleted', 'max_discount'];
+    protected $allowedFields = ['name', 'contact_person_name', 'address', 'phone', 'shipping_address', 'status', 'max_discount'];
 
     // Count all customers
     public function getAllCustomerCount()
     {
         return $this->db->table($this->table)
-            ->where('is_deleted', 0)
+            ->where('status', 'Active')
             ->countAllResults();
     }
 
@@ -21,7 +21,7 @@ class CustomerModel extends Model
     public function getFilteredCustomerCount($search = '')
     {
         $builder = $this->db->table($this->table . ' AS customers');
-        $builder->where('customers.is_deleted', 0);
+        $builder->where('customers.status', 'Active');
 
         // if ($company_id) {
         //     $builder->where('customers.company_id', $company_id);
@@ -54,7 +54,7 @@ class CustomerModel extends Model
         $orderDir = strtoupper($orderDir) === 'ASC' ? 'ASC' : 'DESC';
 
         $builder = $this->db->table($this->table . ' AS customers');
-        $builder->where('customers.is_deleted', 0);
+        $builder->where('customers.status', 'Active');
 
         if (!empty($search)) {
             $normalizedSearch = str_replace(' ', '', strtolower($search));
