@@ -103,7 +103,8 @@
                     <div class="enquiry-title">ENQUIRY</div>
                     <div class="enquiry-details">
                         <p class="mb-1" id="enquiry-id-display">Enquiry No :
-                            <?= isset($enquiry['enquiry_no']) ? $enquiry['enquiry_no'] : '' ?></p>
+                            <?= isset($enquiry['enquiry_no']) ? $enquiry['enquiry_no'] : '' ?>
+                        </p>
                         <p>Date : <?= date('d-m-Y') ?></p>
                     </div>
                 </div>
@@ -207,7 +208,8 @@
                     <div class="modal-body">
                         <div class="form-group">
                             <label>Contact Person</label>
-                            <input type="text" class="form-control" id="popup_person" required>
+                            <input type="text" class="form-control" id="popup_person" name="contact_person_name"
+                                required>
                         </div>
                         <div class="form-group">
                             <label>Customer Name</label>
@@ -557,13 +559,27 @@
                 dataType: "json",
                 success: function (res) {
                     if (res.status === 'success') {
+                        // Add new customer to select2 dropdown
                         const newOption = new Option(res.customer.name, res.customer.customer_id, true, true);
                         $('#customer_id').append(newOption).trigger('change');
+
+                        // Copy contact person to hidden input in enquiry form
+                        $('#enquiry_contact_person_name').val(res.customer.contact_person_name || $('#popup_person').val());
+
+                        // Optionally copy address & phone too
+                        $('#customer_address').val(res.customer.address || $('#popup_address').val());
+                        $('#phone_number').val(res.customer.phone || $('#popup_phone').val());
+
+                        // Clear modal fields
+                        $('#popup_person').val('');
                         $('#popup_name').val('');
                         $('#popup_address').val('');
-                        // $('#max_discount').val('');
                         $('#popup_phone').val('');
+
+                        // Hide modal
                         $('#customerModal').modal('hide');
+
+                        // Show success alert
                         $('.alert')
                             .removeClass('d-none alert-danger')
                             .addClass('alert-success')
@@ -581,6 +597,7 @@
                             .fadeOut();
                     }
                 },
+
                 error: function () {
                     $('.alert')
                         .removeClass('d-none alert-success')

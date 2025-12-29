@@ -28,7 +28,7 @@ class Customer extends BaseController
         // $max_discount = $this->request->getPost('max_discount');
 
         // Validate required fields
-        if (empty($name) || empty($clientname) || empty($address) || empty($user_id)) {
+        if (empty($name) || empty($address) || empty($user_id)) {
             return $this->response->setJSON([
                 'status' => 'error',
                 'message' => 'All fields Are Required'
