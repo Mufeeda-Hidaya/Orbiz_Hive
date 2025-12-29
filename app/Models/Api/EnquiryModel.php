@@ -9,7 +9,7 @@ class EnquiryModel extends Model
     protected $primaryKey = 'enquiry_id';
     protected $allowedFields = [
         'enquiry_no','customer_id','address','phone','name','user_id',
-    'created_by','created_at','is_deleted', 'is_converted','updated_by','updated_at'
+    'created_by','created_at','status', 'is_converted','updated_by','updated_at'
     ];
 
     public function getAllEnquiries($pageSize = 10, $offset = 0, $search = '')
@@ -22,7 +22,7 @@ class EnquiryModel extends Model
                 customers.phone AS customer_phone
             ')
             ->join('customers', 'customers.customer_id = enquiries.customer_id', 'left')
-            ->where('enquiries.is_deleted', 0)
+            ->where('enquiries.status', 0)
             ->where('enquiries.is_converted', 0);
 
         if (!empty($search)) {
@@ -53,7 +53,7 @@ class EnquiryModel extends Model
             ')
             ->join('customers', 'customers.customer_id = enquiries.customer_id', 'left')
             ->where('enquiries.enquiry_id', $id)
-            ->where('enquiries.is_deleted', 0)
+            ->where('enquiries.status', 0)
             ->first();
     }
     public function getEnquiryDetails($enquiryId)
@@ -61,7 +61,7 @@ class EnquiryModel extends Model
         return $this->select('
                 enquiries.enquiry_id,
                 enquiries.enquiry_no,
-                enquiries.is_deleted,
+                enquiries.status,
                 enquiries.is_converted,
                 customers.name AS customer_name,
                 customers.address AS customer_address
