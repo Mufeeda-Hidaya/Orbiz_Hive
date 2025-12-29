@@ -10,34 +10,35 @@ class SupplierModel extends Model
     protected $allowedFields = [
         'enquiry_no',
         'customer_id',
-        'address',
         'phone',
-        'name',
+        'contact_person_name',
         'user_id',
         'created_by',
         'created_at',
-        'is_deleted',
+        'status',
         'is_converted',
         'updated_by',
         'updated_at'
     ];
+
     protected $returnType = 'array';
     // protected $defaultCompanyId = 1; 
 
     public function getFilteredSupplierCount($search = '')
     {
-        $builder = $this->db->table($this->table)
-            ->where('is_deleted', 0);
+        $builder = $this->db->table($this->table . ' e')
+            ->join('customers c', 'c.customer_id = e.customer_id', 'left')
+            ->where('e.status', 1);
 
         if (!empty($search)) {
             $normalizedSearch = str_replace(' ', '', strtolower($search));
             $builder->groupStart()
-                ->like('e.name', $search)
-                ->orLike('e.address', $search)
+                ->like('c.name', $search)
+                ->orLike('c.address', $search)
                 ->orLike('e.enquiry_id', $search)
                 ->orLike('c.contact_person_name', $search) //search contact person
-                ->orWhere("REPLACE(LOWER(e.name),' ','') LIKE '%{$normalizedSearch}%'", null, false)
-                ->orWhere("REPLACE(LOWER(e.address),' ','') LIKE '%{$normalizedSearch}%'", null, false)
+                ->orWhere("REPLACE(LOWER(c.name),' ','') LIKE '%{$normalizedSearch}%'", null, false)
+                ->orWhere("REPLACE(LOWER(c.address),' ','') LIKE '%{$normalizedSearch}%'", null, false)
                 ->orWhere("REPLACE(LOWER(c.contact_person_name),' ','') LIKE '%{$normalizedSearch}%'", null, false)
                 ->groupEnd();
         }
@@ -47,13 +48,8 @@ class SupplierModel extends Model
     }
 
     // Fetch filtered records for DataTables
-    public function getAllFilteredRecords(
-        $search = '',
-        $fromstart = 0,
-        $tolimit = 10,
-        $orderColumn = 'enquiry_id',
-        $orderDir = 'DESC'
-    ) {
+    public function getAllFilteredRecords($search = '', $fromstart = 0, $tolimit = 10, $orderColumn = 'enquiry_id', $orderDir = 'DESC')
+    {
         $allowedColumns = [
             'enquiry_id',
             'name',
@@ -70,24 +66,23 @@ class SupplierModel extends Model
         $builder = $this->db->table($this->table . ' e')
             ->select('
             e.enquiry_id,
-            e.name,
-            e.address,
-            e.is_converted,
+            c.name,
+            c.address,
+            e.stage,
             c.contact_person_name
         ')
             ->join('customers c', 'c.customer_id = e.customer_id', 'left')
-            ->where('e.is_deleted', 0);
-
+            ->where('e.status', 1);
         if (!empty($search)) {
             $normalizedSearch = str_replace(' ', '', strtolower($search));
 
             $builder->groupStart()
-                ->like('e.name', $search)
-                ->orLike('e.address', $search)
+                ->like('c.name', $search)
+                ->orLike('c.address', $search)
                 ->orLike('e.enquiry_id', $search)
                 ->orLike('c.contact_person_name', $search) // ✅ search contact person
-                ->orWhere("REPLACE(LOWER(e.name),' ','') LIKE '%{$normalizedSearch}%'", null, false)
-                ->orWhere("REPLACE(LOWER(e.address),' ','') LIKE '%{$normalizedSearch}%'", null, false)
+                ->orWhere("REPLACE(LOWER(c.name),' ','') LIKE '%{$normalizedSearch}%'", null, false)
+                ->orWhere("REPLACE(LOWER(c.address),' ','') LIKE '%{$normalizedSearch}%'", null, false)
                 ->orWhere("REPLACE(LOWER(c.contact_person_name),' ','') LIKE '%{$normalizedSearch}%'", null, false)
                 ->groupEnd();
         }
