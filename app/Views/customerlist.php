@@ -50,8 +50,8 @@
                     <input type="hidden" name="customer_id" id="customer_id">
                     <div class="mb-3">
                         <label>Contact Person Name</label>
-                        <input type="text" name="contact_person_name" id="contact_person_name" class="form-control" required
-                            autocomplete="off" style="text-transform: capitalize;">
+                        <input type="text" name="contact_person_name" id="contact_person_name" class="form-control"
+                            required autocomplete="off" style="text-transform: capitalize;">
                     </div>
 
                     <div class="mb-3">
@@ -107,6 +107,26 @@
         </div>
     </div>
 </div>
+
+<!-- Block Confirmation Modal -->
+<div class="modal fade" id="confirmBlockModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Action</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to block / unblock this customer?
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="confirm-block-btn" class="btn btn-warning">Yes</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 </div>
 <?php include "common/footer.php"; ?>
 
@@ -117,6 +137,9 @@
     // const customerModal = new bootstrap.Modal(document.getElementById('customerModal'));
     const deleteModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
     var customerModal = new bootstrap.Modal(document.getElementById('customerModal'));
+    const blockModal = new bootstrap.Modal(document.getElementById('confirmBlockModal'));
+    let blockId = null;
+
     // let originalName = '', originalAddress = '', originalPhone = '';
 
     let originalName = '';
@@ -179,6 +202,12 @@
                         <a href="javascript:void(0);" class="edit-customer" data-id="${data}" title="Edit" style="color:rgb(13, 162, 199);">
                             <i class="bi bi-pencil-fill"></i>
                         </a>
+
+
+                         <a href="javascript:void(0);" class="toggle-block" data-id="${data}" title="Block / Unblock" style="color:orange;">
+                            <i class="bi bi-slash-circle-fill"></i>
+                         </a>
+                        
                         <a href="javascript:void(0);" class="delete-customer" data-id="${data}" title="Delete" style="color: #dc3545;">
                             <i class="bi bi-trash-fill"></i>
                         </a>
@@ -206,28 +235,40 @@
         $(document).on('click', '.edit-customer', function () {
             const id = $(this).data('id');
 
-            $.get("<?= base_url('customer/getCustomer/') ?>" + id, function (res) {
-                if (res.status === 'success') {
-                    const customer = res.customer;
+            $.ajax({
+                url: "<?= base_url('customer/getCustomer/') ?>" + id,
+                type: "GET",
+                dataType: "json",
+                success: function (res) {
+                    console.log(res); // debug
 
-                    $('#customer_id').val(customer.customer_id);
-                    $('#name').val(customer.name);
-                    $('#address').val(customer.address);
-                    $('#phone').val(customer.phone);
+                    if (res.status === 'success') {
+                        const customer = res.customer;
 
-                    // Store original values to detect changes
-                    originalName = customer.name.trim();
-                    originalAddress = customer.address.trim();
-                    originalPhone = customer.phone ? customer.phone.trim() : '';
+                        $('#customer_id').val(customer.customer_id);
+                        $('#name').val(customer.name);
+                        $('#contact_person_name').val(customer.contact_person_name);
+                        $('#address').val(customer.address);
+                        $('#phone').val(customer.phone);
 
-                    $('#customerModalLabel').text('Edit Customer');
-                    $('#saveCustomerBtn').prop('disabled', true);
-                    customerModal.show();
-                } else {
-                    showAlert('danger', res.message);
+                        originalName = customer.name?.trim() || '';
+                        originalAddress = customer.address?.trim() || '';
+                        originalPhone = customer.phone?.trim() || '';
+
+                        $('#customerModalLabel').text('Edit Customer');
+                        $('#saveCustomerBtn').prop('disabled', true);
+                        customerModal.show();
+                    } else {
+                        showAlert('danger', res.message);
+                    }
+                },
+                error: function (xhr) {
+                    console.error(xhr.responseText);
+                    showAlert('danger', 'Failed to fetch customer');
                 }
             });
         });
+
 
         // Check if input values changed from original (only in Edit)
         $('#name, #address, #phone').on('input', function () {
@@ -305,6 +346,29 @@
                 deleteId = null;
             }, 'json');
         });
+
+
+        $('#confirm-block-btn').click(function () {
+    if (!blockId) return;
+
+    $.post("<?= base_url('customer/toggleBlock') ?>", { id: blockId }, function (res) {
+        if (res.status === 'success') {
+            showAlert('success', res.message);
+            table.ajax.reload(null, false);
+        } else {
+            showAlert('danger', res.message);
+        }
+        blockModal.hide();
+        blockId = null;
+    }, 'json');
+});
+
+$(document).on('click', '.toggle-block', function () {
+    blockId = $(this).data('id');
+    blockModal.show();
+});
+
+
 
         function showAlert(type, message) {
             alertBox.removeClass().addClass(`alert alert-${type} text-center position-fixed`)

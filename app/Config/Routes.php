@@ -115,6 +115,8 @@ $routes->get('customer/getCustomer/(:num)', 'Customer::getCustomer/$1');
 $routes->get('estimate/customer/(:num)', 'Estimate::viewByCustomer/$1');
 $routes->get('customer', 'Customer::index'); 
 $routes->get('customer/get_discount/(:num)', 'Customer::get_discount/$1');
+$routes->post('customer/toggleBlock', 'Customer::toggleBlock');
+
 
 
 $routes->get('customerreport', 'CustomerReport::index');
