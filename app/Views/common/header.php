@@ -170,6 +170,15 @@ $user_id = $session->get('user_id') ?? null;
             </a>
           </li>
         <?php endif; ?>
+        <?php if (in_array('delivery', $allowedMenus)): ?>
+          <li class="nav-item">
+            <a class="nav-link <?= strpos(uri_string(), 'delivery') !== false ? 'active' : '' ?>"
+              href="<?= base_url('delivery') ?>">
+                  <i class="mdi mdi-truck menu-icon"></i>
+              <span class="menu-title">Delivery</span>
+            </a>
+          </li>
+        <?php endif; ?>
         <!-- <?php if (in_array('customer', $allowedMenus)): ?>
           <li class="nav-item">
             <a class="nav-link <?= strpos($currentPath, 'cashlist') !== false ? 'active' : '' ?>" 
