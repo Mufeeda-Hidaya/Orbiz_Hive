@@ -83,7 +83,7 @@ $(document).ready(function () {
             { data: "slno" ,orderable:"false"},
             { data: "name" },
             { data: "address" },
-            { data: "client_name" },
+            { data: "contact_person_name" },
             {
                 data: "enquiry_id",
                 orderable: false,

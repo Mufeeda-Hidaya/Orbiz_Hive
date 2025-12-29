@@ -35,10 +35,10 @@ class SupplierModel extends Model
                 ->like('e.name', $search)
                 ->orLike('e.address', $search)
                 ->orLike('e.enquiry_id', $search)
-                ->orLike('c.client_name', $search) //search contact person
+                ->orLike('c.contact_person_name', $search) //search contact person
                 ->orWhere("REPLACE(LOWER(e.name),' ','') LIKE '%{$normalizedSearch}%'", null, false)
                 ->orWhere("REPLACE(LOWER(e.address),' ','') LIKE '%{$normalizedSearch}%'", null, false)
-                ->orWhere("REPLACE(LOWER(c.client_name),' ','') LIKE '%{$normalizedSearch}%'", null, false)
+                ->orWhere("REPLACE(LOWER(c.contact_person_name),' ','') LIKE '%{$normalizedSearch}%'", null, false)
                 ->groupEnd();
         }
 
@@ -58,7 +58,7 @@ class SupplierModel extends Model
             'enquiry_id',
             'name',
             'address',
-            'client_name'
+            'contact_person_name'
         ];
 
         if (!in_array($orderColumn, $allowedColumns)) {
@@ -73,7 +73,7 @@ class SupplierModel extends Model
             e.name,
             e.address,
             e.is_converted,
-            c.client_name
+            c.contact_person_name
         ')
             ->join('customers c', 'c.customer_id = e.customer_id', 'left')
             ->where('e.is_deleted', 0);
@@ -85,16 +85,16 @@ class SupplierModel extends Model
                 ->like('e.name', $search)
                 ->orLike('e.address', $search)
                 ->orLike('e.enquiry_id', $search)
-                ->orLike('c.client_name', $search) // ✅ search contact person
+                ->orLike('c.contact_person_name', $search) // ✅ search contact person
                 ->orWhere("REPLACE(LOWER(e.name),' ','') LIKE '%{$normalizedSearch}%'", null, false)
                 ->orWhere("REPLACE(LOWER(e.address),' ','') LIKE '%{$normalizedSearch}%'", null, false)
-                ->orWhere("REPLACE(LOWER(c.client_name),' ','') LIKE '%{$normalizedSearch}%'", null, false)
+                ->orWhere("REPLACE(LOWER(c.contact_person_name),' ','') LIKE '%{$normalizedSearch}%'", null, false)
                 ->groupEnd();
         }
 
         // Order handling (table alias fix)
-        if ($orderColumn === 'client_name') {
-            $builder->orderBy('c.client_name', $orderDir);
+        if ($orderColumn === 'contact_person_name') {
+            $builder->orderBy('c.contact_person_name', $orderDir);
         } else {
             $builder->orderBy('e.' . $orderColumn, $orderDir);
         }

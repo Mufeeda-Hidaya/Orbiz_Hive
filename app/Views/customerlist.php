@@ -50,7 +50,7 @@
                     <input type="hidden" name="customer_id" id="customer_id">
                     <div class="mb-3">
                         <label>Client Name</label>
-                        <input type="text" name="client_name" id="client_name" class="form-control" required
+                        <input type="text" name="contact_person_name" id="contact_person_name" class="form-control" required
                             autocomplete="off" style="text-transform: capitalize;">
                     </div>
 
@@ -154,7 +154,7 @@
                     render: data => data ? data.replace(/\b\w/g, c => c.toUpperCase()) : ''
                 },
                 {
-                    data: "client_name",
+                    data: "contact_person_name",
                     render: data => data ? data.replace(/\b\w/g, c => c.toUpperCase()) : ''
                 },
                 {
