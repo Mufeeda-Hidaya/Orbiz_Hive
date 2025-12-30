@@ -6,7 +6,8 @@ use CodeIgniter\RESTful\ResourceController;
 use App\Models\Api\EnquiryModel;
 use App\Controllers\BaseController;
 use App\Models\Api\LoginModel;
-use App\Models\EnquiryItemModel;
+use App\Models\Api\EnquiryitemModel;
+use App\Models\EnquiryHistoryModel;
 use App\Models\Manageuser_Model;
 use App\Models\customerModel;
 use App\Models\RoleModel;
@@ -213,9 +214,11 @@ class Enquiry extends ResourceController
     //     ]);
     // }
 
-    
+
     public function saveEnquiry()
     {
+        $db = \Config\Database::connect();
+        $db->transBegin();
         $authHeader = AuthHelper::getAuthorizationToken($this->request);
         $user = $this->authService->getAuthenticatedUser($authHeader);
         if (!$user) {
@@ -223,167 +226,174 @@ class Enquiry extends ResourceController
         }
 
         $enquiryModel = new EnquiryModel();
+        $enquiryHistoryModel = new EnquiryHistoryModel();
         $enquiryItemModel = new EnquiryItemModel();
         $customerModel = new CustomerModel();
 
-        $input = $this->request->getJSON(true);
-        if (!$input) {
-            $input = $this->request->getPost();
-        }
+        $input = $this->request->getJSON(true) ?: $this->request->getPost();
 
         $enquiryId = $input['enquiry_id'] ?? null;
         $name = trim($input['name'] ?? '');
+        $personname = trim($input['contact_person_name'] ?? '');
         $phone = trim($input['phone'] ?? '');
         $address = trim($input['address'] ?? '');
         $items = $input['items'] ?? [];
 
-        if (empty($name) || empty($phone) || empty($address) || empty($items) || !is_array($items)) {
+        if (!$name || !$phone || !$address || empty($items)) {
             return $this->response->setJSON([
                 'status' => false,
-                'message' => 'Name, phone, address, and at least one item are required.'
+                'message' => 'Name, phone, address and items are required'
             ]);
         }
 
-        //  Filter and validate items
+        // Validate items
         $validItems = [];
         foreach ($items as $item) {
             $desc = trim($item['description'] ?? '');
-            $qty = floatval($item['quantity'] ?? 0);
-            $images = $item['images'] ?? []; // multiple images as array
+            $qty = (float) ($item['quantity'] ?? 0);
 
             if ($desc && $qty > 0) {
                 $validItems[] = [
                     'description' => $desc,
                     'quantity' => $qty,
-                    'images' => json_encode($images), // store JSON in DB
+                    'images' => json_encode($item['images'] ?? [])
                 ];
             }
         }
 
         if (empty($validItems)) {
-            return $this->response->setJSON([
-                'status' => false,
-                'message' => 'Each item must have a valid description and quantity.'
-            ]);
+            throw new \Exception('Invalid enquiry items');
         }
 
         $userId = session()->get('user_id') ?? 1;
-        // $companyId = 1;
 
-        //  Handle customer
-        $existingCustomer = $customerModel->where('name', $name)->first();
-        if ($existingCustomer) {
-            $customerId = $existingCustomer['customer_id'];
-            $updateData = [];
-
-            if (trim($existingCustomer['address']) !== $address) {
-                $updateData['address'] = $address;
-            }
-            if (trim($existingCustomer['phone'] ?? '') !== $phone) {
-                $updateData['phone'] = $phone;
-            }
-
-            if (!empty($updateData)) {
-                $updateData['updated_by'] = $userId;
-                $updateData['updated_at'] = date('Y-m-d H:i:s');
-                $customerModel->update($customerId, $updateData);
-            }
+        // CUSTOMER
+        $customer = $customerModel->where('name', $name)->first();
+        if ($customer) {
+            $customerId = $customer['customer_id'];
+            $customerModel->update($customerId, [
+                'contact_person_name' => $personname,
+                'phone' => $phone,
+                'address' => $address,
+                'updated_at' => date('Y-m-d H:i:s'),
+                'updated_by' => $userId
+            ]);
         } else {
             $customerModel->insert([
                 'name' => $name,
+                'contact_person_name' => $personname,
                 'phone' => $phone,
                 'address' => $address,
-                // 'company_id' => $companyId,
-                'created_by' => $userId,
+                'status' => 1,
                 'created_at' => date('Y-m-d H:i:s'),
-                'status' => 0
+                'created_by' => $userId
             ]);
             $customerId = $customerModel->getInsertID();
         }
 
-        //  Update existing enquiry
-        if (!empty($enquiryId)) {
-            $existing = $enquiryModel->find($enquiryId);
-            if (!$existing) {
-                return $this->response->setJSON(['status' => false, 'message' => 'Enquiry not found.']);
-            }
+        // CREATE / UPDATE ENQUIRY
+        if ($enquiryId) {
 
+            // UPDATE
             $enquiryModel->update($enquiryId, [
                 'customer_id' => $customerId,
-                'name' => $name,
+                'contact_person_name' => $personname,
                 'phone' => $phone,
-                'address' => $address,
-                'updated_by' => $userId,
-                'updated_at' => date('Y-m-d H:i:s')
+                'updated_at' => date('Y-m-d H:i:s'),
+                'updated_by' => $userId
             ]);
 
-            $enquiryItemModel->where('enquiry_id', $enquiryId)->delete();
+            // revision number
+            $lastHistory = $enquiryHistoryModel
+                ->where('enquiry_id', $enquiryId)
+                ->orderBy('revision_no', 'DESC')
+                ->first();
 
-            foreach ($validItems as $item) {
-                $enquiryItemModel->insert([
-                    'enquiry_id' => $enquiryId,
-                    'description' => $item['description'],
-                    'quantity' => $item['quantity'],
-                    'images' => $item['images'], // store JSON
-                    'status' => 1,
-                    'created_at' => date('Y-m-d H:i:s')
-                ]);
-            }
+            $revisionNo = $lastHistory ? $lastHistory['revision_no'] + 1 : 1;
 
-            return $this->response->setJSON([
-                'status' => 'success',
-                'message' => 'Enquiry updated successfully.',
-                'data' => [
-                    'enquiry_id' => $enquiryId,
-                    'customer_id' => $customerId,
-                    'name' => $name,
-                    'phone' => $phone,
-                    'address' => $address,
-                    'items' => $validItems
-                ]
+        } else {
+
+            // CREATE
+            $lastEnquiry = $enquiryModel->orderBy('enquiry_no', 'DESC')->first();
+            $enquiryNo = $lastEnquiry ? $lastEnquiry['enquiry_no'] + 1 : 1;
+
+            $enquiryModel->insert([
+                'customer_id' => $customerId,
+                'contact_person_name' => $personname,
+                'phone' => $phone,
+                'enquiry_no' => $enquiryNo,
+                'stage' => 1,
+                'status' => 1,
+                'created_at' => date('Y-m-d H:i:s'),
+                'created_by' => $userId
             ]);
+
+            $enquiryId = $enquiryModel->getInsertID();
+            $revisionNo = 1;
         }
-
-        // Create new enquiry
-        $lastEnquiry = $enquiryModel->orderBy('enquiry_no', 'DESC')->first();
-        $nextEnquiryNo = $lastEnquiry ? $lastEnquiry['enquiry_no'] + 1 : 1;
-
-        $enquiryModel->insert([
-            'customer_id' => $customerId,
-            'name' => $name,
-            'phone' => $phone,
-            'address' => $address,
-            // 'company_id'  => $companyId,
-            'user_id' => $userId,
-            'enquiry_no' => $nextEnquiryNo,
-            'status' => 0,
-            'created_by' => $userId,
-            'created_on' => date('Y-m-d H:i:s')
+        // ENQUIRY HISTORY (MANDATORY)
+        $note = trim($input['note'] ?? 'Enquiry saved');
+        $revisionLabel = 'R' . $revisionNo;
+        $enquiryHistoryModel->insert([
+            'enquiry_id' => $enquiryId,
+            'revision_no' => $revisionNo,
+            'revision_label' => $revisionLabel,
+            'date' => date('Y-m-d'),
+            'note' => $note,
+            'comments' => null,
+            'stage' => 1,   // 1 = Enquiry
+            'status' => 1,  // 1 = Active
+            'created_at' => date('Y-m-d H:i:s'),
+            'created_by' => $userId
         ]);
 
-        $newEnquiryId = $enquiryModel->getInsertID();
+        $historyId = $enquiryHistoryModel->getInsertID();
+
+        if (!$historyId) {
+            throw new \Exception('Failed to create enquiry history');
+        }
+
+        // CLEAR OLD ITEMS ON UPDATE
+
+        if ($enquiryId && $revisionNo > 1) {
+            $enquiryItemModel
+                ->where('enquiry_id', $enquiryId)
+                ->update([
+                    'status' => 2, // or 9 if you use soft delete
+                    'updated_at' => date('Y-m-d H:i:s')
+                ]);
+        }
+
+        // ENQUIRY ITEMS
 
         foreach ($validItems as $item) {
-            $enquiryItemModel->insert([
-                'enquiry_id' => $newEnquiryId,
+
+            $insert = $enquiryItemModel->insert([
+                'enquiry_id' => $enquiryId,
+                'history_id' => $historyId,
                 'description' => $item['description'],
                 'quantity' => $item['quantity'],
-                'images' => $item['images'], //  store image JSON here
+                'images' => $item['images'],
                 'status' => 1,
                 'created_at' => date('Y-m-d H:i:s')
             ]);
-        }
 
+            if (!$insert) {
+                throw new \Exception(
+                    'Enquiry item insert failed: ' .
+                    json_encode($enquiryItemModel->errors())
+                );
+            }
+        }
+        $db->transCommit();
+        $enquiryitemId = $enquiryItemModel->getInsertID();
         return $this->response->setJSON([
-            'status' => 'success',
-            'message' => 'Enquiry created successfully.',
+            'status' => true,
+            'message' => 'Enquiry saved successfully',
             'data' => [
-                'enquiry_id' => $newEnquiryId,
-                'customer_id' => $customerId,
-                'name' => $name,
-                'phone' => $phone,
-                'address' => $address,
-                'items' => $validItems
+                'enquiry_id' => $enquiryId,
+                'history_id' => $historyId,
+                'enquiry_item_id' => $enquiryitemId
             ]
         ]);
     }
@@ -404,13 +414,40 @@ class Enquiry extends ResourceController
             $pageSize = 10;
         $offset = $pageIndex * $pageSize;
         $result = $this->enquiryModel->getAllEnquiries($pageSize, $offset, $search);
+
+        $baseImageUrl = base_url('uploads/enquiry/');
+
         foreach ($result['data'] as &$enquiry) {
-            $enquiry['items'] = $this->enquiryItemModel
-                ->select('item_id, description, quantity, images')
+
+            $items = $this->enquiryItemModel
+                ->select('enquiry_item_id, description, quantity, images')
                 ->where('enquiry_id', $enquiry['enquiry_id'])
                 ->where('status !=', 9)
                 ->findAll();
+
+            foreach ($items as &$item) {
+
+                if (!empty($item['images'])) {
+
+                    $images = json_decode($item['images'], true);
+
+                    if (is_array($images)) {
+                        $item['images'] = array_map(
+                            fn($img) => $baseImageUrl . $img,
+                            $images
+                        );
+                    } else {
+                        $item['images'] = [];
+                    }
+
+                } else {
+                    $item['images'] = [];
+                }
+            }
+
+            $enquiry['items'] = $items;
         }
+
 
         return $this->response->setJSON([
             'success' => true,
@@ -472,7 +509,7 @@ class Enquiry extends ResourceController
             ]);
         }
         $this->enquiryModel->update($id, [
-            'status'     => 2,
+            'status' => 2,
             'updated_at' => date('Y-m-d H:i:s')
         ]);
 
@@ -524,7 +561,6 @@ class Enquiry extends ResourceController
             'message' => "Item {$itemId} deleted successfully."
         ]);
     }
-
 
     // public function uploadImage()
 // {
@@ -596,6 +632,7 @@ class Enquiry extends ResourceController
 //         'data'    => $uploadedFiles
 //     ]);
 // }
+
     public function uploadImage()
     {
         $enquiryItemModel = new EnquiryItemModel();
@@ -613,14 +650,14 @@ class Enquiry extends ResourceController
             mkdir($uploadPath, 0777, true);
         }
 
-        // ✅ Automatically get the latest enquiry record
-        $existingItem = $enquiryItemModel->orderBy('item_id', 'DESC')->first();
-        if (!$existingItem) {
-            return $this->response->setJSON([
-                'status' => 'error',
-                'message' => 'No enquiry found to attach images.'
-            ]);
-        }
+        // Automatically get the latest enquiry record
+        $existingItem = $enquiryItemModel->orderBy('enquiry_item_id', 'DESC')->first();
+        // if (!$existingItem) {
+        //     return $this->response->setJSON([
+        //         'status' => 'error',
+        //         'message' => 'No enquiry found to attach images.'
+        //     ]);
+        // }
 
         $uploadedFiles = [];
         $images = is_array($files['images']) ? $files['images'] : [$files['images']];
@@ -642,7 +679,7 @@ class Enquiry extends ResourceController
             ];
         }
 
-        // ✅ Handle existing images in the record (if any)
+        // Handle existing images in the record (if any)
         $existingImages = [];
         if (!empty($existingItem['images'])) {
             $decoded = json_decode($existingItem['images'], true);
@@ -651,12 +688,10 @@ class Enquiry extends ResourceController
             }
         }
 
-        // ✅ Merge old + new images
+        // Merge old + new images
         $mergedImages = array_merge($existingImages, $uploadedFiles);
 
-
-
-        // ✅ Return proper response
+        // Return proper response
         return $this->response->setJSON([
             'status' => 'success',
             'message' => 'All images uploaded successfully.',

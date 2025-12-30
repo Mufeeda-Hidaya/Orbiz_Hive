@@ -22,9 +22,9 @@
         <div class="col-md-6">
             <h3 class="mb-0">Estimate List</h3>
         </div>
-        <div class="col-md-6 text-end">
+        <!-- <div class="col-md-6 text-end">
             <a href="<?= base_url('add_estimate') ?>" class="btn btn-secondary">Add New Estimate</a>
-        </div>
+        </div> -->
     </div>
     <hr>
     <div class="table-responsive">

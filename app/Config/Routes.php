@@ -203,6 +203,7 @@ $routes->post('user/login', 'Api\Login::login');
 $routes->post('user/logout', 'Api\Login::logout');
 
 // Enquiries
+$routes->post('upload-image', 'Api\Enquiry::uploadImage');
 $routes->post('enquiry/save', 'Api\Enquiry::saveEnquiry');
 $routes->get('enquiry/getAll', 'Api\Enquiry::getAllEnquiries');
 $routes->get('enquiry/get/(:num)', 'Api\Enquiry::getEnquiryById/$1');
@@ -227,7 +228,10 @@ $routes->post('joborder/update-progress', 'Api\JobOrder::updateJobOrderProgress'
 $routes->post('joborder/convertToDelivery/(:num)', 'Api\Delivery::convertToDelivery/$1');
 $routes->post('delivery/markAsDelivered/(:num)', 'Api\Delivery::markAsDelivered/$1');
 $routes->get('delivery/getAll', 'Api\Delivery::getAllDeliveries');
-$routes->post('upload-image', 'Api\Enquiry::uploadImage');
+
 
 
 $routes->get('estimate/generateEstimate/(:num)', 'Estimate::generateEstimate/$1');
+
+// Customer search
+$routes->get('api/customers/search', 'Api\Customer::search');
