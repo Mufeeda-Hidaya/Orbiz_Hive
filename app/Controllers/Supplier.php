@@ -29,7 +29,7 @@ class Supplier extends BaseController
 
         // Load all customers
         $data['customers'] = $customerModel
-            // ->where('is_deleted', 0)
+            // ->where('status', 0)
             // ->where('company_id', $companyId)
             ->orderBy('customer_id', 'DESC')
             ->findAll();
@@ -39,7 +39,7 @@ class Supplier extends BaseController
 
         if ($id) {
             // Load enquiry
-            $data['enquiry'] = $enquiryModel->where('is_deleted', 0)->find($id);
+            $data['enquiry'] = $enquiryModel->where('status', 1)->find($id);
 
             // Load items
             $data['items'] = $enquiryItemModel->where('enquiry_id', $id)->findAll();
@@ -109,7 +109,7 @@ class Supplier extends BaseController
             'phone' => $phone,
             'user_id' => $userId,
             // 'company_id'  => $companyId,
-            'is_deleted' => 0,
+            'status' => 1,
             'created_by' => $userId,
             'created_at' => date('Y-m-d H:i:s'),
         ];
@@ -207,7 +207,7 @@ class Supplier extends BaseController
     public function list()
     {
         $SupplierModel = new SupplierModel();
-        $data['enquiries'] = $SupplierModel->where('is_deleted', 0)->findAll();
+        $data['enquiries'] = $SupplierModel->where('status', 1)->findAll();
         return view('supplierlist', $data);
     }
 
@@ -253,7 +253,7 @@ class Supplier extends BaseController
 
         // Get count
         $filteredTotal = $model->getFilteredSupplierCount($search);
-        $totalRecords = $model->where('is_deleted', 0)->countAllResults();
+        $totalRecords = $model->where('status', 1)->countAllResults();
 
         return $this->response->setJSON([
             'draw' => intval($draw),
@@ -275,7 +275,7 @@ class Supplier extends BaseController
         $id = $this->request->getPost('id');
         $model = new SupplierModel();
 
-        if ($model->update($id, ['is_deleted' => 1])) {
+        if ($model->update($id, ['status' => 2])) {
             return $this->response->setJSON(['status' => 'success', 'message' => 'Enquiry Deleted Successfully']);
         }
         return $this->response->setJSON(['status' => 'error', 'message' => 'Failed to Delete Enquiry']);
