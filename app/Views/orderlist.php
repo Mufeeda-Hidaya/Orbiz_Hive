@@ -22,9 +22,9 @@
         <div class="col-md-6">
             <h3 class="mb-0">Job Order List</h3>
         </div>
-        <div class="col-md-6 text-end">
+        <!-- <div class="col-md-6 text-end">
             <a href="<?= base_url('order/add') ?>" class="btn btn-secondary">Add New Order</a>
-        </div>
+        </div> -->
     </div>
     <hr>
     <div class="table-responsive">
