@@ -112,6 +112,7 @@ $user_id = $session->get('user_id') ?? null;
 
           </li>
         <?php endif; ?>
+        
          <?php if (in_array('adduserlist', $allowedMenus)): ?>
           <li class="nav-item">
             <a class="nav-link <?= strpos($currentPath, 'adduser') !== false || strpos($currentPath, 'manageuser') !== false ? 'active' : '' ?>"
@@ -166,7 +167,7 @@ $user_id = $session->get('user_id') ?? null;
             <a class="nav-link <?= strpos(uri_string(), 'orderlist') !== false ? 'active' : '' ?>"
               href="<?= base_url('orderlist') ?>">
               <i class="mdi mdi-receipt menu-icon"></i>
-              <span class="menu-title">Job Order</span>
+              <span class="menu-title">Production</span>
             </a>
           </li>
         <?php endif; ?>

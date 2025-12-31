@@ -267,18 +267,11 @@ class Enquiry extends ResourceController
 
         $userId = session()->get('user_id') ?? 1;
 
-        // CUSTOMER
-        $customer = $customerModel->where('name', $name)->first();
-        if ($customer) {
-            $customerId = $customer['customer_id'];
-            $customerModel->update($customerId, [
-                'contact_person_name' => $personname,
-                'phone' => $phone,
-                'address' => $address,
-                'updated_at' => date('Y-m-d H:i:s'),
-                'updated_by' => $userId
-            ]);
-        } else {
+        // CUSTOMER (SAFE)
+        $customerId = $input['customer_id'] ?? null;
+
+        if (!$customerId) {
+            // Create new customer ONLY if customer_id not provided
             $customerModel->insert([
                 'name' => $name,
                 'contact_person_name' => $personname,
@@ -288,6 +281,7 @@ class Enquiry extends ResourceController
                 'created_at' => date('Y-m-d H:i:s'),
                 'created_by' => $userId
             ]);
+
             $customerId = $customerModel->getInsertID();
         }
 
@@ -652,12 +646,12 @@ class Enquiry extends ResourceController
 
         // Automatically get the latest enquiry record
         $existingItem = $enquiryItemModel->orderBy('enquiry_item_id', 'DESC')->first();
-        // if (!$existingItem) {
-        //     return $this->response->setJSON([
-        //         'status' => 'error',
-        //         'message' => 'No enquiry found to attach images.'
-        //     ]);
-        // }
+        if (!$existingItem) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'No enquiry found to attach images.'
+            ]);
+        }
 
         $uploadedFiles = [];
         $images = is_array($files['images']) ? $files['images'] : [$files['images']];
@@ -699,12 +693,4 @@ class Enquiry extends ResourceController
             'data' => $uploadedFiles
         ]);
     }
-
-
-
-
-
-
-
-
 }
