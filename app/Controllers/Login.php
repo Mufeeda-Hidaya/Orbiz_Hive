@@ -68,7 +68,8 @@ class Login extends BaseController
             4 => 'invoices',
             5 => 'delivery',
             6 => 'adduserlist',
-            7 => 'customer'
+            7 => 'customer',
+            8 => 'rolemanagement'
         ];
 
         $allowedMenus = [];
