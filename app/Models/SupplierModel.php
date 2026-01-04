@@ -8,8 +8,8 @@ class SupplierModel extends Model
     protected $table      = 'enquiries';
     protected $primaryKey = 'enquiry_id';
     protected $allowedFields = [
-        'enquiry_no','customer_id','address','phone','name','user_id',
-    'created_by','created_at','company_id','is_deleted', 'is_converted','updated_by','updated_at'
+        'enquiry_no','customer_id','address','phone','name',
+    'created_by','created_at','status','updated_by','updated_at'
     ];
     protected $returnType = 'array';
     // protected $defaultCompanyId = 1; 
@@ -17,7 +17,7 @@ class SupplierModel extends Model
     public function getFilteredSupplierCount($search = '')
     {
         $builder = $this->db->table($this->table)
-            ->where('is_deleted', 0);
+            ->where('status', 1);
 
         if (!empty($search)) {
             $normalizedSearch = str_replace(' ', '', strtolower($search));
@@ -43,7 +43,7 @@ class SupplierModel extends Model
         $orderDir = strtoupper($orderDir) === 'ASC' ? 'ASC' : 'DESC';
 
         $builder = $this->db->table($this->table)
-            ->where('is_deleted', 0);
+            ->where('status', 1);
 
         if (!empty($search)) {
             $normalizedSearch = str_replace(' ', '', strtolower($search));

@@ -6,17 +6,17 @@ use CodeIgniter\Router\RouteCollection;
  * @var RouteCollection $routes
  */
 $routes->get('/', 'Home::index');
-$routes->get('dashboard','Dashboard::index');
+$routes->get('dashboard', 'Dashboard::index');
 
 $routes->get('logout', 'Auth::logout');
 
 $routes->post('admin/login/authenticate', 'Login::authenticate');
-$routes->get('admin/login','Login::index');
+$routes->get('admin/login', 'Login::index');
 
 $routes->post('manageuser/userlistajax', 'Manageuser::userlistajax');
 $routes->get('manageuser', 'Manageuser::index');
 $routes->get('adduser', 'Manageuser::index');
-$routes->get('adduser/(:num)', 'Manageuser::index/$1'); 
+$routes->get('adduser/(:num)', 'Manageuser::index/$1');
 $routes->get('adduserlist', 'Manageuser::add');
 $routes->post('manageuser/save', 'Manageuser::save');
 $routes->get('manageuser/getUser/(:num)', 'Manageuser::getUser/$1');
@@ -70,14 +70,14 @@ $routes->post('customer/create', 'Customer::create');
 $routes->post('customer/get-address', 'Customer::get_address');
 $routes->get('customer/search', 'Customer::search');
 
-$routes->get('expense', 'Expense::index'); 
+$routes->get('expense', 'Expense::index');
 // $routes->get('addexpenselist', 'Expense::index'); 
-$routes->get('addexpense', 'Expense::create');              
+$routes->get('addexpense', 'Expense::create');
 $routes->get('addexpense/(:num)', 'Expense::create/$1');
 $routes->post('expense/store', 'Expense::store');
 $routes->post('expense/list', 'Expense::expenselistajax');
 $routes->post('expense/delete/(:num)', 'Expense::delete/$1');
-$routes->post('expense/delete', 'Expense::delete'); 
+$routes->post('expense/delete', 'Expense::delete');
 $routes->post('expense/getExpensesAjax', 'Expense::getExpensesAjax');
 $routes->get('expense/report', 'Expense::report');
 
@@ -110,20 +110,20 @@ $routes->post('customer/fetch', 'Customer::fetch');
 $routes->post('customer/create', 'Customer::create');
 $routes->post('customer/delete', 'Customer::delete');
 $routes->post('customer/get_address', 'Customer::get_address');
-$routes->get('customer/edit/(:num)', 'Customer::edit/$1'); 
+$routes->get('customer/edit/(:num)', 'Customer::edit/$1');
 $routes->get('customer/getCustomer/(:num)', 'Customer::getCustomer/$1');
 $routes->get('estimate/customer/(:num)', 'Estimate::viewByCustomer/$1');
-$routes->get('customer', 'Customer::index'); 
+$routes->get('customer', 'Customer::index');
 $routes->get('customer/get_discount/(:num)', 'Customer::get_discount/$1');
-
+$routes->post('customer/toggleBlock', 'Customer::toggleBlock');
 
 $routes->get('customerreport', 'CustomerReport::index');
 // In app/Config/Routes.php
 $routes->post('customerreport/getReport', 'CustomerReport::getReport');
 
 
-$routes->get('add_estimate', 'Estimate::add_estimate'); 
-$routes->post('estimate/save', 'Estimate::save'); 
+$routes->get('add_estimate', 'Estimate::add_estimate');
+$routes->post('estimate/save', 'Estimate::save');
 $routes->post('estimate/estimatelistajax', 'Estimate::estimatelistajax');
 $routes->post('estimate/delete', 'Estimate::delete');
 $routes->get('estimatelist', 'Estimate::estimatelist');
@@ -137,7 +137,7 @@ $routes->get('estimate/generateEstimate/(:segment)', 'Estimate::generateEstimate
 
 $routes->get('enquiry/list', 'Supplier::list');
 $routes->post('enquiry/fetch', 'Supplier::fetch');
-$routes->get('add_enquiry', 'Supplier::add_enquiry'); 
+$routes->get('add_enquiry', 'Supplier::add_enquiry');
 $routes->post('enquiry/saveEnquiry', 'Supplier::saveEnquiry');
 $routes->post('enquiry/delete', 'Supplier::delete');
 // $routes->post('supplier/get_address', 'Supplier::get_address');
@@ -161,10 +161,10 @@ $routes->get('order/add/(:num)', 'JobOrder::add/$1');
 $routes->post('invoice/save', 'Invoice::save');
 $routes->get('invoice/print/(:segment)', 'Invoice::print/$1');
 $routes->post('invoice/invoicelistajax', 'Invoice::invoicelistajax');
-$routes->get('invoice/edit/(:segment)', 'Invoice::edit/$1');      
+$routes->get('invoice/edit/(:segment)', 'Invoice::edit/$1');
 $routes->post('invoice/delete/(:segment)', 'Invoice::delete/$1');
 $routes->get('invoice/edit/(:num)', 'Invoice::edit/$1');
-$routes->post('invoice/save', 'Invoice::save'); 
+$routes->post('invoice/save', 'Invoice::save');
 // $routes->get('invoice/add/(:num)', 'Invoice::add/$1');
 $routes->get('invoice/convertFromEstimate/(:num)', 'Invoice::convertFromEstimate/$1');
 $routes->get('invoice/delivery_note/(:num)', 'Invoice::delivery_note/$1');
@@ -189,7 +189,7 @@ $routes->get('receiptvoucher/print/(:num)', 'ReceiptVoucher::index/$1');
 $routes->get('paymentvoucher/print/(:num)', 'PaymentVoucher::index/$1');
 
 
- 
+
 
 
 
@@ -203,6 +203,7 @@ $routes->post('user/logout', 'Api\Login::logout');
 // Enquiries
 $routes->post('enquiry/save', 'Api\Enquiry::saveEnquiry');
 $routes->get('enquiry/getAll', 'Api\Enquiry::getAllEnquiries');
+$routes->post('enquiry/markViewed', 'Api\Enquiry::markViewed');
 $routes->get('enquiry/get/(:num)', 'Api\Enquiry::getEnquiryById/$1');
 $routes->delete('enquiry/delete/(:num)', 'Api\Enquiry::deleteEnquiry/$1');
 $routes->delete('enquiry/deleteItem/(:num)', 'Api\Enquiry::deleteItem/$1');
@@ -229,3 +230,5 @@ $routes->post('upload-image', 'Api\Enquiry::uploadImage');
 
 
 $routes->get('estimate/generateEstimate/(:num)', 'Estimate::generateEstimate/$1');
+// Customer search
+$routes->get('api/customers/search', 'Api\Customer::search');

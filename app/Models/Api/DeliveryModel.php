@@ -14,13 +14,13 @@ class DeliveryModel extends Model
         'updated_at', 'updated_by'
     ];
 
-     public function getAllDeliveries($companyId, $limit = 10, $offset = 0, $search = null)
+    public function getAllDeliveries($companyId, $limit = 10, $offset = 0, $search = null)
     {
         $builder = $this->db->table($this->table . ' d');
         $builder->select("
             d.delivery_id, d.delivery_no, d.joborder_id, d.customer_id, d.total_amount,
             d.delivery_status, d.delivered_at, d.created_at,
-            c.name AS customer_name, c.address AS customer_address,
+            c.name AS customer_name, c.address AS customer_address,c.phone   AS customer_phone,
             jo.joborder_no
         ");
 
@@ -33,6 +33,7 @@ class DeliveryModel extends Model
             $builder->groupStart()
                 ->like('d.delivery_no', $search)
                 ->orLike('c.name', $search)
+                ->orLike('c.phone', $search)
                 ->orLike('jo.joborder_no', $search)
                 ->groupEnd();
         }

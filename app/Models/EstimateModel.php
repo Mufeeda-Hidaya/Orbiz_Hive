@@ -1,142 +1,148 @@
 <?php
 namespace App\Models;
+
 use CodeIgniter\Model;
 
 class EstimateModel extends Model
 {
     protected $table = 'estimates';
     protected $primaryKey = 'estimate_id';
+
     protected $allowedFields = [
-        'enquiry_id','customer_id','customer_address','discount','total_amount','sub_total',
-        'date','phone_number','is_converted','company_id','estimate_no','is_deleted'
+        'enquiry_id',
+        'user_id',
+        'customer_id',
+        'customer_address',
+        'phone_number',
+        'date',
+        'estimate_no',
+        'revision_no',
+        'revision_label',
+        'transportation_cost',
+        'discount',
+        'sub_total',
+        'total_amount',
+        'status',
+        'is_deleted',
+        'is_converted',
+        'created_at',
+        'created_by',
+        'updated_at',
+        'updated_by'
     ];
 
-    public function getLastEstimateNoByCompany($companyId)
+    /* ---------------- Estimate Number ---------------- */
+
+    public function getLastEstimateNo()
     {
-        $last = $this->where('company_id', $companyId)
-                     ->orderBy('estimate_no', 'DESC')
-                     ->first();
-        return $last ? intval($last['estimate_no']) : 0;
+        $last = $this->orderBy('estimate_no', 'DESC')->first();
+        return $last ? (int) $last['estimate_no'] : 0;
     }
+
+    /* ---------------- Insert ---------------- */
 
     public function insertEstimateWithItems($estimateData, $items)
     {
-        if (!isset($estimateData['estimate_no']) && isset($estimateData['company_id'])) {
-            $estimateData['estimate_no'] = $this->getLastEstimateNoByCompany($estimateData['company_id']) + 1;
+        if (!isset($estimateData['estimate_no'])) {
+            $estimateData['estimate_no'] = $this->getLastEstimateNo() + 1;
         }
 
+        $this->db->transStart();
+
         $estimateId = $this->insert($estimateData);
+
         $itemModel = new \App\Models\EstimateItemModel();
 
         foreach ($items as $index => $item) {
             $item['estimate_id'] = $estimateId;
-            if (!isset($item['item_order'])) $item['item_order'] = $index + 1;
+            $item['item_order'] = $item['item_order'] ?? ($index + 1);
             $itemModel->insert($item);
+        }
+
+        $this->db->transComplete();
+
+        if ($this->db->transStatus() === false) {
+            throw new \RuntimeException('Failed to insert estimate');
         }
 
         return $estimateId;
     }
 
+    /* ---------------- Update ---------------- */
+
     public function updateEstimateWithItems($estimateId, $estimateData, $items)
     {
         $this->update($estimateId, $estimateData);
+
         $itemModel = new \App\Models\EstimateItemModel();
         $itemModel->where('estimate_id', $estimateId)->delete();
 
         foreach ($items as $index => $item) {
             $item['estimate_id'] = $estimateId;
-            if (!isset($item['item_order'])) $item['item_order'] = $index + 1;
+            $item['item_order'] = $item['item_order'] ?? ($index + 1);
             $itemModel->insert($item);
         }
     }
-   
 
+    /* ---------------- Datatable Helpers ---------------- */
 
-
-    public function getEstimateCount($companyId = 1)
-{
-    $builder = $this->db->table('estimates')
-        ->join('customers', 'customers.customer_id = estimates.customer_id', 'left')
-        ->where('estimates.company_id', $companyId)
-        ->where('estimates.is_deleted', 0);
-
-    return $builder->get()->getNumRows();
-}
-
-public function getFilteredCount($searchValue, $companyId = 1)
-{
-    $searchValue = trim($searchValue);
-    $builder = $this->db->table('estimates')
-        ->join('customers', 'customers.customer_id = estimates.customer_id', 'left')
-        ->where('estimates.company_id', $companyId)
-        ->where('estimates.is_deleted', 0);
-
-    if (!empty($searchValue)) {
-        $normalizedSearch = str_replace(' ', '', strtolower($searchValue));
-
-        $builder->groupStart()
-            ->like('customers.name', $searchValue)
-            ->orLike('customers.address', $searchValue)
-            ->orLike('estimates.estimate_id', $searchValue)
-            ->orWhere("REPLACE(REPLACE(REPLACE(LOWER(customers.name), ' ', ''), '\n', ''), '\r', '') LIKE ?", ["%{$normalizedSearch}%"])
-            ->orWhere("REPLACE(REPLACE(REPLACE(LOWER(customers.address), ' ', ''), '\n', ''), '\r', '') LIKE ?", ["%{$normalizedSearch}%"])
-        ->groupEnd();
+    public function getEstimateCount()
+    {
+        return $this->db->table('estimates')
+            ->where('status', 1)
+            ->countAllResults();
     }
 
-    return $builder->get()->getNumRows();
-}
+    public function getFilteredCount($searchValue)
+    {
+        $builder = $this->db->table('estimates')
+            ->join('customers', 'customers.customer_id = estimates.customer_id', 'left')
+            ->where('estimates.status', 1);
 
+        if ($searchValue) {
+            $builder->groupStart()
+                ->like('customers.name', $searchValue)
+                ->orLike('customers.address', $searchValue)
+                ->orLike('estimates.estimate_no', $searchValue)
+                ->groupEnd();
+        }
 
-
-public function getFilteredEstimates($searchValue, $start, $length, $orderByColumn, $orderDir, $companyId)
-{
-    $searchValue = trim($searchValue); 
-
-    $builder = $this->db->table('estimates')
-        ->select('estimates.*, customers.name AS customer_name, customers.address AS customer_address')
-        ->join('customers', 'customers.customer_id = estimates.customer_id', 'left')
-        ->where('estimates.company_id', $companyId)
-        ->where('estimates.is_deleted', 0);
-
-    if (!empty($searchValue)) {
-        $normalizedSearch = str_replace(' ', '', strtolower($searchValue));
-
-        $builder->groupStart()
-            ->like('customers.name', $searchValue)
-            ->orLike('customers.address', $searchValue)
-            ->orLike('estimates.estimate_id', $searchValue)
-
-           ->orWhere("REPLACE(REPLACE(REPLACE(LOWER(customers.name), ' ', ''), '\n', ''), '\r', '') LIKE '%{$normalizedSearch}%'", null, false)
-        ->orWhere("REPLACE(REPLACE(REPLACE(LOWER(customers.address), ' ', ''), '\n', ''), '\r', '') LIKE '%{$normalizedSearch}%'", null, false)
-        ->groupEnd();
+        return $builder->countAllResults();
     }
 
-    $builder->orderBy($orderByColumn, $orderDir)
-            ->limit($length, $start);
+    public function getFilteredEstimates($searchValue, $start, $length, $orderBy, $dir)
+    {
+        $builder = $this->db->table('estimates')
+            ->select('estimates.*, customers.name customer_name, customers.address customer_address')
+            ->join('customers', 'customers.customer_id = estimates.customer_id', 'left')
+            ->where('estimates.status', 1);
 
-    return $builder->get()->getResultArray();
-}
+        if ($searchValue) {
+            $builder->groupStart()
+                ->like('customers.name', $searchValue)
+                ->orLike('customers.address', $searchValue)
+                ->orLike('estimates.estimate_no', $searchValue)
+                ->groupEnd();
+        }
 
-  public function getRecentEstimatesWithCustomer($limit = 5)
-{
-    $companyId = session()->get('company_id');
-    return $this->db->table('estimates')
-        ->select('estimates.*, customers.name AS customer_name, customers.address AS customer_address')
-        ->join('customers', 'customers.customer_id = estimates.customer_id', 'left')
-        ->where('estimates.company_id', $companyId)
-        ->where('estimates.is_deleted', 0)
-        ->orderBy('estimates.date', 'DESC')
-        ->limit($limit)
-        ->get()
-        ->getResultArray();
-}
+        return $builder
+            ->orderBy($orderBy, $dir)
+            ->limit($length, $start)
+            ->get()
+            ->getResultArray();
+    }
 
-public function getLastEstimateIdByCompany($companyId)
-{
-    return $this->select('estimate_id')
-                ->where('company_id', $companyId)
-                ->orderBy('estimate_no', 'DESC')
-                ->first();
-}
+    /* ---------------- Dashboard ---------------- */
 
+    public function getRecentEstimatesWithCustomer($limit = 5)
+    {
+        return $this->db->table('estimates')
+            ->select('estimates.*, customers.name customer_name')
+            ->join('customers', 'customers.customer_id = estimates.customer_id', 'left')
+            ->where('estimates.status', 1)
+            ->orderBy('estimates.date', 'DESC')
+            ->limit($limit)
+            ->get()
+            ->getResultArray();
+    }
 }

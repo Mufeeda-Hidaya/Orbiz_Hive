@@ -20,23 +20,6 @@ class Login extends BaseController
         $isAdminLogin = ($uri->getSegment(1) === 'admin');
 
         $data['isAdminLogin'] = $isAdminLogin;
-        $data['singleCompany'] = false;
-        $data['singleCompanyId'] = null;
-
-        if ($isAdminLogin) {
-            $companyModel = new Managecompany_Model();
-            $companies = $companyModel->where('company_status', 1)->findAll();
-
-            // Automatically pick the one company if exists
-            if (count($companies) === 1) {
-                $data['singleCompany'] = true;
-                $data['singleCompanyId'] = $companies[0]['company_id'];
-            }
-
-            $data['companies'] = $companies;
-        } else {
-            $data['companies'] = [];
-        }
 
         return view('login', $data);
     }
@@ -45,7 +28,6 @@ class Login extends BaseController
     {
         $email      = $this->request->getPost('email');
         $password   = $this->request->getPost('password');
-        $companyId  = $this->request->getPost('company_id');
         $loginMode  = $this->request->getPost('login_mode');
 
         if (!$email || !$password) {
@@ -79,15 +61,6 @@ class Login extends BaseController
             if ($result->role_id != 1) {
                 return $this->response->setJSON(['status' => 0, 'message' => 'Only Admins Can Log In Here']);
             }
-
-            // Auto-assign the single company if not passed from form
-            if (empty($companyId)) {
-                $companyModel = new Managecompany_Model();
-                $company = $companyModel->where('company_status', 1)->first();
-                $companyId = $company ? $company['company_id'] : null;
-            }
-
-            $result->company_id = $companyId;
         } else {
             // Normal user login
             if ($result->role_id == 1) {
@@ -107,7 +80,6 @@ class Login extends BaseController
             'allowed_menus' => $allowedMenus,
             'status'        => 1,
             'logged_in'     => true,
-            'company_id'    => $result->company_id,
             'user_status'   => $result->user_status
         ]);
 

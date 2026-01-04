@@ -7,11 +7,20 @@ class EnquiryItemModel extends Model
 {
     protected $table = 'enquiry_items';
     protected $primaryKey = 'item_id';
-    protected $allowedFields = ['enquiry_id','description','quantity', 'images', 'created_at','updated_at','status'];
+    protected $allowedFields = [
+        'enquiry_id',
+        'description',
+        'quantity',
+        'note',
+        'images',
+        'status',
+        'created_at',
+        'updated_at'
+    ];
 
     public function getItemsByEnquiryId($enquiryId)
     {
-        return $this->select('item_id, description, quantity, images')
+        return $this->select('item_id, description, quantity, note,images')
             ->where('enquiry_id', $enquiryId)
             ->where('status !=', 9)
             ->findAll();

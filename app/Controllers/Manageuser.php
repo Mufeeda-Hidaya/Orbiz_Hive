@@ -4,64 +4,63 @@ namespace App\Controllers;
 use App\Controllers\BaseController;
 use App\Models\Manageuser_Model;
 use App\Models\RoleModel;
-use App\Models\Managecompany_Model;
 
 class Manageuser extends BaseController
 {
     public function __construct()
     {
-       $session = \Config\Services::session();
+        $session = \Config\Services::session();
         if (!$session->get('logged_in')) {
             header('Location: ' . base_url('/'));
             exit;
         }
     }
-public function index($uid = null)
-{
-    $session = session();
-    $isEdit = !empty($uid);
+    public function index($uid = null)
+    {
+        $session = session();
+        $isEdit = !empty($uid);
 
-    $userModel           = new Manageuser_Model();
-    $roleModel           = new RoleModel();
-    $managecompany_Model = new Managecompany_Model();
+        $userModel = new Manageuser_Model();
+        $roleModel = new RoleModel();
 
-    $userData = $isEdit ? $userModel->find($uid) : [];
+        $userData = $isEdit ? $userModel->find($uid) : [];
 
-    $loggedInCompanyId = $session->get('company_id');
-    // fetch only roles for the logged-in company
-    $roles = $roleModel->where('company_id', $loggedInCompanyId)->findAll();
-    $companies = $managecompany_Model->where('company_id', $loggedInCompanyId)->findAll();
+        // $loggedInCompanyId = $session->get('company_id');
+        // fetch only roles for the logged-in company
+        $roles = $roleModel->findAll();
+        // $companies = $managecompany_Model->findAll();
 
-    return view('adduser', [
-        'uid'       => $uid,
-        'isEdit'    => $isEdit,
-        'userData'  => $userData,
-        'roles'     => $roles,
-        'companies' => $companies
-    ]);
-}
-    public function add(){
+        return view('adduser', [
+            'uid' => $uid,
+            'isEdit' => $isEdit,
+            'userData' => $userData,
+            'roles' => $roles,
+            // 'companies' => $companies
+        ]);
+    }
+    public function add()
+    {
         return view('adduserlist');
     }
     public function save()
     {
-        $model   = new Manageuser_Model();
-        $id      = $this->request->getPost('uid');
-        $name    = trim($this->request->getPost('name'));
-        $email   = trim($this->request->getPost('email'));
-        $phone   = trim($this->request->getPost('phonenumber'));
-        $pw      = trim($this->request->getPost('password'));
-        $confPw  = trim($this->request->getPost('confirm_password'));
-        $newPw   = trim($this->request->getPost('new_password'));
+        $model = new Manageuser_Model();
+        $id = $this->request->getPost('uid');
+        $name = trim($this->request->getPost('name'));
+        $email = trim($this->request->getPost('email'));
+        $phone = trim($this->request->getPost('phonenumber'));
+        $pw = trim($this->request->getPost('password'));
+        $confPw = trim($this->request->getPost('confirm_password'));
+        $newPw = trim($this->request->getPost('new_password'));
         $confNewPw = trim($this->request->getPost('confirm_new_password'));
-        $roleId  = $this->request->getPost('role_id');
+        $roleId = $this->request->getPost('role_id');
 
         $isEdit = !empty($id);
 
         // Mandatory fields
         if ($name === '' || $email === '' || (!$isEdit && $pw === '')) {
             return $this->response->setJSON([
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => 'Please Fill All Mandatory Fields.'
             ]);
         }
@@ -69,7 +68,7 @@ public function index($uid = null)
         // Email validation
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             return $this->response->setJSON([
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => 'Invalid email address.'
             ]);
         }
@@ -77,7 +76,7 @@ public function index($uid = null)
         // Role validation
         if (empty($roleId)) {
             return $this->response->setJSON([
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => 'Please Select A Role.'
             ]);
         }
@@ -86,13 +85,13 @@ public function index($uid = null)
         if (!$isEdit) {
             if (strlen($pw) < 6 || strlen($pw) > 15) {
                 return $this->response->setJSON([
-                    'status'  => 'error',
+                    'status' => 'error',
                     'message' => 'Password Must Be Between 6 And 15 Characters.'
                 ]);
             }
             if ($pw !== $confPw) {
                 return $this->response->setJSON([
-                    'status'  => 'error',
+                    'status' => 'error',
                     'message' => 'Password And Confirm Password Must Match.'
                 ]);
             }
@@ -102,24 +101,24 @@ public function index($uid = null)
         if ($isEdit && ($newPw !== '' || $confNewPw !== '')) {
             if (strlen($newPw) < 6 || strlen($newPw) > 15) {
                 return $this->response->setJSON([
-                    'status'  => 'error',
+                    'status' => 'error',
                     'message' => 'New Password Must Be Between 6 And 15 Characters.'
                 ]);
             }
             if ($newPw !== $confNewPw) {
                 return $this->response->setJSON([
-                    'status'  => 'error',
+                    'status' => 'error',
                     'message' => 'New Password And Confirm Password Must Match.'
                 ]);
             }
         }
 
         $data = [
-            'name'        => $name,
-            'email'       => $email,
+            'name' => $name,
+            'email' => $email,
             'phonenumber' => $phone,
-            'role_id'     => $roleId,
-            'company_id'  => 1
+            'role_id' => $roleId,
+            // 'company_id'  => 1
         ];
 
         if (!$isEdit && $pw !== '') {
@@ -130,19 +129,20 @@ public function index($uid = null)
 
         // Insert
         if (!$isEdit) {
+            $data['status'] = 1;
             $model->insert($data);
             return $this->response->setJSON([
-                'status'  => 'success',
+                'status' => 'success',
                 'message' => 'User Created Successfully.'
             ]);
         }
 
         // Update
         $existing = $model->find($id);
-        if (!$existing) {
+        if (!$existing || $existing['status'] == 9) {
             return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => 'User Not Found.'
+                'status' => 'error',
+                'message' => 'User Not Found or Deleted.'
             ]);
         }
 
@@ -156,14 +156,14 @@ public function index($uid = null)
 
         if ($unchanged) {
             return $this->response->setJSON([
-                'status'  => 'info',
+                'status' => 'info',
                 'message' => 'No Changes Detected.'
             ]);
         }
 
         $model->update($id, $data);
         return $this->response->setJSON([
-            'status'  => 'success',
+            'status' => 'success',
             'message' => 'User Updated Successfully.'
         ]);
     }
@@ -171,93 +171,105 @@ public function index($uid = null)
 
 
 
-public function userlistajax()
-{
-    $db = \Config\Database::connect();
-    $session = \Config\Services::session();
-    $roleId = $session->get('role_Id');
-    $companyId = $session->get('company_id');
+    public function userlistajax()
+    {
+        $db = \Config\Database::connect();
+        $session = \Config\Services::session();
+        $roleId = $session->get('role_Id');
+        // $companyId = $session->get('company_id');
 
-    $draw = $_POST['draw'] ?? 1;
-    $fromstart = $_POST['start'] ?? 0;
-    $tolimit = $_POST['length'] ?? 10;
-    $orderDir = $_POST['order'][0]['dir'] ?? 'desc';
-    $columnIndex = $_POST['order'][0]['column'] ?? 1;
-    $search = $_POST['search']['value'] ?? '';
-    $slno = $fromstart + 1;
+        $draw = $_POST['draw'] ?? 1;
+        $fromstart = $_POST['start'] ?? 0;
+        $tolimit = $_POST['length'] ?? 10;
+        $orderDir = $_POST['order'][0]['dir'] ?? 'desc';
+        $columnIndex = $_POST['order'][0]['column'] ?? 1;
+        $search = $_POST['search']['value'] ?? '';
+        $slno = $fromstart + 1;
 
-    $columnMap = [
-        0 => 'user_id',
-        1 => 'name',
-        2 => 'role_name',
-        3 => 'email',
-        4 => 'phonenumber',
-        5 => 'user_id'
-    ];
-    $orderColumn = $columnMap[$columnIndex] ?? 'user_id';
+        $columnMap = [
+            0 => 'user_id',
+            1 => 'name',
+            2 => 'role_name',
+            3 => 'email',
+            4 => 'phonenumber',
+            5 => 'user_id'
+        ];
+        $orderColumn = $columnMap[$columnIndex] ?? 'user_id';
 
-  $condition = "1=1";
-if (!empty($companyId)) {
-    $condition .= " AND user.company_id = " . (int)$companyId;
-}
+        $condition = "1=1";
+
+        // if (!empty($companyId)) {
+//     $condition .= " AND user.company_id = " . (int)$companyId;
+// }
 
 
-    // Search logic
-    $search = trim(preg_replace('/\s+/', ' ', $search));
-    if (!empty($search)) {
-        $normalizedSearch = str_replace(' ', '', strtolower($search));
-        $condition .= " AND (
+        // Search logic
+        $search = trim(preg_replace('/\s+/', ' ', $search));
+        if (!empty($search)) {
+            $normalizedSearch = str_replace(' ', '', strtolower($search));
+            $condition .= " AND (
             REPLACE(LOWER(user.name), ' ', '') LIKE '%$normalizedSearch%' OR
             REPLACE(LOWER(user.email), ' ', '') LIKE '%$normalizedSearch%' OR
             REPLACE(LOWER(user.phonenumber), ' ', '') LIKE '%$normalizedSearch%' OR
             REPLACE(LOWER(role_acces.role_name), ' ', '') LIKE '%$normalizedSearch%'
         )";
+        }
+
+        $userModel = new \App\Models\Manageuser_Model();
+        $users = $userModel->getAllFilteredRecords($condition, $fromstart, $tolimit, $orderColumn, $orderDir, $roleId);
+
+        $result = [];
+        if (!empty($users)) {
+            foreach ($users as $user) {
+                $result[] = [
+                    'slno' => $slno++,
+                    'user_id' => $user->user_id,
+                    'name' => $user->name,
+                    'role_name' => $user->role_name ?? '',
+                    'email' => $user->email,
+                    'phonenumber' => (isset($user->phonenumber) && trim($user->phonenumber) !== '')
+                        ? $user->phonenumber
+                        : 'N/A',
+                ];
+            }
+
+        }
+
+        // $totalCondition = ($roleId == 1) ? "1=1" : "user.company_id = " . (int)$companyId;
+        $totalCondition = "1=1";
+        $total = $userModel->getAllUserCount($totalCondition)->totuser ?? 0;
+        $filtered = $userModel->getFilterUserCount($condition);
+        $filteredTotal = isset($filtered->totuser) ? (int) $filtered->totuser : 0;
+
+        return $this->response->setJSON([
+            'draw' => intval($draw),
+            'recordsTotal' => $total,
+            'recordsFiltered' => $filteredTotal,
+            'data' => $result
+        ]);
     }
-
-    $userModel = new \App\Models\Manageuser_Model();
-    $users = $userModel->getAllFilteredRecords($condition, $fromstart, $tolimit, $orderColumn, $orderDir,$roleId);
-
-    $result = [];
-    if (!empty($users)){
-        foreach ($users as $user) {
-        $result[] = [
-            'slno'        => $slno++,
-            'user_id'     => $user->user_id,
-            'name'        => $user->name,
-            'role_name'   => $user->role_name ?? '',
-            'email'       => $user->email,
-             'phonenumber' => (isset($user->phonenumber) && trim($user->phonenumber) !== '') 
-                         ? $user->phonenumber 
-                         : 'N/A',
-        ];
-    }
-
-    }
-    
-    $totalCondition = ($roleId == 1) ? "1=1" : "user.company_id = " . (int)$companyId;
-    $total = $userModel->getAllUserCount($totalCondition)->totuser ?? 0;
-    $filtered = $userModel->getFilterUserCount($condition);
-    $filteredTotal = isset($filtered->totuser) ? (int) $filtered->totuser : 0;
-
-    return $this->response->setJSON([
-        'draw' => intval($draw),
-        'recordsTotal' => $total,
-        'recordsFiltered' => $filteredTotal,
-        'data' => $result
-    ]);
-}
-   public function delete()
+    public function delete()
     {
         $user_id = $this->request->getPost('user_id');
 
         if (!$user_id) {
-            return $this->response->setJSON(['status' => 'error', 'message' => 'User ID is missing']);
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'User ID is missing'
+            ]);
         }
 
         $userModel = new Manageuser_Model();
-        $userModel->delete($user_id);
 
-        return $this->response->setJSON(['status' => 'success']);
+        $userModel->update($user_id, [
+            'status' => 9
+        ]);
+
+        return $this->response->setJSON([
+            'status' => 'success',
+            'message' => 'User deleted successfully'
+        ]);
     }
+
 }
 

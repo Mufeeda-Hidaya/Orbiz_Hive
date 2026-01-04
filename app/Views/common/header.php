@@ -1,17 +1,3 @@
-<?php
-$session = session();
-$company_id = $session->get('company_id') ?? null; 
-$user_id = $session->get('user_id') ?? null;       
-
-if (!$company_id) {
-    $company_id = 1; 
-}
-$company = [];
-if ($company_id) {
-    $companyModel = new \App\Models\Managecompany_Model();
-    $company = $companyModel->find($company_id);
-}
-?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -166,9 +152,19 @@ if ($company_id) {
             <a class="nav-link <?= strpos(uri_string(), 'orderlist') !== false ? 'active' : '' ?>"
               href="<?= base_url('orderlist') ?>">
               <i class="mdi mdi-receipt menu-icon"></i>
-              <span class="menu-title">Job Order</span>
+              <span class="menu-title">Production</span>
             </a>
           </li>
+        <?php endif; ?>
+        <?php if (in_array('invoices', $allowedMenus)): ?>
+          <li class="nav-item">
+            <a class="nav-link <?= strpos(uri_string(), 'orderlist') !== false ? 'active' : '' ?>"
+              href="<?= base_url('orderlist') ?>">
+              <i class="mdi mdi-truck menu-icon"></i>
+              <span class="menu-title">Delivery</span>
+            </a>
+          </li>
+          
         <?php endif; ?>
         <!-- <?php if (in_array('customer', $allowedMenus)): ?>
           <li class="nav-item">

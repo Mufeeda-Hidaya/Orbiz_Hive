@@ -65,18 +65,7 @@
                   <i class="mdi mdi-eye-off position-absolute" id="togglePassword"
                     style="top: 50%; right: 15px; transform: translateY(-50%); cursor: pointer;"></i>
                 </div>
-                <!-- <?php if (!empty($isAdminLogin) && $isAdminLogin): ?>
-                  <div class="form-group mt-2">
-                    <select name="company_id" class="form-control form-control-lg px-4" required>
-                      <option value=""> Select Company </option>
-                      <?php foreach ($companies as $company): ?>
-                          <option value="<?= $company['company_id'] ?>">
-                              <?= esc(ucwords(strtolower($company['company_name']))) ?>
-                          </option>
-                      <?php endforeach; ?>
-                  </select>
-                  </div>
-                <?php endif; ?> -->
+               
 
                 <div class="mt-3 d-grid gap-2">
                   <button type="button"

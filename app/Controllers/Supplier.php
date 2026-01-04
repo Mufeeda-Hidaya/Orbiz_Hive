@@ -20,197 +20,260 @@ class Supplier extends BaseController
 
     // Create or Update 
     public function add_enquiry($id = null)
-{
-    $customerModel = new CustomerModel();
-    $enquiryModel = new SupplierModel();
-    $enquiryItemModel = new EnquiryItemModel();
+    {
+        $customerModel = new CustomerModel();
+        $enquiryModel = new SupplierModel();
+        $enquiryItemModel = new EnquiryItemModel();
 
-    $companyId = 1;
+        $data['customers'] = $customerModel
+            ->where('status', 1)
+            ->orderBy('customer_id', 'DESC')
+            ->findAll();
 
-    // Load all customers
-    $data['customers'] = $customerModel
-        ->where('is_deleted', 0)
-        ->where('company_id', $companyId)
-        ->orderBy('customer_id', 'DESC')
-        ->findAll();
+        $data['enquiry'] = null;
+        $data['items'] = [];
+        $data['note'] = ''; // special note
 
-    $data['enquiry'] = null;
-    $data['items'] = [];
+        if ($id) {
+            $data['enquiry'] = $enquiryModel->find($id);
 
-    if ($id) {
-        // Load enquiry
-        $data['enquiry'] = $enquiryModel->where('is_deleted', 0)->find($id);
+            // Load enquiry items WITH note and images
+            $data['items'] = $enquiryItemModel->getItemsByEnquiryId($id);
 
-        // Load items
-        $data['items'] = $enquiryItemModel->where('enquiry_id', $id)->findAll();
+            // Get note from first item (all items have the same note)
+            if (!empty($data['items'])) {
+                $data['note'] = $data['items'][0]['note'] ?? '';
+            }
+        }
+
+        return view('add_enquiry', $data);
     }
 
-    return view('add_enquiry', $data);
-}
+    // public function saveEnquiry()
+    // {
+    //     $db = \Config\Database::connect();
+    //     $db->transBegin();
+
+    //     $enquiryModel = new SupplierModel();
+    //     $enquiryItemModel = new EnquiryItemModel();
+    //     $customerModel = new CustomerModel();
+
+    //     $customerId = $this->request->getPost('customer_id');
+    //     $address = trim($this->request->getPost('customer_address'));
+    //     $descriptions = $this->request->getPost('description');
+    //     $quantities = $this->request->getPost('quantity');
+    //     $note = $this->request->getPost('note'); // single note
+    //     $files = $this->request->getFiles();
+
+    //     if (empty($customerId) || empty($address)) {
+    //         return $this->response->setJSON([
+    //             'status' => 'error',
+    //             'message' => 'Please fill all required fields.'
+    //         ]);
+    //     }
+
+    //     $customer = $customerModel->find($customerId);
+    //     if (!$customer) {
+    //         return $this->response->setJSON([
+    //             'status' => 'error',
+    //             'message' => 'Customer not found.'
+    //         ]);
+    //     }
+
+    //     $userId = session()->get('user_id') ?? 1;
+
+    //     // Generate enquiry no
+    //     $last = $enquiryModel->orderBy('enquiry_id', 'DESC')->first();
+    //     $next = $last ? ((int) str_replace('OBENQ', '', $last['enquiry_no']) + 1) : 1;
+    //     $enquiryNo = 'OBENQ' . str_pad($next, 3, '0', STR_PAD_LEFT);
+
+    //     // Insert enquiry
+    //     $enquiryId = $enquiryModel->insert([
+    //         'enquiry_no' => $enquiryNo,
+    //         'customer_id' => $customerId,
+    //         'name' => $customer['name'],
+    //         'address' => $address,
+    //         'phone' => $customer['phone'],
+    //         'user_id' => $userId,
+    //         'status' => 1,
+    //         'created_by' => $userId,
+    //         'note' => $note // save note in enquiry table
+    //     ]);
+
+    //     if (!$enquiryId) {
+    //         $db->transRollback();
+    //         return $this->response->setJSON([
+    //             'status' => 'error',
+    //             'message' => 'Failed to create enquiry'
+    //         ]);
+    //     }
+
+    //     // Insert enquiry items
+    //     foreach ($descriptions as $key => $desc) {
+
+    //         $desc = trim($desc);
+    //         $qty = (int) ($quantities[$key] ?? 0);
+
+    //         if ($desc === '' || $qty <= 0)
+    //             continue;
+
+    //         $itemImages = [];
+
+    //         // handle multiple images per item
+    //         if (isset($files['item_images'][$key]) && is_array($files['item_images'][$key])) {
+    //             foreach ($files['item_images'][$key] as $file) {
+    //                 if ($file instanceof \CodeIgniter\HTTP\Files\UploadedFile && $file->isValid() && !$file->hasMoved()) {
+    //                     $newName = $file->getRandomName();
+    //                     $file->move(FCPATH . 'uploads/enquiry', $newName);
+    //                     $itemImages[] = $newName; // store only filenames
+    //                 }
+    //             }
+    //         }
+
+    //         $insertData = [
+    //             'enquiry_id' => $enquiryId,
+    //             'description' => $desc,
+    //             'quantity' => $qty,
+    //             'note' => $note, // same note for all items
+    //             'images' => !empty($itemImages) ? json_encode($itemImages) : null,
+    //             'status' => 1,
+    //             'created_at' => date('Y-m-d H:i:s'),
+    //             'updated_at' => date('Y-m-d H:i:s')
+    //         ];
+
+    //         $enquiryItemModel->insert($insertData);
+    //     }
+
+    //     $db->transCommit();
+
+    //     return $this->response->setJSON([
+    //         'status' => 'success',
+    //         'message' => 'Enquiry generated successfully',
+    //         'enquiry_id' => $enquiryId,
+    //         'enquiry_no' => $enquiryNo,
+    //         'note' => $note,
+    //         'images' => isset($itemImages) ? json_encode($itemImages) : null,
+    //     ]);
+    // }
+
 
 
     public function saveEnquiry()
-{
-    $enquiryModel     = new SupplierModel();
-    $enquiryItemModel = new EnquiryItemModel();
-    $customerModel    = new CustomerModel();
+    {
+        $db = \Config\Database::connect();
+        $db->transBegin();
 
-    $enquiryId   = $this->request->getPost('enquiry_id');
-    $customerId  = $this->request->getPost('customer_id');
-    $address     = trim($this->request->getPost('customer_address'));
-    $descriptions = $this->request->getPost('description');
-    $quantities   = $this->request->getPost('quantity');
+        $enquiryModel = new SupplierModel();
+        $enquiryItemModel = new EnquiryItemModel();
+        $customerModel = new CustomerModel();
 
-    // -------------------------
-    // 1. Validate inputs
-    // -------------------------
-    if (empty($customerId) || empty($address)) {
-        return $this->response->setJSON([
-            'status' => 'error',
-            'message' => 'Please fill all required fields.'
-        ]);
-    }
+        $enquiryId = $this->request->getPost('enquiry_id'); // check if editing
+        $customerId = $this->request->getPost('customer_id');
+        $address = trim($this->request->getPost('customer_address'));
+        $descriptions = $this->request->getPost('description');
+        $quantities = $this->request->getPost('quantity');
+        $note = $this->request->getPost('note');
+        $files = $this->request->getFiles();
 
-    $validItems = 0;
-    foreach ($descriptions as $key => $desc) {
-        $desc = trim($desc);
-        $qty  = floatval($quantities[$key] ?? 0);
-        if ($desc !== '' && $qty > 0) {
-            $validItems++;
-        }
-    }
-    if ($validItems === 0) {
-        return $this->response->setJSON([
-            'status' => 'error',
-            'message' => 'Please add at least one item with description and quantity.'
-        ]);
-    }
-
-    // -------------------------
-    // 2. Fetch customer details
-    // -------------------------
-    $customer = $customerModel->find($customerId);
-    if (!$customer) {
-        return $this->response->setJSON(['status' => 'error', 'message' => 'Customer not found.']);
-    }
-
-    $name     = $customer['name'];
-    $phone    = $customer['phone'];
-    $userId   = session()->get('user_id') ?? 1;
-    $companyId = 1;
-
-    // -------------------------
-    // 3. Prepare enquiry data
-    // -------------------------
-    $enquiryData = [
-        'customer_id' => $customerId,
-        'name'        => $name,
-        'address'     => $address,
-        'phone'       => $phone,
-        'user_id'     => $userId,
-        'company_id'  => $companyId,
-        'is_deleted'  => 0,
-        'created_by'  => $userId,
-        'created_at'  => date('Y-m-d H:i:s'),
-    ];
-
-    // -------------------------
-    // 4. Update existing enquiry
-    // -------------------------
-    if (!empty($enquiryId)) {
-        $existing = $enquiryModel->find($enquiryId);
-        if (!$existing) {
+        if (empty($customerId) || empty($address)) {
             return $this->response->setJSON([
                 'status' => 'error',
-                'message' => 'Enquiry not found.'
+                'message' => 'Please fill all required fields.'
             ]);
         }
 
-        $hasChanges = (
-            $existing['customer_id'] != $customerId ||
-            $existing['address'] !== $address
-        );
+        $customer = $customerModel->find($customerId);
+        if (!$customer) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Customer not found.'
+            ]);
+        }
 
-        if ($hasChanges) {
-            $enquiryData['updated_by'] = $userId;
-            $enquiryData['updated_at'] = date('Y-m-d H:i:s');
+        $userId = session()->get('user_id') ?? 1;
+        $isEdit = !empty($enquiryId);
+        // EDIT MODE
+        if ($enquiryId) {
+            $enquiryModel->update($enquiryId, [
+                'customer_id' => $customerId,
+                'name' => $customer['name'],
+                'address' => $address,
+                'phone' => $customer['phone'],
+                'note' => $note,
+                'updated_by' => $userId,
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
 
-            $enquiryModel->update($enquiryId, $enquiryData);
-
-            // Delete and reinsert items
+            // Delete old items (or soft delete)
             $enquiryItemModel->where('enquiry_id', $enquiryId)->delete();
-            foreach ($descriptions as $key => $desc) {
-                $desc = trim($desc);
-                $qty  = floatval($quantities[$key] ?? 0);
-                if ($desc !== '' && $qty > 0) {
-                    $enquiryItemModel->insert([
-                        'enquiry_id' => $enquiryId,
-                        'description'=> $desc,
-                        'quantity'   => $qty,
-                        'created_at' => date('Y-m-d H:i:s')
-                    ]);
+        } else {
+            // NEW MODE
+            $last = $enquiryModel->orderBy('enquiry_id', 'DESC')->first();
+            $next = $last ? ((int) str_replace('OBENQ', '', $last['enquiry_no']) + 1) : 1;
+            $enquiryNo = 'OBENQ' . str_pad($next, 3, '0', STR_PAD_LEFT);
+
+            $enquiryId = $enquiryModel->insert([
+                'enquiry_no' => $enquiryNo,
+                'customer_id' => $customerId,
+                'name' => $customer['name'],
+                'address' => $address,
+                'phone' => $customer['phone'],
+                'user_id' => $userId,
+                'status' => 1,
+                'created_by' => $userId,
+                'note' => $note
+            ]);
+        }
+
+        // Insert items
+        foreach ($descriptions as $key => $desc) {
+            $desc = trim($desc);
+            $qty = (int) ($quantities[$key] ?? 0);
+            if ($desc === '' || $qty <= 0)
+                continue;
+
+            $imageName = null;
+
+            // Single image per item
+            if (isset($files['item_image'][$key])) {
+                $file = $files['item_image'][$key];
+                if ($file instanceof \CodeIgniter\HTTP\Files\UploadedFile && $file->isValid() && !$file->hasMoved()) {
+                    $imageName = $file->getRandomName();
+                    $file->move(FCPATH . 'uploads/enquiry', $imageName);
                 }
             }
 
-            return $this->response->setJSON([
-                'status' => 'success',
-                'message' => 'Enquiry updated successfully.',
-                'enquiry_id' => $enquiryId
-            ]);
-        } else {
-            return $this->response->setJSON([
-                'status' => 'nochange',
-                'message' => 'No changes detected.',
-                'enquiry_id' => $enquiryId
-            ]);
-        }
-    }
-
-    // -------------------------
-    // 5. New enquiry — Generate enquiry number
-    // -------------------------
-    $lastEnquiry = $enquiryModel
-        ->where('company_id', $companyId)
-        ->orderBy('enquiry_no', 'DESC')
-        ->first();
-
-    $nextEnquiryNo = $lastEnquiry ? $lastEnquiry['enquiry_no'] + 1 : 1;
-    $enquiryData['enquiry_no'] = $nextEnquiryNo;
-
-    // Insert new enquiry
-    $enquiryId = $enquiryModel->insert($enquiryData);
-
-    // Insert enquiry items
-    foreach ($descriptions as $key => $desc) {
-        $desc = trim($desc);
-        $qty  = floatval($quantities[$key] ?? 0);
-        if ($desc !== '' && $qty > 0) {
             $enquiryItemModel->insert([
                 'enquiry_id' => $enquiryId,
-                'description'=> $desc,
-                'quantity'   => $qty,
-                'created_at' => date('Y-m-d H:i:s')
+                'description' => $desc,
+                'quantity' => $qty,
+                'note' => $note,
+                'images' => $imageName, // only single image
+                'status' => 1,
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s')
             ]);
         }
+
+        $db->transCommit();
+
+        return $this->response->setJSON([
+            'status' => 'success',
+            'message' => $isEdit
+                ? 'Enquiry updated successfully'
+                : 'Enquiry created successfully',
+            'enquiry_id' => $enquiryId,
+            'note' => $note
+        ]);
+
     }
-
-    return $this->response->setJSON([
-        'status' => 'success',
-        'message' => 'Enquiry generated successfully.',
-        'enquiry_id' => $enquiryId,
-        'enquiry_no' => $nextEnquiryNo
-    ]);
-}
-
-
-
 
 
     // List all enquiries (basic)
     public function list()
     {
         $SupplierModel = new SupplierModel();
-        $data['enquiries'] = $SupplierModel->where('is_deleted', 0)->findAll();
+        $data['enquiries'] = $SupplierModel->where('status', 0)->findAll();
         return view('supplierlist', $data);
     }
 
@@ -231,8 +294,10 @@ class Supplier extends BaseController
 
         $columnMap = [
             0 => 'enquiry_id',
-            1 => 'name',
-            2 => 'address'
+            1 => 'enquiry_no',
+            2 => 'name',
+            3 => 'address',
+            4 => 'created_at'
         ];
         $orderColumn = $columnMap[$columnIndex] ?? 'enquiry_id';
 
@@ -244,23 +309,25 @@ class Supplier extends BaseController
 
         foreach ($enquiries as $row) {
             $result[] = [
-                'slno'       => $slno++,
+                'slno' => $slno++,
                 'enquiry_id' => $row['enquiry_id'],
-                'name'       => ucwords(strtolower($row['name'] ?? '')),
-                'address'    => ucwords(strtolower($row['address'] ?? '')),
-                'is_converted' => $row['is_converted'] ?? 0,
+                'enquiry_no' => $row['enquiry_no'],
+                'name' => ucwords(strtolower($row['name'] ?? '')),
+                'address' => ucwords(strtolower($row['address'] ?? '')),
+                'status' => $row['status'],
+                'enquiry_date' => date('Y-m-d', strtotime($row['created_at'])),
             ];
         }
 
         // Get count
         $filteredTotal = $model->getFilteredSupplierCount($search);
-        $totalRecords = $model->where('is_deleted', 0)->countAllResults();
+        $totalRecords = $model->where('status', 0)->countAllResults();
 
         return $this->response->setJSON([
-            'draw'            => intval($draw),
-            'recordsTotal'    => $totalRecords,
+            'draw' => intval($draw),
+            'recordsTotal' => $totalRecords,
             'recordsFiltered' => $filteredTotal,
-            'data'            => $result
+            'data' => $result
         ]);
     }
 
@@ -276,7 +343,7 @@ class Supplier extends BaseController
         $id = $this->request->getPost('id');
         $model = new SupplierModel();
 
-        if ($model->update($id, ['is_deleted' => 1])) {
+        if ($model->update($id, ['status' => 9])) {
             return $this->response->setJSON(['status' => 'success', 'message' => 'Enquiry Deleted Successfully']);
         }
         return $this->response->setJSON(['status' => 'error', 'message' => 'Failed to Delete Enquiry']);
@@ -286,41 +353,56 @@ class Supplier extends BaseController
     {
         $supplierModel = new SupplierModel();
 
-        // Check if enquiry exists
         $enquiry = $supplierModel->find($id);
         if (!$enquiry) {
-            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Enquiry not found");
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('Enquiry not found');
         }
 
-        // Mark enquiry as converted
-        $supplierModel->update($id, ['is_converted' => 1]);
+        // Safety check
+        if ($enquiry['status'] != 3) {
+            return redirect()->back()->with('error', 'Enquiry not converted yet');
+        }
 
-        // Redirect to estimate creation page with enquiry_id
-        return redirect()->to(base_url('estimate/add_estimate?enquiry_id=' . $id));
+        return redirect()->to(
+            base_url('estimate/add_estimate?enquiry_id=' . $id)
+        );
     }
+
 
     public function markConverted()
     {
-        $id = $this->request->getPost('enquiry_id');
-        $model = new SupplierModel();
+        $enquiryId = $this->request->getPost('enquiry_id');
 
-        if (!$id) {
+        if (!$enquiryId) {
             return $this->response->setJSON([
                 'status' => 'error',
-                'message' => 'Invalid enquiry ID.'
+                'message' => 'Invalid enquiry ID'
             ]);
         }
 
-        if ($model->update($id, ['is_converted' => 1])) {
+        $supplierModel = new SupplierModel();
+        $enquiry = $supplierModel->find($enquiryId);
+
+        if (!$enquiry) {
             return $this->response->setJSON([
-                'status' => 'success',
-                'message' => 'Enquiry marked as converted.'
+                'status' => 'error',
+                'message' => 'Enquiry not found'
             ]);
         }
+
+        if ($enquiry['status'] == 3) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Enquiry already converted'
+            ]);
+        }
+
+        $supplierModel->update($enquiryId, [
+            'status' => 3 // Converted
+        ]);
 
         return $this->response->setJSON([
-            'status' => 'error',
-            'message' => 'Failed to update enquiry.'
+            'status' => 'success'
         ]);
     }
 

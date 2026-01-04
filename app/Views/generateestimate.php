@@ -275,9 +275,7 @@
         </div>
         <div class="footer-f">
           If you have any queries about this estimate, please contact<br>
-          (<?= esc($company['company_name']) ?>,
-          <?= esc($company['email']) ?>,
-          <?= esc($company['phone']) ?>)<br>
+           <?= esc($user_name ?? '') ?>, <?= esc($role_name ?? '') ?> <br>
           <strong>Thank You For Your Business!</strong>
         </div>
       </div>

@@ -1,5 +1,4 @@
-
-<?php include "common/header.php";?>
+<?php include "common/header.php"; ?>
 <div class="form-control mb-3 right_container">
     <div class="alert d-none text-center position-fixed" role="alert"></div>
 
@@ -66,11 +65,14 @@
             paging: true,
             processing: true,
             serverSide: true,
-            
+
             order: [[6, 'desc']],
             columnDefs: [
                 { searchable: false, orderable: false, targets: [0, 4, 5] }
             ],
+            language: {
+                infoFiltered: ""   // removes "(filtered from X total entries)"
+            },
             dom: "<'row mb-3'<'col-sm-6'l><'col-sm-6'f>>" +
                 "<'row'<'col-sm-12'tr>>" +
                 "<'row mt-3'<'col-sm-5'i><'col-sm-7'p>>",
