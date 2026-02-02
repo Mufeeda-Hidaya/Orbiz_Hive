@@ -178,7 +178,7 @@ $(document).on('click', '.toggle-password', function () {
 
         // Mandatory fields
         if (!name || !email || !roleId || (isNew && (!pw || !confPw))) {
-            showAlert('Please Fill All Mandatory Fields <span class="text-danger">*</span>.', 'danger');
+            showAlert('Please Fill In All Mandatory Fields <span class="text-danger">*</span>.', 'danger');
             return btn.prop('disabled', false);
         }
 

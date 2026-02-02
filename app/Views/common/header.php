@@ -78,6 +78,7 @@ $user_id = $session->get('user_id') ?? null;
     $allowedMenus = $session->get('allowed_menus') ?? [];
     $uri = service('uri');
     ?>
+    
     <?php $currentPath = uri_string(); ?>
     <nav class="sidebar sidebar-offcanvas" id="sidebar">
       <ul class="nav">
@@ -162,7 +163,7 @@ $user_id = $session->get('user_id') ?? null;
             </a>
           </li>
         <?php endif; ?>
-        <?php if (in_array('invoices', $allowedMenus)): ?>
+        <?php if (in_array('invoice', $allowedMenus)): ?>
           <li class="nav-item">
             <a class="nav-link <?= strpos(uri_string(), 'orderlist') !== false ? 'active' : '' ?>"
               href="<?= base_url('orderlist') ?>">

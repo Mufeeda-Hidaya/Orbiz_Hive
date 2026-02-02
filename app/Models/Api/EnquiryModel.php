@@ -45,7 +45,7 @@ class EnquiryModel extends Model
         ')
             ->join('customers', 'customers.customer_id = enquiries.customer_id', 'left')
 
-            // ✅ JOIN LATEST HISTORY PER ENQUIRY
+            // JOIN LATEST HISTORY PER ENQUIRY
             ->join(
                 '(SELECT enquiry_id, MAX(revision_no) AS max_revision 
               FROM enquiries_history 

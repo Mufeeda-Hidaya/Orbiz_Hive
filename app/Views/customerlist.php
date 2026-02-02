@@ -349,24 +349,24 @@
 
 
         $('#confirm-block-btn').click(function () {
-    if (!blockId) return;
+            if (!blockId) return;
 
-    $.post("<?= base_url('customer/toggleBlock') ?>", { id: blockId }, function (res) {
-        if (res.status === 'success') {
-            showAlert('success', res.message);
-            table.ajax.reload(null, false);
-        } else {
-            showAlert('danger', res.message);
-        }
-        blockModal.hide();
-        blockId = null;
-    }, 'json');
-});
+            $.post("<?= base_url('customer/toggleBlock') ?>", { id: blockId }, function (res) {
+                if (res.status === 'success') {
+                    showAlert('success', res.message);
+                    table.ajax.reload(null, false);
+                } else {
+                    showAlert('danger', res.message);
+                }
+                blockModal.hide();
+                blockId = null;
+            }, 'json');
+        });
 
-$(document).on('click', '.toggle-block', function () {
-    blockId = $(this).data('id');
-    blockModal.show();
-});
+        $(document).on('click', '.toggle-block', function () {
+            blockId = $(this).data('id');
+            blockModal.show();
+        });
 
 
 

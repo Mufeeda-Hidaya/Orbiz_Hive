@@ -62,7 +62,7 @@ public function index($uid = null)
         if ($name === '' || $email === '' || (!$isEdit && $pw === '')) {
             return $this->response->setJSON([
                 'status'  => 'error',
-                'message' => 'Please Fill All Mandatory Fields.'
+                'message' => 'Please Fill In All Mandatory Fields.'
             ]);
         }
 

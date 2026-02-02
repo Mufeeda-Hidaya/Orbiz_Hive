@@ -89,6 +89,9 @@
                     <label class="mt-3"><strong>Customer Address</strong><span class="text-danger">*</span></label>
                     <textarea name="customer_address" id="customer_address" class="form-control"
                         rows="3"><?= isset($enquiry['address']) ? trim($enquiry['address']) : '' ?></textarea>
+                    <label class="mt-3"><strong>Customer Address</strong><span class="text-danger">*</span></label>
+                    <textarea name="customer_address" id="customer_address" class="form-control"
+                        rows="3"><?= isset($enquiry['address']) ? trim($enquiry['address']) : '' ?></textarea>
 
                     <div class="phone pt-3">
                         <label class="mt-md-0 mt-3"><strong>Contact Number</strong><span
